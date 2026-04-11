@@ -1,0 +1,2829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KNX GA Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens ─────────────────────────────────────────────────────── */
+    :root {
+      --teal-50:  #f0fdfa;
+      --teal-100: #ccfbf1;
+      --teal-200: #99f6e4;
+      --teal-300: #5eead4;
+      --teal-400: #2dd4bf;
+      --teal-500: #14b8a6;
+      --teal-600: #0d9488;
+      --teal-700: #0f766e;
+      --teal-800: #115e59;
+      --teal-900: #134e4a;
+
+      --gray-50:  #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+
+      --accent:   var(--teal-600);
+      --accent-h: var(--teal-700);
+      --accent-l: var(--teal-50);
+
+      --font-sans: 'DM Sans', system-ui, sans-serif;
+      --font-mono: 'DM Mono', monospace;
+
+      --radius-sm: 6px;
+      --radius:    10px;
+      --radius-lg: 16px;
+
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+      --shadow:    0 2px 8px rgba(0,0,0,.10);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,.12);
+
+      --header-h:  60px;
+      --sidebar-w: 280px;
+      --bottom-h:  64px;
+      --step-h:    52px;
+    }
+
+    /* ── Reset ─────────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--gray-800);
+      background: var(--gray-50);
+      overflow: hidden;
+    }
+    button { cursor: pointer; font-family: inherit; }
+    input, select, textarea { font-family: inherit; font-size: inherit; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── App shell ──────────────────────────────────────────────────────────── */
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────────── */
+    #header {
+      height: var(--header-h);
+      background: var(--gray-900);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 16px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.3px;
+    }
+    .header-brand .logo-knx {
+      background: var(--teal-500);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 3px 7px;
+      border-radius: 4px;
+    }
+    .header-sep { flex: 1; }
+    .header-project {
+      font-size: 13px;
+      color: var(--gray-300);
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .header-project span {
+      color: #fff;
+      font-weight: 500;
+      margin-left: 4px;
+    }
+    .btn-lang {
+      background: transparent;
+      border: 1px solid var(--gray-600);
+      color: var(--gray-300);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all .15s;
+    }
+    .btn-lang:hover {
+      border-color: var(--teal-400);
+      color: var(--teal-300);
+    }
+
+    /* ── Step bar ───────────────────────────────────────────────────────────── */
+    #stepbar {
+      height: var(--step-h);
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 4px;
+      flex-shrink: 0;
+      overflow-x: auto;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-400);
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+      border: none;
+      background: transparent;
+    }
+    .step-item:hover { color: var(--gray-700); background: var(--gray-100); }
+    .step-item.active { color: var(--accent); background: var(--teal-50); }
+    .step-item.done { color: var(--gray-600); }
+    .step-item.done:hover { color: var(--gray-800); }
+    .step-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--gray-200);
+      color: var(--gray-500);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-item.active .step-num {
+      background: var(--accent);
+      color: #fff;
+    }
+    .step-item.done .step-num {
+      background: var(--teal-100);
+      color: var(--teal-700);
+    }
+    .step-arrow {
+      color: var(--gray-300);
+      font-size: 12px;
+      user-select: none;
+    }
+
+    /* ── Workspace ──────────────────────────────────────────────────────────── */
+    #workspace {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ────────────────────────────────────────────────────────────── */
+    #sidebar {
+      width: var(--sidebar-w);
+      background: #fff;
+      border-right: 1px solid var(--gray-200);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .sidebar-section {
+      padding: 16px;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .sidebar-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--gray-400);
+      margin-bottom: 10px;
+    }
+    .sidebar-summary-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--gray-600);
+      padding: 3px 0;
+    }
+    .sidebar-summary-row strong { color: var(--gray-800); }
+    .sidebar-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stat-val {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--teal-600);
+    }
+    .stat-label { font-size: 12px; color: var(--gray-500); }
+
+    /* ── Main panel ─────────────────────────────────────────────────────────── */
+    #panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── Bottom bar ─────────────────────────────────────────────────────────── */
+    #bottombar {
+      height: var(--bottom-h);
+      background: #fff;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+
+    /* ── Buttons ────────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      transition: all .15s;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--accent-h); }
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-700);
+      border: 1px solid var(--gray-200);
+    }
+    .btn-secondary:hover { background: var(--gray-200); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--gray-600);
+      border: 1px solid transparent;
+    }
+    .btn-ghost:hover { background: var(--gray-100); border-color: var(--gray-200); }
+    .btn-danger {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    .btn-danger:hover { background: #fecaca; }
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+    .btn-xs { padding: 3px 8px; font-size: 11px; }
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+    .btn-icon {
+      background: transparent;
+      border: none;
+      color: var(--gray-400);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+    }
+    .btn-icon:hover { color: var(--gray-700); background: var(--gray-100); }
+    .btn-icon.danger:hover { color: #dc2626; background: #fee2e2; }
+
+    /* ── Cards ──────────────────────────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-800);
+    }
+    .card.selected {
+      border-color: var(--accent);
+      background: var(--teal-50);
+    }
+
+    /* ── Chips ──────────────────────────────────────────────────────────────── */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--gray-200);
+      background: var(--gray-50);
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all .15s;
+      user-select: none;
+    }
+    .chip:hover { border-color: var(--teal-300); color: var(--teal-700); }
+    .chip.active {
+      background: var(--teal-100);
+      border-color: var(--teal-400);
+      color: var(--teal-800);
+    }
+    .chip-remove {
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+      opacity: .6;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .chip-remove:hover { opacity: 1; }
+
+    /* ── Inputs ─────────────────────────────────────────────────────────────── */
+    .input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      color: var(--gray-800);
+      background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+      outline: none;
+    }
+    .input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(13,148,136,.12);
+    }
+    .input-sm { padding: 5px 9px; font-size: 12px; }
+    .input-inline {
+      border: 1px solid var(--teal-400);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 13px;
+      outline: none;
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(13,148,136,.15);
+    }
+    select.input { appearance: auto; }
+    label.field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-600);
+      margin-bottom: 5px;
+    }
+    .field { margin-bottom: 14px; }
+
+    /* ── Toggle ─────────────────────────────────────────────────────────────── */
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--gray-300);
+      border-radius: 20px;
+      transition: .2s;
+      cursor: pointer;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      left: 3px; top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: .2s;
+    }
+    .toggle input:checked + .toggle-slider { background: var(--accent); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 6px 0;
+    }
+    .toggle-label { font-size: 13px; color: var(--gray-700); }
+
+    /* ── Badge ──────────────────────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-teal { background: var(--teal-100); color: var(--teal-800); }
+    .badge-gray { background: var(--gray-100); color: var(--gray-600); }
+    .badge-red  { background: #fee2e2; color: #dc2626; }
+
+    /* ── Step 1 — Structure ─────────────────────────────────────────────────── */
+    .structure-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .structure-card {
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .structure-card:hover { border-color: var(--teal-300); }
+    .structure-card.selected { border-color: var(--accent); background: var(--teal-50); }
+    .structure-card .sc-icon { font-size: 28px; margin-bottom: 10px; }
+    .structure-card .sc-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+    .structure-card .sc-desc { font-size: 12px; color: var(--gray-500); }
+
+    /* ── Step 2 — Systems ───────────────────────────────────────────────────── */
+    .systems-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+    }
+    .sys-card {
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 14px;
+      cursor: pointer;
+      transition: all .15s;
+      text-align: center;
+    }
+    .sys-card:hover { border-color: var(--teal-300); }
+    .sys-card.active { border-color: var(--accent); background: var(--teal-50); }
+    .sys-card .sys-icon { font-size: 24px; margin-bottom: 6px; }
+    .sys-card .sys-name { font-size: 12px; font-weight: 600; color: var(--gray-700); }
+    .sys-card .sys-main { font-size: 11px; color: var(--gray-400); }
+    .sub-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .ga-preview { font-family: var(--font-mono); font-size: 11px; color: var(--gray-600); }
+    .ga-preview-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .ga-preview-row:last-child { border-bottom: none; }
+    .ga-addr { color: var(--teal-700); font-weight: 500; min-width: 40px; }
+    .ga-dpt { color: var(--gray-400); }
+    .ga-type-ctrl { color: #3b82f6; }
+    .ga-type-fb   { color: var(--gray-400); }
+
+    /* ── Step 3 — Floors (compact style block) ──────────────────────────────── */
+    .floor-grid { display: flex; flex-direction: column; gap: 10px; }
+    .room-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    /* ── Step 4 — Quantities ────────────────────────────────────────────────── */
+    .qty-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .qty-table th {
+      text-align: left;
+      padding: 8px 10px;
+      background: var(--gray-50);
+      border-bottom: 2px solid var(--gray-200);
+      font-weight: 600;
+      color: var(--gray-600);
+      font-size: 12px;
+    }
+    .qty-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--gray-100);
+      vertical-align: middle;
+    }
+    .qty-table tr:hover td { background: var(--gray-50); }
+    .qty-input {
+      width: 60px;
+      text-align: center;
+      border: 1px solid var(--gray-300);
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 13px;
+    }
+    .qty-input:focus { border-color: var(--accent); outline: none; }
+
+    /* ── Step 5 — GA List ───────────────────────────────────────────────────── */
+    .stat-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .stat-card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+    .stat-card .val {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--teal-600);
+      line-height: 1;
+    }
+    .stat-card .lbl { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+    .ga-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ga-tree { font-size: 13px; }
+    .ga-main-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--gray-800);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+    .ga-main-name { font-weight: 600; font-size: 13px; }
+    .ga-mid-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px 6px 24px;
+      background: var(--gray-100);
+      border-radius: var(--radius-sm);
+      margin-bottom: 2px;
+      cursor: pointer;
+    }
+    .ga-mid-name { font-weight: 600; color: var(--gray-700); }
+    .ga-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px 5px 40px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+    .ga-row:hover { background: var(--gray-50); }
+    .ga-row .addr { color: var(--teal-700); font-weight: 500; min-width: 50px; }
+    .ga-row .name { flex: 1; color: var(--gray-700); }
+    .ga-row .dpt  { color: var(--gray-400); font-size: 11px; }
+    .ga-row .type { font-size: 10px; }
+    .ga-row .actions { display: flex; gap: 4px; opacity: 0; transition: opacity .1s; }
+    .ga-row:hover .actions { opacity: 1; }
+    .ga-table-wrap { overflow-x: auto; }
+    .ga-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+    .ga-table th {
+      padding: 7px 10px;
+      background: var(--gray-50);
+      border-bottom: 2px solid var(--gray-200);
+      font-weight: 600;
+      text-align: left;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+    .ga-table td {
+      padding: 5px 10px;
+      border-bottom: 1px solid var(--gray-100);
+      vertical-align: middle;
+    }
+    .ga-table tr:hover td { background: var(--gray-50); }
+    .add-manual-form {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 10px 8px 40px;
+      background: var(--teal-50);
+      border-radius: var(--radius-sm);
+      margin-top: 4px;
+    }
+    .add-manual-form .input { padding: 4px 8px; font-size: 12px; }
+
+    /* ── Step 6 — Export ────────────────────────────────────────────────────── */
+    .export-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    .export-panel .card { height: 100%; }
+    .format-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .format-btn {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--gray-50);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--gray-500);
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s;
+    }
+    .format-btn.active {
+      border-color: var(--accent);
+      background: var(--teal-50);
+      color: var(--accent);
+    }
+    .xml-preview {
+      background: var(--gray-900);
+      color: #e2e8f0;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      border-radius: var(--radius);
+      padding: 16px;
+      overflow: auto;
+      max-height: 420px;
+      white-space: pre;
+      tab-size: 2;
+    }
+    .xml-preview .tag   { color: #7dd3fc; }
+    .xml-preview .attr  { color: #86efac; }
+    .xml-preview .val   { color: #fde68a; }
+    .xml-preview .cmt   { color: #94a3b8; font-style: italic; }
+    .preview-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .preview-title { font-weight: 600; font-size: 13px; color: var(--gray-700); }
+
+    /* ── Import modal ───────────────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      width: 480px;
+      max-width: calc(100vw - 40px);
+      box-shadow: var(--shadow-lg);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modal-title { font-size: 16px; font-weight: 700; }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--gray-400);
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .modal-close:hover { color: var(--gray-700); background: var(--gray-100); }
+    .drop-zone {
+      border: 2px dashed var(--gray-300);
+      border-radius: var(--radius);
+      padding: 32px;
+      text-align: center;
+      color: var(--gray-400);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--teal-400);
+      background: var(--teal-50);
+      color: var(--teal-600);
+    }
+    .drop-zone-icon { font-size: 32px; margin-bottom: 10px; }
+    .drop-zone-text { font-size: 13px; }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    /* ── Loading overlay ────────────────────────────────────────────────────── */
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,.75);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      z-index: 900;
+    }
+    #loading-overlay.hidden { display: none; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--gray-200);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-msg { font-size: 14px; color: var(--gray-500); }
+
+    /* ── Toast ──────────────────────────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--gray-900);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      z-index: 800;
+      opacity: 0;
+      transition: all .25s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    #toast.toast-error { background: #dc2626; }
+
+    /* ── Misc utils ─────────────────────────────────────────────────────────── */
+    .hidden { display: none !important; }
+    .text-sm { font-size: 12px; }
+    .text-muted { color: var(--gray-400); }
+    .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 12px; }
+    .mt-4 { margin-top: 16px; }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .gap-2 { gap: 8px; }
+    .gap-3 { gap: 12px; }
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--gray-800);
+      margin-bottom: 4px;
+    }
+    .section-desc { font-size: 13px; color: var(--gray-500); margin-bottom: 18px; }
+    .divider { height: 1px; background: var(--gray-100); margin: 12px 0; }
+
+    /* ── Step 2 — Two col layout ─────────────────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 20px;
+      align-items: start;
+    }
+    .ga-set-preview {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px;
+      position: sticky;
+      top: 0;
+    }
+    .ga-set-empty {
+      text-align: center;
+      color: var(--gray-400);
+      font-size: 13px;
+      padding: 24px 0;
+    }
+    .ga-set-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 12px;
+    }
+    .ga-set-row:last-child { border-bottom: none; }
+    .ga-offset { font-family: var(--font-mono); color: var(--gray-400); min-width: 30px; font-size: 11px; }
+    .ga-set-name { flex: 1; color: var(--gray-700); }
+    .ga-type-badge {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    .ga-type-badge.ctrl { background: #dbeafe; color: #1d4ed8; }
+    .ga-type-badge.fb   { background: var(--gray-100); color: var(--gray-500); }
+    .sel-count { font-size: 12px; color: var(--gray-500); }
+
+    /* ── View toggle (Step 2/3) ──────────────────────────────────────────────── */
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--gray-100);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+    }
+    .vt-btn {
+      padding: 4px 12px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--gray-500);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .vt-btn.active { background: #fff; color: var(--gray-800); box-shadow: var(--shadow-sm); }
+
+    /* ── Step 3 — Floor builder ─────────────────────────────────────────────── */
+    .floors-list { display: flex; flex-direction: column; gap: 12px; }
+    .floor-card {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: box-shadow .15s;
+    }
+    .floor-card:focus-within { box-shadow: 0 0 0 2px rgba(13,148,136,.15); border-color: var(--teal-300); }
+    .floor-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .floor-card-header.fixed-floor { background: var(--teal-50); }
+    .mid-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 22px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 0 7px;
+      border-radius: 10px;
+      background: var(--teal-100);
+      color: var(--teal-800);
+      flex-shrink: 0;
+    }
+    .floor-name-field {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-800);
+      outline: none;
+      min-width: 0;
+    }
+    .floor-name-field:focus {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 0 0 2px rgba(13,148,136,.2);
+      padding: 2px 6px;
+      margin: -2px -6px;
+    }
+    .floor-room-count {
+      font-size: 11px;
+      color: var(--gray-400);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .floor-card-body { padding: 12px 14px; }
+    .room-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .room-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      font-size: 12px;
+      color: var(--gray-700);
+      cursor: default;
+      transition: background .1s;
+    }
+    .room-tag:hover { background: var(--gray-200); }
+    .room-tag.fixed-room { background: var(--teal-50); border-color: var(--teal-200); color: var(--teal-800); }
+    .room-tag-del {
+      background: none;
+      border: none;
+      padding: 0;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      color: var(--gray-400);
+      cursor: pointer;
+      transition: all .1s;
+      flex-shrink: 0;
+    }
+    .room-tag-del:hover { background: #fecaca; color: #dc2626; }
+    .room-add-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gray-50);
+      border: 1px dashed var(--gray-300);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      transition: all .15s;
+    }
+    .room-add-row:focus-within {
+      background: #fff;
+      border-color: var(--teal-400);
+      border-style: solid;
+      box-shadow: 0 0 0 2px rgba(13,148,136,.12);
+    }
+    .room-add-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      color: var(--gray-800);
+      outline: none;
+    }
+    .room-add-input::placeholder { color: var(--gray-400); }
+    .room-add-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s;
+    }
+    .room-add-row:focus-within .room-add-btn { opacity: 1; }
+    .add-floor-btn {
+      margin-top: 4px;
+      background: transparent;
+      border: 2px dashed var(--gray-200);
+      border-radius: var(--radius);
+      padding: 12px;
+      width: 100%;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-400);
+      cursor: pointer;
+      transition: all .15s;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .add-floor-btn:hover { border-color: var(--teal-400); color: var(--teal-600); background: var(--teal-50); }
+
+    /* ── Step 3 — Room inline rename ────────────────────────────────────────── */
+    .room-tag-rename {
+      border: none; background: transparent; outline: none;
+      font-size: 12px; color: var(--gray-800);
+      min-width: 40px; max-width: 160px;
+    }
+    .room-tag.editing { background: #fff; border-color: var(--teal-400);
+      box-shadow: 0 0 0 2px rgba(13,148,136,.15); }
+
+    /* ── Step 3 — Tree view ──────────────────────────────────────────────────── */
+    .tree-list { display: flex; flex-direction: column; gap: 4px; }
+    .tree-floor-node { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--gray-200); background: #fff; }
+    .tree-floor-node:focus-within { border-color: var(--teal-300); box-shadow: 0 0 0 2px rgba(13,148,136,.1); }
+    .tree-floor-hd {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 12px;
+      background: var(--gray-50);
+      border-bottom: 1px solid transparent;
+      cursor: pointer; user-select: none;
+    }
+    .tree-floor-hd.open { border-bottom-color: var(--gray-100); }
+    .tree-caret {
+      font-size: 10px; color: var(--gray-400);
+      transition: transform .15s; flex-shrink: 0;
+    }
+    .tree-caret.open { transform: rotate(90deg); }
+    .tree-floor-body { padding: 6px 12px 10px 36px; }
+    .tree-room-row {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 6px; border-radius: var(--radius-sm);
+      font-size: 13px; color: var(--gray-700);
+      position: relative;
+    }
+    .tree-room-row:hover { background: var(--gray-100); }
+    .tree-room-row::before {
+      content: ''; position: absolute; left: -16px; top: 50%;
+      width: 10px; height: 1px; background: var(--gray-300);
+    }
+    .tree-room-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tree-room-rename-inp {
+      flex: 1; border: 1px solid var(--teal-400); border-radius: 4px;
+      padding: 1px 6px; font-size: 13px; outline: none;
+      background: #fff; color: var(--gray-800);
+    }
+    .tree-room-actions { display: none; gap: 2px; flex-shrink: 0; }
+    .tree-room-row:hover .tree-room-actions { display: flex; }
+    .tree-icon-btn {
+      background: none; border: none; padding: 2px 4px; border-radius: 3px;
+      cursor: pointer; font-size: 12px; color: var(--gray-400);
+      line-height: 1;
+    }
+    .tree-icon-btn:hover { background: var(--gray-200); color: var(--gray-700); }
+    .tree-icon-btn.danger:hover { background: #fecaca; color: #dc2626; }
+    .tree-add-room {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 6px; margin-top: 4px;
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--gray-300); background: var(--gray-50);
+      font-size: 12px; color: var(--gray-400);
+      transition: all .15s;
+    }
+    .tree-add-room:focus-within {
+      border-color: var(--teal-400); border-style: solid;
+      background: #fff; color: var(--gray-700);
+      box-shadow: 0 0 0 2px rgba(13,148,136,.1);
+    }
+    .tree-add-room-inp {
+      flex: 1; border: none; background: transparent;
+      font-size: 12px; outline: none; color: var(--gray-800);
+    }
+    .tree-add-room-inp::placeholder { color: var(--gray-400); }
+    .tree-connector { position: relative; }
+    .tree-connector::before {
+      content: ''; position: absolute;
+      left: -16px; top: 0; bottom: 0;
+      width: 1px; background: var(--gray-200);
+    }
+
+    /* Step 3 empty state */
+    .floors-empty {
+      text-align: center; padding: 48px 24px;
+      border: 2px dashed var(--gray-200); border-radius: var(--radius);
+      color: var(--gray-400);
+    }
+    .floors-empty-icon { font-size: 32px; margin-bottom: 12px; }
+    .floors-empty p { font-size: 13px; margin: 0 0 16px; }
+
+    /* ── Step 4 — Assign layout ─────────────────────────────────────────────── */
+    .assign-layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .assign-left {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .assign-floor-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 12px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      color: var(--gray-700);
+      cursor: pointer;
+      border-bottom: 1px solid var(--gray-100);
+      text-align: left;
+      transition: background .1s;
+    }
+    .assign-floor-btn:hover { background: var(--gray-50); }
+    .assign-floor-btn.active { background: var(--teal-50); color: var(--teal-800); font-weight: 600; }
+    .assign-floor-btn:last-child { border-bottom: none; }
+    .room-tab-bar {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      padding: 10px 12px;
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .room-tab {
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gray-200);
+      background: #fff;
+      font-size: 12px;
+      color: var(--gray-600);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .room-tab:hover { border-color: var(--teal-300); }
+    .room-tab.active { border-color: var(--accent); background: var(--teal-50); color: var(--teal-800); font-weight: 600; }
+    .room-qty-area {
+      background: #fff;
+      border: 1px solid var(--gray-200);
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
+      padding: 12px;
+    }
+    .sys-section-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0 6px;
+      margin-top: 8px;
+      border-bottom: 2px solid var(--gray-200);
+      margin-bottom: 2px;
+    }
+    .sys-section-head:first-child { margin-top: 0; }
+    .sys-section-icon { width: 18px; height: 18px; color: var(--accent); flex-shrink: 0; }
+    .sys-section-icon svg { width: 100%; height: 100%; }
+    .sys-section-label { font-weight: 600; font-size: 13px; flex: 1; }
+    .qty-sum-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--teal-100);
+      color: var(--teal-800);
+      font-weight: 600;
+    }
+    .qty-sum-badge.zero { background: var(--gray-100); color: var(--gray-400); }
+    .qty-stepper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+    .qty-stepper-btn {
+      width: 24px; height: 24px;
+      border-radius: 4px;
+      border: 1px solid var(--gray-300);
+      background: var(--gray-50);
+      cursor: pointer;
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gray-600);
+      transition: all .1s;
+    }
+    .qty-stepper-btn:hover { border-color: var(--teal-400); color: var(--teal-700); background: var(--teal-50); }
+
+    /* ── Sidebar styles ──────────────────────────────────────────────────────── */
+    .sb-section { padding: 14px 16px; border-bottom: 1px solid var(--gray-100); }
+    .sb-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--gray-400); margin-bottom: 8px; }
+    .sb-step-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 7px 8px;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--gray-500);
+      cursor: pointer;
+      text-align: left;
+      transition: all .1s;
+    }
+    .sb-step-btn:hover { background: var(--gray-100); color: var(--gray-800); }
+    .sb-step-btn.active { background: var(--teal-50); color: var(--teal-800); font-weight: 600; }
+    .sb-step-btn.done { color: var(--gray-600); }
+    .sb-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--gray-300);
+      flex-shrink: 0;
+    }
+    .sb-step-btn.active .sb-dot { background: var(--accent); }
+    .sb-step-btn.done .sb-dot { background: var(--teal-300); }
+    .sb-info-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--gray-600);
+      padding: 3px 0;
+    }
+    .sb-info-row strong { color: var(--gray-800); }
+    .sb-sys-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+    .sb-sys-chip {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: var(--teal-100);
+      color: var(--teal-800);
+      font-weight: 600;
+    }
+
+    /* ── Save indicator ─────────────────────────────────────────────────────── */
+    #save-indicator {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--gray-600);
+      opacity: 0;
+      transition: opacity .3s;
+      white-space: nowrap;
+    }
+    #save-indicator.saved { opacity: 1; color: var(--teal-400); }
+
+    /* ── GA name editing ─────────────────────────────────────────────────────── */
+    .ga-name-text { cursor: text; flex: 1; }
+    .ga-name-input { display: none; flex: 1; }
+    .ga-name-input.visible { display: block; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Header -->
+  <header id="header">
+    <div class="header-brand">
+      <span class="logo-knx">KNX</span>
+      GA Planner
+    </div>
+    <div class="header-sep"></div>
+    <div class="header-project" id="header-project" style="display:none">
+      Project: <span id="header-project-name"></span>
+    </div>
+    <span id="save-indicator">✓ Saved</span>
+    <button class="btn-lang" id="btn-lang" onclick="setLang(state.lang==='en'?'vi':'en')">VI</button>
+  </header>
+
+  <!-- Step bar -->
+  <nav id="stepbar"></nav>
+
+  <!-- Workspace -->
+  <div id="workspace">
+    <aside id="sidebar"></aside>
+    <main id="panel"></main>
+  </div>
+
+  <!-- Bottom bar -->
+  <footer id="bottombar">
+    <button class="btn btn-ghost" id="btn-back" onclick="goStep(state.step-1)">← Back</button>
+    <button class="btn btn-primary" id="btn-next" onclick="goStep(state.step+1)">Next →</button>
+  </footer>
+
+</div>
+
+<!-- Import XML modal -->
+<div class="modal-overlay hidden" id="import-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title-import">Import XML</span>
+      <button class="modal-close" onclick="document.getElementById('import-modal').classList.add('hidden')">×</button>
+    </div>
+    <div
+      class="drop-zone"
+      id="drop-zone"
+      onclick="document.getElementById('file-input').click()"
+    >
+      <div class="drop-zone-icon">📂</div>
+      <div class="drop-zone-text" id="drop-zone-text">Click or drag ETS XML file here</div>
+    </div>
+    <input type="file" id="file-input" accept=".xml" style="display:none" />
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('import-modal').classList.add('hidden')" id="btn-cancel-import">Cancel</button>
+      <button class="btn btn-primary" id="btn-confirm-import" disabled>Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading overlay -->
+<div id="loading-overlay" class="hidden">
+  <div class="spinner"></div>
+  <div class="loading-msg" id="loading-msg">Generating GAs…</div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ── State ──────────────────────────────────────────────────────────────────────
+const state = {
+  lang: 'en',
+  step: 1,
+  projectName: '',
+  structure: 'function',
+  systems: { lt:true, pres:true, sht:true, hvac:true, sec:true, scn:true, av:false, nrg:false, sys:false },
+  ltSubs:   { onoff:true, dim:true, cct:true, rgb:true, facade:false },
+  hvacSubs: { therm:true, split:true, fcu:false, ufh:false, hp:false },
+  floors: [],
+  quantities:    {},
+  generatedGAs:  [],
+  manualGAs:     [],
+  floorView:     'chip',
+  gaView:        'tree',
+  gaFilter:      'all',
+  exportFormat:  'xml',
+  exportOpts:    { dpt:true, desc:false, unused:false, floorFirst:false },
+  importedXml:   null
+};
+
+// ── i18n ───────────────────────────────────────────────────────────────────────
+const i18n = {
+  en: {
+    steps: ['Structure','Systems','Floors & Rooms','Assign','Generate & Review','Export'],
+    step1_title: 'Project setup',
+    step1_desc:  'Choose a GA structure type and name your project.',
+    step2_title: 'Select systems',
+    step2_desc:  'Choose which systems are in this project. Click a card to preview its GA set.',
+    step3_title: 'Floors & rooms',
+    step3_desc:  'Each floor maps to one middle group (0–7). Add rooms within each floor.',
+    step4_title: 'Assign systems & quantities',
+    step4_desc:  'Enter the number of each circuit type per room.',
+    step5_title: 'Generated group addresses',
+    step5_desc:  'Review and edit before export.',
+    step6_title: 'Export',
+    step6_desc:  'Download XML for ETS or CSV for spreadsheet use.',
+    function_based: 'Function-based', building_based: 'Building-based',
+    fn_desc: 'Main = System (Lighting, HVAC…), Middle = Floor, Sub = Room + GA type. Ideal for Savant integration.',
+    bd_desc: 'Main = Floor, Middle = System, Sub = GA type. Best for per-room commissioning.',
+    project_name: 'Project name', project_name_ph: 'e.g. Villa Thảo Điền',
+    core_systems: 'Core systems', extended_systems: 'Extended systems',
+    lt_subopts: 'Lighting circuit types', hvac_subopts: 'HVAC interface types',
+    ga_set_per: 'GA set generated per circuit',
+    click_card: 'Click a system card to preview its GA set',
+    chip_view: 'Chip', tree_view: 'Tree',
+    add_room: '+ room', add_floor: '+ add floor / zone',
+    floors: 'Floors', total_gas: 'Total GAs', main_groups: 'Main groups',
+    control: 'control', feedback: 'feedback', ctrl_short: 'ctrl', fb_short: 'fb',
+    import_xml: 'Import XML', cancel: 'Cancel', merge_import: 'Merge & import',
+    drop_here: 'Drop XML file here or click to browse',
+    project_summary: 'Project summary', export_format: 'Export format',
+    include_dpt: 'Include DPT', include_desc: 'Include description',
+    include_unused: 'Include unused GAs', group_floor: 'Group by floor first',
+    copy_clipboard: 'Copy to clipboard', copied: 'Copied!',
+    export_csv: 'Export CSV', download_xml: 'Download XML',
+    prev: '← Back', next_systems: 'Next: Systems →',
+    next_floors: 'Next: Floors & Rooms →', next_assign: 'Next: Assign →',
+    next_generate: 'Next: Generate →', next_export: 'Next: Export →',
+    regenerate: 'Regenerate', file_ready: 'File ready — check your downloads',
+    structure_type: 'Structure type', xml_preview: 'XML preview',
+    no_rooms: 'No rooms in this floor. Go back to Step 3 to add rooms.',
+    no_gas: 'No GAs yet. Enter quantities in Step 4 then click Regenerate.',
+    add_ga_manual: 'Add GA manually', add_ga: 'Add GA',
+    generate_prompt: 'Click "Generate" in Step 4 or go back and enter quantities.'
+  },
+  vi: {
+    steps: ['Cấu trúc','Hệ thống','Tầng & Phòng','Phân gán','Tạo & Kiểm tra','Xuất file'],
+    step1_title: 'Thiết lập dự án',
+    step1_desc:  'Chọn kiểu cấu trúc GA và đặt tên dự án.',
+    step2_title: 'Chọn hệ thống',
+    step2_desc:  'Chọn các hệ thống có trong dự án. Click vào thẻ để xem trước GA set.',
+    step3_title: 'Tầng & Phòng',
+    step3_desc:  'Mỗi tầng ứng với một middle group (0–7). Thêm phòng trong từng tầng.',
+    step4_title: 'Phân gán hệ thống & số lượng',
+    step4_desc:  'Nhập số lượng mạch điều khiển cho từng phòng.',
+    step5_title: 'Danh sách địa chỉ nhóm',
+    step5_desc:  'Xem lại và chỉnh sửa trước khi xuất.',
+    step6_title: 'Xuất file',
+    step6_desc:  'Tải XML để import vào ETS, hoặc xuất CSV cho bảng tính.',
+    function_based: 'Theo chức năng', building_based: 'Theo tòa nhà',
+    fn_desc: 'Main = Hệ thống (Chiếu sáng, HVAC…), Middle = Tầng, Sub = Phòng + loại GA. Phù hợp tích hợp Savant.',
+    bd_desc: 'Main = Tầng, Middle = Hệ thống, Sub = Loại GA. Tốt nhất cho commissioning từng phòng.',
+    project_name: 'Tên dự án', project_name_ph: 'VD: Villa Thảo Điền',
+    core_systems: 'Hệ thống cơ bản', extended_systems: 'Hệ thống mở rộng',
+    lt_subopts: 'Loại mạch chiếu sáng', hvac_subopts: 'Loại giao diện HVAC',
+    ga_set_per: 'GA set tạo ra cho mỗi mạch',
+    click_card: 'Click vào thẻ hệ thống để xem GA set',
+    chip_view: 'Chip', tree_view: 'Cây',
+    add_room: '+ phòng', add_floor: '+ thêm tầng / khu vực',
+    floors: 'Tầng', total_gas: 'Tổng GA', main_groups: 'Main groups',
+    control: 'điều khiển', feedback: 'phản hồi', ctrl_short: 'ctrl', fb_short: 'fb',
+    import_xml: 'Nhập XML', cancel: 'Hủy', merge_import: 'Gộp & nhập',
+    drop_here: 'Thả file XML vào đây hoặc click để chọn',
+    project_summary: 'Tóm tắt dự án', export_format: 'Định dạng xuất',
+    include_dpt: 'Bao gồm DPT', include_desc: 'Bao gồm mô tả',
+    include_unused: 'Bao gồm GA chưa dùng', group_floor: 'Nhóm theo tầng trước',
+    copy_clipboard: 'Sao chép', copied: 'Đã sao chép!',
+    export_csv: 'Xuất CSV', download_xml: 'Tải XML',
+    prev: '← Quay lại', next_systems: 'Tiếp: Hệ thống →',
+    next_floors: 'Tiếp: Tầng & Phòng →', next_assign: 'Tiếp: Phân gán →',
+    next_generate: 'Tiếp: Tạo GA →', next_export: 'Tiếp: Xuất file →',
+    regenerate: 'Tạo lại', file_ready: 'File đã sẵn — kiểm tra mục tải xuống',
+    structure_type: 'Kiểu cấu trúc', xml_preview: 'Xem trước XML',
+    no_rooms: 'Tầng này chưa có phòng. Quay lại Step 3 để thêm phòng.',
+    no_gas: 'Chưa có GA nào. Nhập số lượng ở Step 4 rồi nhấn Tạo lại.',
+    add_ga_manual: 'Thêm GA thủ công', add_ga: 'Thêm GA',
+    generate_prompt: 'Nhấn "Tạo lại" hoặc quay lại Step 4 để nhập số lượng.'
+  }
+};
+
+function t(k) { return (i18n[state.lang] || i18n.en)[k] || k; }
+
+function setLang(lang) {
+  state.lang = lang;
+  document.getElementById('btn-lang').textContent = lang === 'en' ? 'VI' : 'EN';
+  renderAll();
+}
+
+// ── UI-only system metadata (display only — no GA generation logic) ─────────
+const sysInfo = {
+  lt:   { name_en:'Lighting',      name_vi:'Chiếu sáng',         main:1, icon:'light',
+          desc_en:'Switching, dimming, CCT and RGBW circuits.',
+          desc_vi:'Điều khiển bật/tắt, dim, nhiệt độ màu, RGBW.',
+          gaNames: ['SW','FB','DIM','VAL','VALFB','CCT','CCT_FB','RGB','RGB_FB'] },
+  pres: { name_en:'Presence',      name_vi:'Cảm biến hiện diện', main:2, icon:'pres',
+          desc_en:'Motion sensors with lux value and lock.',
+          desc_vi:'Cảm biến chuyển động với giá trị lux và khoá.',
+          gaNames: ['STATUS','LUX','LOCK'] },
+  sht:  { name_en:'Shutter',       name_vi:'Rèm / Mành',         main:3, icon:'sht',
+          desc_en:'Up/down, position, tilt and safety lockout.',
+          desc_vi:'Lên/xuống, vị trí, góc cánh và khoá an toàn.',
+          gaNames: ['MOVE','STEP','POS','POS_FB','TILT','TILT_FB','WIND','RAIN'] },
+  hvac: { name_en:'HVAC',          name_vi:'HVAC',               main:4, icon:'hvac',
+          desc_en:'Temperature, setpoint, mode and fan speed.',
+          desc_vi:'Nhiệt độ, cài đặt, chế độ và tốc độ quạt.',
+          gaNames: ['TEMP','SETP','MODE','FAN','ENABLE','OUTPUT_FB'] },
+  sec:  { name_en:'Security',      name_vi:'An ninh',            main:5, icon:'sec',
+          desc_en:'Burglar zones, door sensors, fire and siren.',
+          desc_vi:'Vùng báo trộm, cảm biến cửa, báo cháy, còi.',
+          gaNames: ['ARM_AWAY','ARM_HOME','DISARM','ALARM_FB','ZONE_STATUS','FIRE','SIREN'] },
+  scn:  { name_en:'Scenes',        name_vi:'Cảnh (Scenes)',      main:6, icon:'scn',
+          desc_en:'Central and per-room scene activation.',
+          desc_vi:'Kích hoạt cảnh trung tâm và theo từng phòng.',
+          gaNames: ['ACTIVATE','FB'] },
+  av:   { name_en:'Audio Visual',  name_vi:'Nghe nhìn',          main:7, icon:'av',
+          desc_en:'TV/amp power, source, volume and mute.',
+          desc_vi:'Nguồn TV/amp, chọn đầu vào, âm lượng, tắt tiếng.',
+          gaNames: ['POWER','SOURCE','VOL','VOL_FB','MUTE'] },
+  nrg:  { name_en:'Energy',        name_vi:'Giám sát điện',      main:8, icon:'nrg',
+          desc_en:'Power, energy, voltage and current per circuit.',
+          desc_vi:'Công suất, điện năng, điện áp, dòng điện.',
+          gaNames: ['POWER','ENERGY','VOLTAGE','CURRENT'] },
+  sys:  { name_en:'System logic',  name_vi:'Logic hệ thống',     main:9, icon:'sys',
+          desc_en:'Time, date, sunrise/sunset and occupancy mode.',
+          desc_vi:'Thời gian, ngày tháng, mặt trời và chế độ.',
+          gaNames: ['TIME','DATE','SUNRISE','SUNSET','OCC_MODE','HEARTBEAT'] }
+};
+
+const sysIconSvg = {
+  light: '<circle cx="7.5" cy="6" r="3.5"/><line x1="7.5" y1="1" x2="7.5" y2="2.2"/><line x1="7.5" y1="9.8" x2="7.5" y2="11"/><line x1="2.5" y1="6" x2="1.2" y2="6"/><line x1="13.8" y1="6" x2="12.5" y2="6"/><path d="M5.5,11 L9.5,11 L9,13.5 L6,13.5 Z"/>',
+  pres:  '<circle cx="7.5" cy="5" r="2.5"/><path d="M2,14 C2,10.5 13,10.5 13,14"/>',
+  sht:   '<rect x="2" y="2" width="11" height="11" rx="1"/><line x1="2" y1="5.5" x2="13" y2="5.5"/><line x1="2" y1="9" x2="13" y2="9"/>',
+  hvac:  '<path d="M7.5,2 L7.5,13 M3,4.5 L7.5,2 L12,4.5 M3,10.5 L7.5,13 L12,10.5"/><circle cx="7.5" cy="7.5" r="2"/>',
+  sec:   '<path d="M7.5,1.5 L13,4 L13,8 C13,11 10,13.5 7.5,14 C5,13.5 2,11 2,8 L2,4 Z"/>',
+  scn:   '<rect x="2" y="2" width="5" height="5" rx="1"/><rect x="8" y="2" width="5" height="5" rx="1"/><rect x="2" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/>',
+  av:    '<rect x="1" y="3" width="13" height="9" rx="1.5"/><line x1="5" y1="12" x2="10" y2="12"/><line x1="7.5" y1="12" x2="7.5" y2="14"/><circle cx="7.5" cy="7.5" r="2.5"/>',
+  nrg:   '<polyline points="2,11 5,6 8,9 11,4 13,6"/>',
+  sys:   '<circle cx="7.5" cy="7.5" r="5.5"/><line x1="7.5" y1="4" x2="7.5" y2="7.5"/><line x1="7.5" y1="7.5" x2="10" y2="9"/>'
+};
+
+// Circuit type labels per system — UI only (no GA data / DPTs)
+const circuitDefs = {
+  lt:   [['onoff','On/Off'],['dim','Dimming'],['cct','CCT'],['rgb','RGBW']],
+  pres: [['sensor','Sensor']],
+  sht:  [['motor','Motor']],
+  hvac: [['therm','Thermostat'],['split','Split AC'],['fcu','FCU'],['ufh','UFH'],['hp','Heat pump']],
+  sec:  [['zone','Zone']],
+  scn:  [['scene','Scene group']],
+  av:   [['unit','AV unit']],
+  nrg:  [['meter','Meter']],
+  sys:  [['unit','Unit']]
+};
+
+// Return only circuit defs enabled by sub-type selections
+function activeDefs(sk) {
+  const all = circuitDefs[sk] || [];
+  if (sk === 'lt')   return all.filter(([ck]) => state.ltSubs[ck]);
+  if (sk === 'hvac') return all.filter(([ck]) => state.hvacSubs[ck]);
+  return all;
+}
+
+// ── Quantity helpers ──────────────────────────────────────────────────────────
+function getQty(fi, ri, sk, ck) {
+  return ((state.quantities[fi] || {})[ri] || {})[sk]?.[ck] || 0;
+}
+
+function setQty(fi, ri, sk, ck, val) {
+  if (!state.quantities[fi])         state.quantities[fi] = {};
+  if (!state.quantities[fi][ri])     state.quantities[fi][ri] = {};
+  if (!state.quantities[fi][ri][sk]) state.quantities[fi][ri][sk] = {};
+  state.quantities[fi][ri][sk][ck] = Math.max(0, parseInt(val) || 0);
+  debouncedSave();
+}
+
+function adjQty(fi, ri, sk, ck, delta) {
+  setQty(fi, ri, sk, ck, getQty(fi, ri, sk, ck) + delta);
+  renderPanel();
+}
+
+// ── Core render ───────────────────────────────────────────────────────────────
+function renderAll() {
+  renderStepBar();
+  renderSidebar();
+  renderPanel();
+  renderBottomBar();
+
+  // Update header project badge
+  const hp = document.getElementById('header-project');
+  const hn = document.getElementById('header-project-name');
+  if (state.projectName) {
+    hp.style.display = '';
+    hn.textContent = state.projectName;
+  } else {
+    hp.style.display = 'none';
+  }
+}
+
+function renderStepBar() {
+  const labels = t('steps');
+  let html = '';
+  for (let i = 1; i <= 6; i++) {
+    const cls = i === state.step ? 'active' : (i < state.step ? 'done' : '');
+    const num = i < state.step ? '✓' : i;
+    html += `<button class="step-item ${cls}" onclick="goStep(${i})">
+      <div class="step-num">${num}</div>
+      ${Array.isArray(labels) ? labels[i-1] : ''}
+    </button>`;
+    if (i < 6) html += '<div class="step-arrow">›</div>';
+  }
+  document.getElementById('stepbar').innerHTML = html;
+}
+
+function renderSidebar() {
+  const labels = t('steps');
+  const selSystems = Object.keys(state.systems).filter(k => state.systems[k]);
+  let html = '';
+
+  // Step navigation
+  html += '<div class="sb-section"><div class="sb-label">Steps</div>';
+  for (let i = 1; i <= 6; i++) {
+    const cls = i === state.step ? 'active' : (i < state.step ? 'done' : '');
+    html += `<button class="sb-step-btn ${cls}" onclick="goStep(${i})">
+      <div class="sb-dot"></div>${Array.isArray(labels) ? labels[i-1] : ''}
+    </button>`;
+  }
+  html += '</div>';
+
+  // Project info
+  html += '<div class="sb-section">';
+  html += '<div class="sb-label">Project</div>';
+  html += `<div class="sb-info-row"><span>Name</span><strong>${state.projectName || '—'}</strong></div>`;
+  html += `<div class="sb-info-row"><span>Structure</span><strong>${state.structure === 'function' ? t('function_based') : t('building_based')}</strong></div>`;
+  html += `<div class="sb-info-row"><span>${t('floors')}</span><strong>${state.floors.length}</strong></div>`;
+  html += '</div>';
+
+  // Selected systems
+  if (selSystems.length) {
+    html += '<div class="sb-section">';
+    html += `<div class="sb-label">Systems (${selSystems.length})</div>`;
+    html += '<div class="sb-sys-chips">';
+    selSystems.forEach(sk => {
+      const si = sysInfo[sk];
+      html += `<span class="sb-sys-chip">${si['name_' + state.lang] || si.name_en}</span>`;
+    });
+    html += '</div></div>';
+  }
+
+  // GA count if generated
+  if (state.generatedGAs.length) {
+    html += '<div class="sb-section">';
+    html += `<div class="sb-label">${t('total_gas')}</div>`;
+    html += `<div style="font-size:24px;font-weight:700;color:var(--teal-600)">${state.generatedGAs.length}</div>`;
+    html += '</div>';
+  }
+
+  // New project button
+  html += `<div class="sb-section" style="margin-top:auto">
+    <button class="btn btn-ghost btn-sm" style="width:100%;color:var(--gray-500)"
+      onclick="newProject()">
+      ${state.lang === 'vi' ? '🗑 Dự án mới' : '🗑 New project'}
+    </button>
+  </div>`;
+
+  document.getElementById('sidebar').innerHTML = html;
+}
+
+function renderPanel() {
+  const renders = [null, renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6];
+  const fn = renders[state.step];
+  document.getElementById('panel').innerHTML = fn ? fn() : '';
+}
+
+function renderBottomBar() {
+  const back = document.getElementById('btn-back');
+  const next = document.getElementById('btn-next');
+
+  back.style.visibility = state.step === 1 ? 'hidden' : '';
+  back.textContent = t('prev');
+
+  const nextLabels = {
+    1: t('next_systems'), 2: t('next_floors'), 3: t('next_assign'),
+    4: t('next_generate'), 5: t('next_export'), 6: ''
+  };
+  next.textContent = nextLabels[state.step] || 'Next →';
+  next.style.display = state.step === 6 ? 'none' : '';
+}
+
+function goStep(n) {
+  if (n < 1 || n > 6) return;
+  state.step = n;
+  renderAll();
+  if (n === 5 && state.generatedGAs.length === 0) callGenerate();
+  if (n === 6 && state.generatedGAs.length > 0)  loadXmlPreview();
+}
+
+// ── Step 1 — Structure ────────────────────────────────────────────────────────
+function renderStep1() {
+  return `
+  <div class="section-title">${t('step1_title')}</div>
+  <div class="section-desc">${t('step1_desc')}</div>
+
+  <div class="sb-label" style="margin-bottom:10px">${t('structure_type')}</div>
+  <div class="structure-grid">
+    <div class="structure-card ${state.structure === 'function' ? 'selected' : ''}" onclick="selectStructure('function')">
+      <div class="sc-icon">⚙️</div>
+      <div class="sc-title">${t('function_based')}</div>
+      <div class="sc-desc">${t('fn_desc')}</div>
+      <div class="mt-3" style="font-family:var(--font-mono);font-size:11px;color:var(--teal-700);background:var(--teal-50);padding:8px;border-radius:4px;line-height:1.8">
+        1/2/0 → LT - GF - Living room - SW<br>
+        3/2/0 → SHT - GF - Living room - MOVE<br>
+        4/3/0 → HVAC - FL1 - Master bed - TEMP
+      </div>
+    </div>
+    <div class="structure-card ${state.structure === 'building' ? 'selected' : ''}" onclick="selectStructure('building')">
+      <div class="sc-icon">🏢</div>
+      <div class="sc-title">${t('building_based')}</div>
+      <div class="sc-desc">${t('bd_desc')}</div>
+      <div class="mt-3" style="font-family:var(--font-mono);font-size:11px;color:var(--teal-700);background:var(--teal-50);padding:8px;border-radius:4px;line-height:1.8">
+        2/1/0 → GF - Lighting - Living room - SW<br>
+        2/3/0 → GF - Shutter - Living room - MOVE<br>
+        3/2/0 → FL1 - HVAC - Master bed - TEMP
+      </div>
+    </div>
+  </div>
+
+  <div class="field mt-4" style="max-width:400px">
+    <label class="field-label">${t('project_name')}</label>
+    <input class="input" id="proj-name-input"
+      placeholder="${t('project_name_ph')}"
+      value="${escHtml(state.projectName)}"
+      oninput="state.projectName=this.value;updateHeaderProject()" />
+  </div>`;
+}
+
+function selectStructure(s) {
+  state.structure = s;
+  renderPanel();
+  saveState();
+}
+
+// ── Step 2 — Systems ──────────────────────────────────────────────────────────
+function renderStep2() {
+  const coreSys = ['lt','pres','sht','hvac','sec','scn'];
+  const extSys  = ['av','nrg','sys'];
+  const selCount = Object.values(state.systems).filter(Boolean).length;
+
+  function sysCard(sk) {
+    const si  = sysInfo[sk];
+    const on  = state.systems[sk];
+    const icon = `<svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${sysIconSvg[si.icon]}</svg>`;
+    return `<div class="sys-card ${on ? 'active' : ''}" onclick="toggleSys('${sk}');showGaDetail('${sk}')">
+      <div class="sys-icon">${icon}</div>
+      <div class="sys-name">${si['name_' + state.lang] || si.name_en}</div>
+      <div class="sys-main" style="font-size:10px;color:var(--gray-400)">Main ${si.main} · ${si.gaNames.length} GAs</div>
+    </div>`;
+  }
+
+  const ltSubChips  = [['onoff','On/Off'],['dim','Dimming'],['cct','CCT'],['rgb','RGBW'],['facade','Facade']];
+  const hvacSubChips = [['therm','Thermostat'],['split','Split AC'],['fcu','FCU'],['ufh','UFH'],['hp','Heat pump']];
+
+  return `
+  <div class="two-col">
+    <div>
+      <div class="section-title">${t('step2_title')}</div>
+      <div class="section-desc">${t('step2_desc')} <span class="sel-count">${selCount} selected</span></div>
+
+      <div class="sb-label">${t('core_systems')}</div>
+      <div class="systems-grid" style="margin-bottom:16px">${coreSys.map(sysCard).join('')}</div>
+
+      <div class="sb-label">${t('extended_systems')}</div>
+      <div class="systems-grid" style="margin-bottom:16px">${extSys.map(sysCard).join('')}</div>
+
+      ${state.systems.lt ? `
+      <div class="sb-label">${t('lt_subopts')}</div>
+      <div class="sub-chips" style="margin-bottom:16px">
+        ${ltSubChips.map(([k,l]) => `<div class="chip ${state.ltSubs[k] ? 'active' : ''}" onclick="state.ltSubs['${k}']=!state.ltSubs['${k}'];this.classList.toggle('active')">${l}</div>`).join('')}
+      </div>` : ''}
+
+      ${state.systems.hvac ? `
+      <div class="sb-label">${t('hvac_subopts')}</div>
+      <div class="sub-chips">
+        ${hvacSubChips.map(([k,l]) => `<div class="chip ${state.hvacSubs[k] ? 'active' : ''}" onclick="state.hvacSubs['${k}']=!state.hvacSubs['${k}'];this.classList.toggle('active')">${l}</div>`).join('')}
+      </div>` : ''}
+    </div>
+    <div>
+      <div class="ga-set-preview" id="ga-detail-pane">
+        <div class="ga-set-empty">
+          <div style="font-size:28px;margin-bottom:8px">📋</div>
+          ${t('click_card')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleSys(sk) {
+  state.systems[sk] = !state.systems[sk];
+  renderPanel();
+  renderSidebar();
+  saveState();
+}
+
+function showGaDetail(sk) {
+  const pane = document.getElementById('ga-detail-pane');
+  if (!pane) return;
+  const si = sysInfo[sk];
+  const lang = state.lang;
+  pane.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <svg viewBox="0 0 15 15" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">${sysIconSvg[si.icon]}</svg>
+      <strong style="font-size:14px">${si['name_' + lang] || si.name_en}</strong>
+      <span class="badge badge-teal">Main ${si.main}</span>
+    </div>
+    <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px">${si['desc_' + lang] || si.desc_en}</div>
+    <div class="sb-label">${t('ga_set_per')}</div>
+    ${si.gaNames.map((n, i) => `<div class="ga-set-row">
+      <span class="ga-offset">+${i}</span>
+      <span class="ga-set-name">${n}</span>
+    </div>`).join('')}`;
+}
+
+// ── Step 3 — Floors ───────────────────────────────────────────────────────────
+function renderStep3() {
+  const isChip = state.floorView !== 'tree';
+  const isEmpty = state.floors.length === 0;
+  const vi = state.lang === 'vi';
+
+  const emptyState = `
+  <div class="floors-empty">
+    <div class="floors-empty-icon" style="font-size:28px;color:var(--gray-300)">▤</div>
+    <p>${vi ? 'Chưa có tầng nào. Bấm "+ Thêm tầng" để bắt đầu.' : 'No floors yet. Click "+ Add floor" to get started.'}</p>
+  </div>`;
+
+  return `
+  <div class="section-title">${t('step3_title')}</div>
+  <div class="section-desc">${t('step3_desc')}</div>
+
+  <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+    <div class="view-toggle">
+      <button class="vt-btn ${isChip ? 'active' : ''}" onclick="state.floorView='chip';renderPanel()">${t('chip_view')}</button>
+      <button class="vt-btn ${!isChip ? 'active' : ''}" onclick="state.floorView='tree';renderPanel()">${t('tree_view')}</button>
+    </div>
+  </div>
+
+  ${isEmpty ? emptyState : (isChip
+    ? `<div class="floors-list">${state.floors.map((floor, fi) => renderFloorCard(floor, fi)).join('')}</div>`
+    : renderFloorTree()
+  )}
+
+  <button class="add-floor-btn" onclick="addFloor()" style="margin-top:${isEmpty?'0':'4px'}">
+    <span style="font-size:18px;line-height:1">+</span>
+    ${t('add_floor')}
+  </button>`;
+}
+
+function renderFloorCard(floor, fi) {
+  const rc = floor.rooms.length;
+  const vi = state.lang === 'vi';
+  const roomTags = floor.rooms.map((r, ri) => `
+    <div class="room-tag" id="chip-${fi}-${ri}">
+      <span class="room-tag-text" ondblclick="startRenameRoomChip(${fi},${ri})">${escHtml(r)}</span>
+      <button class="room-tag-del" onclick="removeRoom(${fi},${ri})" title="${vi?'Xóa':'Remove'}">×</button>
+    </div>`).join('');
+
+  return `
+  <div class="floor-card">
+    <div class="floor-card-header">
+      <span class="mid-badge">M${floor.mid}</span>
+      <input class="floor-name-field" value="${escHtml(floor.name)}"
+        oninput="state.floors[${fi}].name=this.value;debouncedSave();renderSidebar()"
+        title="${vi?'Click để đổi tên':'Click to rename'}" />
+      <span class="floor-room-count" id="frc-${fi}">${rc} ${vi?'phòng':rc===1?'room':'rooms'}</span>
+      <button class="btn-icon danger btn-sm" onclick="removeFloor(${fi})"
+        title="${vi?'Xóa tầng':'Remove floor'}" style="flex-shrink:0">✕</button>
+    </div>
+    <div class="floor-card-body">
+      <div class="room-tags" id="rtags-${fi}">${roomTags}</div>
+      <div class="room-add-row">
+        <span style="color:var(--teal-400);font-size:16px;line-height:1;flex-shrink:0">+</span>
+        <input class="room-add-input" id="room-input-${fi}" type="text"
+          placeholder="${vi?'Thêm phòng… (Enter để lưu)':'Add a room… (Enter to save)'}"
+          onkeydown="handleRoomKey(event,${fi})" />
+        <button class="room-add-btn" onclick="addRoomFromInput(${fi})">${vi?'Thêm':'Add'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderFloorTree() {
+  const vi = state.lang === 'vi';
+  return `<div class="tree-list">${state.floors.map((floor, fi) => {
+    const rc = floor.rooms.length;
+    const isOpen = floor._open !== false; // default expanded
+    return `
+    <div class="tree-floor-node">
+      <div class="tree-floor-hd ${isOpen?'open':''}" onclick="toggleTreeFloor(${fi})">
+        <span class="tree-caret ${isOpen?'open':''}">▶</span>
+        <span class="mid-badge">M${floor.mid}</span>
+        <input class="floor-name-field" value="${escHtml(floor.name)}"
+          oninput="state.floors[${fi}].name=this.value;debouncedSave();renderSidebar()"
+          onclick="event.stopPropagation()" style="flex:1" />
+        <span class="floor-room-count" id="frc-${fi}" style="flex-shrink:0">${rc} ${vi?'phòng':rc===1?'room':'rooms'}</span>
+        <button class="btn-icon danger btn-sm" onclick="event.stopPropagation();removeFloor(${fi})"
+          title="${vi?'Xóa tầng':'Remove floor'}">✕</button>
+      </div>
+      ${isOpen ? `
+      <div class="tree-floor-body tree-connector">
+        ${floor.rooms.map((r, ri) => `
+        <div class="tree-room-row" id="troom-${fi}-${ri}">
+          <span class="tree-room-name" id="tname-${fi}-${ri}">${escHtml(r)}</span>
+          <div class="tree-room-actions">
+            <button class="tree-icon-btn" onclick="startRenameRoomTree(${fi},${ri})" title="${vi?'Đổi tên':'Rename'}">✎</button>
+            <button class="tree-icon-btn danger" onclick="removeRoom(${fi},${ri})" title="${vi?'Xóa':'Delete'}">✕</button>
+          </div>
+        </div>`).join('')}
+        <div class="tree-add-room">
+          <span style="color:var(--teal-400);font-size:14px;line-height:1;flex-shrink:0">+</span>
+          <input class="tree-add-room-inp" id="room-input-${fi}" type="text"
+            placeholder="${vi?'Thêm phòng… (Enter)':'Add a room… (Enter)'}"
+            onkeydown="handleRoomKey(event,${fi})" />
+          <button class="room-add-btn" onclick="addRoomFromInput(${fi})">${vi?'Thêm':'Add'}</button>
+        </div>
+      </div>` : ''}
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function toggleTreeFloor(fi) {
+  state.floors[fi]._open = state.floors[fi]._open === false ? true : false;
+  renderPanel();
+}
+
+// ── Room rename helpers ───────────────────────────────────────────────────────
+function startRenameRoomChip(fi, ri) {
+  const tag = document.getElementById('chip-' + fi + '-' + ri);
+  if (!tag) return;
+  const span = tag.querySelector('.room-tag-text');
+  if (!span) return;
+  const cur = state.floors[fi].rooms[ri];
+  tag.classList.add('editing');
+  const inp = document.createElement('input');
+  inp.className = 'room-tag-rename';
+  inp.value = cur;
+  inp.style.width = Math.max(50, cur.length * 8) + 'px';
+  span.replaceWith(inp);
+  inp.focus(); inp.select();
+  function commit() {
+    const v = inp.value.trim();
+    if (v && v !== cur) { state.floors[fi].rooms[ri] = v; saveState(); renderSidebar(); }
+    const s = document.createElement('span');
+    s.className = 'room-tag-text';
+    s.textContent = v || cur;
+    s.setAttribute('ondblclick', `startRenameRoomChip(${fi},${ri})`);
+    inp.replaceWith(s);
+    tag.classList.remove('editing');
+  }
+  inp.onblur = commit;
+  inp.onkeydown = e => {
+    if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+    if (e.key === 'Escape') { inp.value = cur; inp.blur(); }
+  };
+}
+
+function startRenameRoomTree(fi, ri) {
+  const nameEl = document.getElementById('tname-' + fi + '-' + ri);
+  if (!nameEl) return;
+  const cur = state.floors[fi].rooms[ri];
+  const inp = document.createElement('input');
+  inp.className = 'tree-room-rename-inp';
+  inp.value = cur;
+  nameEl.replaceWith(inp);
+  inp.focus(); inp.select();
+  function commit() {
+    const v = inp.value.trim();
+    if (v && v !== cur) { state.floors[fi].rooms[ri] = v; saveState(); renderSidebar(); }
+    const s = document.createElement('span');
+    s.className = 'tree-room-name';
+    s.id = 'tname-' + fi + '-' + ri;
+    s.textContent = v || cur;
+    inp.replaceWith(s);
+  }
+  inp.onblur = commit;
+  inp.onkeydown = e => {
+    if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+    if (e.key === 'Escape') { inp.value = cur; inp.blur(); }
+  };
+}
+
+function handleRoomKey(e, fi) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    addRoomFromInput(fi);
+  }
+  if (e.key === 'Escape') {
+    e.target.value = '';
+    e.target.blur();
+  }
+}
+
+function addRoomFromInput(fi) {
+  const inp = document.getElementById('room-input-' + fi);
+  if (!inp) return;
+  const name = inp.value.trim();
+  if (!name) { inp.focus(); return; }
+  state.floors[fi].rooms.push(name);
+  inp.value = '';
+  inp.focus();
+  // Full panel re-render is needed (tree inserts new row; chip re-indexes IDs)
+  renderPanel();
+  renderSidebar();
+  saveState();
+  // Restore focus to input after re-render
+  setTimeout(() => { const el = document.getElementById('room-input-' + fi); if (el) el.focus(); }, 20);
+}
+
+function removeRoom(fi, ri) {
+  state.floors[fi].rooms.splice(ri, 1);
+  renderPanel();
+  renderSidebar();
+  saveState();
+}
+
+function addFloor() {
+  const usedMids = new Set(state.floors.map(f => f.mid));
+  let nextMid = 1;
+  while (usedMids.has(nextMid) && nextMid <= 7) nextMid++;
+  if (nextMid > 7) { showToast(state.lang === 'vi' ? 'Tối đa 7 tầng (M1–M7)' : 'Maximum 7 floors (M1–M7)', true); return; }
+  state.floors.push({ id:'f'+nextMid, mid:nextMid, name: (state.lang === 'vi' ? 'Tầng ' : 'Floor ') + nextMid, rooms:[] });
+  renderPanel();
+  renderSidebar();
+  saveState();
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('.floor-name-field');
+    if (inputs.length) inputs[inputs.length - 1].select();
+  }, 50);
+}
+
+function removeFloor(fi) {
+  if (state.floors[fi].rooms.length > 0) {
+    if (!confirm((state.lang === 'vi'
+      ? `Xóa tầng "${state.floors[fi].name}" và ${state.floors[fi].rooms.length} phòng?`
+      : `Remove "${state.floors[fi].name}" and its ${state.floors[fi].rooms.length} room(s)?`))) return;
+  }
+  state.floors.splice(fi, 1);
+  renderPanel();
+  renderSidebar();
+  saveState();
+}
+
+function removeRoom(fi, ri) {
+  state.floors[fi].rooms.splice(ri, 1);
+  // Re-render just the room tags without full panel refresh
+  const isFixed = state.floors[fi].fixed;
+  const tagsEl  = document.getElementById('rtags-' + fi);
+  const cntEl   = document.getElementById('frc-' + fi);
+  if (tagsEl) {
+    tagsEl.innerHTML = state.floors[fi].rooms.map((r, ri2) => `
+      <div class="room-tag ${isFixed ? 'fixed-room' : ''}">
+        ${escHtml(r)}
+        ${!isFixed ? `<button class="room-tag-del" onclick="removeRoom(${fi},${ri2})" title="Remove">×</button>` : ''}
+      </div>`).join('');
+  }
+  if (cntEl) {
+    const c = state.floors[fi].rooms.length;
+    cntEl.textContent = c + ' ' + (state.lang === 'vi' ? 'phòng' : c === 1 ? 'room' : 'rooms');
+  }
+  renderSidebar();
+  saveState();
+}
+
+// ── Step 4 — Quantities ───────────────────────────────────────────────────────
+let assignFloor = 0;
+let assignRoom  = 0;
+
+function renderStep4() {
+  const sysList = Object.keys(state.systems).filter(k => state.systems[k]);
+  const vi = state.lang === 'vi';
+
+  if (state.floors.length === 0) return `
+    <div class="section-title">${t('step4_title')}</div>
+    <div class="section-desc">${t('step4_desc')}</div>
+    <div style="padding:40px;text-align:center;color:var(--gray-400);font-size:13px;border:1px dashed var(--gray-200);border-radius:var(--radius)">
+      ${vi ? 'Chưa có tầng nào. Quay lại bước Tầng & Phòng để thêm.' : 'No floors defined. Go back to Floors & Rooms to add some.'}
+    </div>`;
+
+  // Clamp assignFloor if floors changed
+  if (assignFloor >= state.floors.length) assignFloor = 0;
+  const floor = state.floors[assignFloor];
+  const validRooms = (floor.rooms || []);
+  if (assignRoom >= validRooms.length) assignRoom = 0;
+
+  function floorTotal(fi) {
+    const fl = state.floors[fi];
+    return (fl.rooms || []).reduce((a, _, ri) =>
+      a + sysList.reduce((b, sk) =>
+        b + activeDefs(sk).reduce((c, [ck]) => c + getQty(fi, ri, sk, ck), 0), 0), 0);
+  }
+
+  function roomTotal(fi, ri) {
+    return sysList.reduce((a, sk) =>
+      a + activeDefs(sk).reduce((b, [ck]) => b + getQty(fi, ri, sk, ck), 0), 0);
+  }
+
+  function renderRoomQty(fi, ri) {
+    return sysList.map(sk => {
+      const si    = sysInfo[sk];
+      const cdefs = activeDefs(sk);
+      const sysTotal = cdefs.reduce((a, [ck]) => a + getQty(fi, ri, sk, ck), 0);
+      return `
+      <div class="sys-section-head">
+        <div class="sys-section-icon">
+          <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${sysIconSvg[si.icon]}</svg>
+        </div>
+        <span class="sys-section-label">${si['name_' + state.lang] || si.name_en}</span>
+        <span class="qty-sum-badge ${sysTotal === 0 ? 'zero' : ''}">${sysTotal === 0 ? (state.lang === 'vi' ? 'chưa có' : 'none') : sysTotal + ' unit' + (sysTotal > 1 ? 's' : '')}</span>
+      </div>
+      <table class="qty-table" style="margin-bottom:8px">
+        <thead><tr>
+          <th style="width:160px">${state.lang === 'vi' ? 'Loại mạch' : 'Circuit type'}</th>
+          <th>${state.lang === 'vi' ? 'Số lượng' : 'Quantity'}</th>
+        </tr></thead>
+        <tbody>
+          ${cdefs.map(([ck, clabel]) => {
+            const qty = getQty(fi, ri, sk, ck);
+            return `<tr>
+              <td>${clabel}</td>
+              <td>
+                <div class="qty-stepper">
+                  <button class="qty-stepper-btn" onclick="adjQty(${fi},${ri},'${sk}','${ck}',-1)">−</button>
+                  <input class="qty-input" type="number" min="0" max="99" value="${qty}"
+                    onchange="setQty(${fi},${ri},'${sk}','${ck}',this.value);renderPanel()"
+                    onblur="setQty(${fi},${ri},'${sk}','${ck}',this.value);renderPanel()" />
+                  <button class="qty-stepper-btn" onclick="adjQty(${fi},${ri},'${sk}','${ck}',1)">+</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+    }).join('');
+  }
+
+  return `
+  <div class="section-title">${t('step4_title')}</div>
+  <div class="section-desc">${t('step4_desc')}</div>
+
+  <div class="assign-layout">
+    <div class="assign-left">
+      ${state.floors.map((f, fi) => {
+        const ft = floorTotal(fi);
+        return `<button class="assign-floor-btn ${fi === assignFloor ? 'active' : ''}"
+          onclick="assignFloor=${fi};assignRoom=0;renderPanel()">
+          <span class="mid-badge">M${f.mid}</span>
+          <span style="flex:1">${escHtml(f.name)}</span>
+          ${ft > 0 ? `<span style="font-size:10px;color:var(--teal-500);font-weight:700">${ft}</span>` : ''}
+        </button>`;
+      }).join('')}
+    </div>
+
+    <div>
+      <div class="room-tab-bar">
+        ${validRooms.length === 0
+          ? `<span style="font-size:13px;color:var(--gray-400)">${t('no_rooms')}</span>`
+          : validRooms.map((room, ri) => {
+              const rt = roomTotal(assignFloor, ri);
+              return `<button class="room-tab ${ri === assignRoom ? 'active' : ''}"
+                onclick="assignRoom=${ri};renderPanel()">
+                ${escHtml(room)}${rt > 0 ? ` <span style="font-size:10px;color:var(--teal-500)">(${rt})</span>` : ''}
+              </button>`;
+            }).join('')}
+      </div>
+      <div class="room-qty-area">
+        ${validRooms.length === 0
+          ? `<div style="padding:24px;text-align:center;color:var(--gray-400);font-size:13px">${t('no_rooms')}</div>`
+          : (sysList.length === 0
+            ? `<div style="padding:24px;text-align:center;color:var(--gray-400);font-size:13px">${state.lang === 'vi' ? 'Chưa chọn hệ thống nào.' : 'No systems selected.'}</div>`
+            : renderRoomQty(assignFloor, assignRoom))}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Step 5 — Generate & Review ────────────────────────────────────────────────
+function renderStep5() {
+  const gas      = state.generatedGAs;
+  const total    = gas.length;
+  const ctrlCnt  = gas.filter(g => g.type === 'ctrl').length;
+  const fbCnt    = gas.filter(g => g.type === 'fb').length;
+  const mainCnt  = new Set(gas.map(g => g.main)).size;
+  const sysList  = Object.keys(state.systems).filter(k => state.systems[k]);
+  const isTree   = state.gaView === 'tree';
+
+  const filtered = state.gaFilter === 'all'
+    ? gas
+    : gas.filter(g => { const si = sysInfo[state.gaFilter]; return si && g.main === si.main; });
+
+  // Main opts for add-GA form
+  const mainOpts = sysList.map(sk => {
+    const si = sysInfo[sk];
+    return `<option value="${si.main}">${si.main} — ${si['name_' + state.lang] || si.name_en}</option>`;
+  }).join('');
+  const midOpts = state.floors.map(f =>
+    `<option value="${f.mid}">${f.mid} — ${escHtml(f.name)}</option>`).join('');
+
+  return `
+  <div class="section-title">${t('step5_title')}</div>
+  <div class="section-desc">${t('step5_desc')}</div>
+
+  <div class="stat-bar" style="margin-bottom:16px">
+    <div class="stat-card"><div class="val">${total}</div><div class="lbl">${t('total_gas')}</div></div>
+    <div class="stat-card"><div class="val">${mainCnt}</div><div class="lbl">${t('main_groups')}</div></div>
+    <div class="stat-card"><div class="val">${state.floors.length}</div><div class="lbl">${t('floors')}</div></div>
+  </div>
+
+  <div class="ga-toolbar" style="margin-bottom:12px">
+    <div class="filter-chips">
+      <div class="chip ${state.gaFilter === 'all' ? 'active' : ''}" onclick="state.gaFilter='all';renderPanel()">${t('all_filter')} (${total})</div>
+      ${sysList.map(sk => {
+        const si  = sysInfo[sk];
+        const cnt = gas.filter(g => g.main === si.main).length;
+        return `<div class="chip ${state.gaFilter === sk ? 'active' : ''}" onclick="state.gaFilter='${sk}';renderPanel()">${si['name_' + state.lang] || si.name_en} (${cnt})</div>`;
+      }).join('')}
+    </div>
+    <div style="display:flex;gap:8px;margin-left:auto;align-items:center">
+      <div class="view-toggle">
+        <button class="vt-btn ${isTree ? 'active' : ''}" onclick="state.gaView='tree';renderPanel()">Tree</button>
+        <button class="vt-btn ${!isTree ? 'active' : ''}" onclick="state.gaView='table';renderPanel()">Table</button>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="openImportModal()">${t('import_xml')}</button>
+      <button class="btn btn-secondary btn-sm" onclick="callGenerate()">${t('regenerate')}</button>
+    </div>
+  </div>
+
+  ${total === 0
+    ? `<div class="card" style="text-align:center;padding:40px;color:var(--gray-400)">${t('no_gas')}</div>`
+    : (isTree ? renderGaTree(filtered) : renderGaTable(filtered))
+  }
+
+  <div class="card mt-4">
+    <div class="card-header">
+      <div class="card-title">${t('add_ga_manual')}</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+      <div class="field" style="margin:0">
+        <label class="field-label">Main</label>
+        <select class="input input-sm" id="add-main" style="width:140px">${mainOpts}</select>
+      </div>
+      <div class="field" style="margin:0">
+        <label class="field-label">Middle</label>
+        <select class="input input-sm" id="add-mid" style="width:140px">${midOpts}</select>
+      </div>
+      <div class="field" style="margin:0">
+        <label class="field-label">Sub (0–255)</label>
+        <input class="input input-sm" id="add-sub" type="number" min="0" max="255" placeholder="0" style="width:80px" />
+      </div>
+      <div class="field" style="margin:0;flex:1;min-width:180px">
+        <label class="field-label">${state.lang === 'vi' ? 'Tên GA' : 'GA name'}</label>
+        <input class="input input-sm" id="add-name" type="text" placeholder="e.g. LT - GF - Custom - SW" />
+      </div>
+      <div class="field" style="margin:0">
+        <label class="field-label">DPT</label>
+        <select class="input input-sm" id="add-dpt" style="width:130px">
+          <option value="DPST-1-001">DPST-1-001 (1-bit)</option>
+          <option value="DPST-3-007">DPST-3-007 (4-bit)</option>
+          <option value="DPST-5-001">DPST-5-001 (1-byte)</option>
+          <option value="DPST-9-001">DPST-9-001 (2-byte float)</option>
+          <option value="DPST-18-001">DPST-18-001 (scene)</option>
+          <option value="DPST-232-600">DPST-232-600 (RGB)</option>
+        </select>
+      </div>
+      <div class="field" style="margin:0">
+        <label class="field-label">${state.lang === 'vi' ? 'Loại' : 'Type'}</label>
+        <select class="input input-sm" id="add-type" style="width:100px">
+          <option value="ctrl">control</option>
+          <option value="fb">feedback</option>
+        </select>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="addManualGA()">+ ${t('add_ga')}</button>
+    </div>
+  </div>`;
+}
+
+function renderGaTree(filtered) {
+  const mainGroups = {};
+  filtered.forEach(g => {
+    if (!mainGroups[g.main]) mainGroups[g.main] = { name: g.mainName, mids: {} };
+    if (!mainGroups[g.main].mids[g.mid]) {
+      const fl = state.floors.find(f => f.mid === g.mid);
+      mainGroups[g.main].mids[g.mid] = { name: fl ? fl.name : 'Zone', gas: [] };
+    }
+    mainGroups[g.main].mids[g.mid].gas.push(g);
+  });
+
+  if (!Object.keys(mainGroups).length) return `<div class="card" style="padding:32px;text-align:center;color:var(--gray-400)">${t('no_gas')}</div>`;
+
+  return Object.entries(mainGroups).map(([mn, mg]) => {
+    const total = Object.values(mg.mids).reduce((a, m) => a + m.gas.length, 0);
+    return `
+    <div style="margin-bottom:8px">
+      <div class="ga-main-row" onclick="toggleBlock('gm-${mn}')">
+        <span style="font-family:var(--font-mono);font-size:11px;opacity:.6">${mn}</span>
+        <span class="ga-main-name">${mg.name}</span>
+        <span class="badge badge-teal" style="margin-left:auto">${total} GAs</span>
+        <span style="margin-left:8px;opacity:.5;font-size:12px" id="arr-gm-${mn}">▼</span>
+      </div>
+      <div id="gm-${mn}">
+        ${Object.entries(mg.mids).map(([mid, mm]) => `
+        <div style="margin-bottom:4px">
+          <div class="ga-mid-row" onclick="toggleBlock('gmid-${mn}-${mid}')">
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--gray-400)">${mn}/${mid}</span>
+            <span class="ga-mid-name">${escHtml(mm.name)}</span>
+            <span class="badge badge-gray" style="margin-left:auto">${mm.gas.length}</span>
+            <span style="margin-left:8px;opacity:.4;font-size:11px" id="arr-gmid-${mn}-${mid}">▼</span>
+          </div>
+          <div id="gmid-${mn}-${mid}">
+            ${mm.gas.map(g => gaRow(g)).join('')}
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderGaTable(filtered) {
+  return `<div class="ga-table-wrap">
+    <table class="ga-table">
+      <thead><tr>
+        <th style="width:72px">${state.lang === 'vi' ? 'Địa chỉ' : 'Address'}</th>
+        <th>${state.lang === 'vi' ? 'Tên' : 'Name'}</th>
+        <th style="width:120px">DPT</th>
+        <th style="width:60px">${state.lang === 'vi' ? 'Loại' : 'Type'}</th>
+        <th style="width:32px"></th>
+      </tr></thead>
+      <tbody>${filtered.map(g => `<tr>
+        <td style="font-family:var(--font-mono);color:var(--teal-700);font-weight:500">${g.addr}</td>
+        <td>
+          <span class="ga-name-text" onclick="startGaEdit(this)">${escHtml(g.name)}</span>
+          <input class="input-inline ga-name-input" data-addr="${g.addr}"
+            onblur="stopGaEdit(this)" onkeydown="keyGaEdit(event,this)" />
+        </td>
+        <td style="font-family:var(--font-mono);font-size:11px;color:var(--gray-400)">${g.dpt}</td>
+        <td><span class="badge ${g.type === 'ctrl' ? 'badge-teal' : 'badge-gray'}">${g.type === 'ctrl' ? t('ctrl_short') : t('fb_short')}</span></td>
+        <td><button class="btn-icon danger" onclick="deleteGA('${g.addr}')">✕</button></td>
+      </tr>`).join('')}</tbody>
+    </table>
+  </div>`;
+}
+
+function gaRow(g) {
+  return `<div class="ga-row">
+    <span class="addr">${g.addr}</span>
+    <span class="ga-name-text name" onclick="startGaEdit(this)">${escHtml(g.name)}</span>
+    <input class="input-inline ga-name-input name" data-addr="${g.addr}"
+      onblur="stopGaEdit(this)" onkeydown="keyGaEdit(event,this)" />
+    <span class="dpt">${g.dpt}</span>
+    <span class="type badge ${g.type === 'ctrl' ? 'badge-teal' : 'badge-gray'}">${g.type === 'ctrl' ? t('ctrl_short') : t('fb_short')}</span>
+    <span class="actions">
+      <button class="btn-icon danger btn-xs" onclick="deleteGA('${g.addr}')">✕</button>
+    </span>
+  </div>`;
+}
+
+function toggleBlock(id) {
+  const el  = document.getElementById(id);
+  const arr = document.getElementById('arr-' + id);
+  if (!el) return;
+  const hidden = el.style.display === 'none';
+  el.style.display  = hidden ? '' : 'none';
+  if (arr) arr.textContent = hidden ? '▼' : '▶';
+}
+
+function startGaEdit(el) {
+  const inp = el.nextElementSibling;
+  inp.value = el.textContent;
+  el.style.display  = 'none';
+  inp.style.display = 'block';
+  inp.focus(); inp.select();
+}
+
+function stopGaEdit(inp) {
+  const text = inp.previousElementSibling;
+  const addr = inp.getAttribute('data-addr');
+  const val  = inp.value.trim();
+  if (val) {
+    text.textContent = val;
+    const ga = state.generatedGAs.find(g => g.addr === addr);
+    if (ga) { ga.name = val; debouncedSave(); }
+  }
+  inp.style.display  = 'none';
+  text.style.display = '';
+}
+
+function keyGaEdit(e, inp) {
+  if (e.key === 'Enter')  inp.blur();
+  if (e.key === 'Escape') { inp.value = ''; inp.blur(); }
+}
+
+function deleteGA(addr) {
+  if (!confirm((state.lang === 'vi' ? 'Xóa GA ' : 'Delete GA ') + addr + '?')) return;
+  state.generatedGAs = state.generatedGAs.filter(g => g.addr !== addr);
+  state.manualGAs    = state.manualGAs.filter(g => g.addr !== addr);
+  renderPanel();
+  renderSidebar();
+  saveState();
+}
+
+function addManualGA() {
+  const main = parseInt(document.getElementById('add-main').value) || 1;
+  const mid  = parseInt(document.getElementById('add-mid').value)  || 0;
+  const sub  = parseInt(document.getElementById('add-sub').value);
+  const name = (document.getElementById('add-name').value || '').trim();
+  const dpt  = document.getElementById('add-dpt').value;
+  const type = document.getElementById('add-type').value;
+
+  if (isNaN(sub) || sub < 0 || sub > 255) {
+    showToast(state.lang === 'vi' ? 'Sub group phải từ 0–255' : 'Sub group must be 0–255', true); return;
+  }
+  if (!name) {
+    showToast(state.lang === 'vi' ? 'Vui lòng nhập tên GA' : 'Please enter a GA name', true); return;
+  }
+  const addr = `${main}/${mid}/${sub}`;
+  if (state.generatedGAs.find(g => g.addr === addr)) {
+    if (!confirm((state.lang === 'vi' ? 'Địa chỉ ' : 'Address ') + addr + (state.lang === 'vi' ? ' đã tồn tại. Ghi đè?' : ' already exists. Overwrite?'))) return;
+    state.generatedGAs = state.generatedGAs.filter(g => g.addr !== addr);
+    state.manualGAs    = state.manualGAs.filter(g => g.addr !== addr);
+  }
+  const skEntry = Object.keys(sysInfo).find(k => sysInfo[k].main === main);
+  const newGA = { addr, name, dpt, type, main, mid, mainName: skEntry ? sysInfo[skEntry].name_en : 'Custom', manual: true };
+  state.generatedGAs.push(newGA);
+  state.manualGAs.push({ ...newGA });
+  state.generatedGAs.sort((a, b) => {
+    const ap = a.addr.split('/').map(Number), bp = b.addr.split('/').map(Number);
+    for (let i = 0; i < 3; i++) { if (ap[i] !== bp[i]) return ap[i] - bp[i]; } return 0;
+  });
+  renderPanel();
+  renderSidebar();
+  saveState();
+}
+
+// ── Step 6 — Export ────────────────────────────────────────────────────────────
+function renderStep6() {
+  const gas     = state.generatedGAs;
+  const sysList = Object.keys(state.systems).filter(k => state.systems[k]);
+  const defName = (state.projectName || 'KNX_Project').replace(/\s+/g, '_') + '_GA';
+
+  return `
+  <div class="section-title">${t('step6_title')}</div>
+  <div class="section-desc">${t('step6_desc')}</div>
+
+  <div class="export-layout">
+    <div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title" style="margin-bottom:10px">${t('project_summary')}</div>
+        <div class="sb-info-row"><span>${state.lang === 'vi' ? 'Dự án' : 'Project'}</span><strong>${escHtml(state.projectName || '—')}</strong></div>
+        <div class="sb-info-row"><span>${state.lang === 'vi' ? 'Cấu trúc' : 'Structure'}</span><strong>${state.structure === 'function' ? t('function_based') : t('building_based')}</strong></div>
+        <div class="sb-info-row"><span>${t('total_gas')}</span><strong style="color:var(--teal-600)">${gas.length}</strong></div>
+        <div class="sb-info-row"><span>${t('main_groups')}</span><strong>${sysList.length}</strong></div>
+        <div class="sb-info-row"><span>${t('floors')}</span><strong>${state.floors.length}</strong></div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title" style="margin-bottom:10px">${t('export_format')}</div>
+        <div class="format-selector">
+          <div class="format-btn ${state.exportFormat === 'xml' ? 'active' : ''}" onclick="state.exportFormat='xml';renderPanel()">XML</div>
+          <div class="format-btn ${state.exportFormat === 'csv' ? 'active' : ''}" onclick="state.exportFormat='csv';renderPanel()">CSV</div>
+        </div>
+        <div style="font-size:12px;color:var(--gray-500)">
+          ${state.exportFormat === 'xml' ? t('xml_desc') : t('csv_desc')}
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div class="card-title" style="margin-bottom:10px">${t('options')}</div>
+        ${[['dpt', t('include_dpt')], ['desc', t('include_desc')], ['unused', t('include_unused')], ['floorFirst', t('group_floor')]].map(([k, l]) => `
+        <div class="toggle-row">
+          <span class="toggle-label">${l}</span>
+          <label class="toggle">
+            <input type="checkbox" ${state.exportOpts[k] ? 'checked' : ''}
+              onchange="state.exportOpts['${k}']=this.checked;refreshPreview()" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>`).join('')}
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:8px">${t('filename')}</div>
+        <input class="input input-sm" id="filename-input" value="${escHtml(defName)}" />
+        <div style="font-size:11px;color:var(--gray-400);margin-top:4px">.${state.exportFormat} ${state.lang === 'vi' ? 'sẽ được thêm vào' : 'will be appended'}</div>
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="callExportXML()">${t('download_xml')}</button>
+          <button class="btn btn-secondary" onclick="callExportCSV()">${t('export_csv')}</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="preview-toolbar">
+        <span class="preview-title">${t('xml_preview')}</span>
+        <button class="btn btn-secondary btn-sm" id="btn-copy-preview" onclick="copyPreview()">${t('copy_clipboard')}</button>
+      </div>
+      <div class="xml-preview" id="xml-preview-pane">
+        <span style="color:var(--gray-500)">${gas.length === 0
+          ? (state.lang === 'vi' ? 'Chưa có GA nào để hiển thị.' : 'No GAs to preview.')
+          : (state.lang === 'vi' ? 'Đang tải...' : 'Loading preview…')
+        }</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function refreshPreview() {
+  if (state.step !== 6) return;
+  loadXmlPreview();
+}
+
+async function loadXmlPreview() {
+  const pane = document.getElementById('xml-preview-pane');
+  if (!pane || !state.generatedGAs.length) return;
+  try {
+    const res = await fetch('/api/export/xml', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        gas: state.generatedGAs,
+        opts: {
+          projectName: state.projectName,
+          floors:      state.floors,
+          includeDpt:  state.exportOpts.dpt,
+          includeDesc: state.exportOpts.desc
+        }
+      })
+    });
+    if (!res.ok) throw new Error((await res.json()).error);
+    const xml = await res.text();
+    state._xmlCache = xml;
+    pane.innerHTML = syntaxHighlight(xml);
+  } catch (e) {
+    if (pane) pane.innerHTML = `<span style="color:#f87171">${escHtml(e.message)}</span>`;
+  }
+}
+
+function syntaxHighlight(xml) {
+  return escHtml(xml)
+    .replace(/(&lt;\/?[\w:-]+)/g,  '<span class="tag">$1</span>')
+    .replace(/([\w-]+=)/g,         '<span class="attr">$1</span>')
+    .replace(/="([^"]*)"/g,        '="<span class="val">$1</span>"')
+    .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="cmt">$1</span>');
+}
+
+function copyPreview() {
+  const content = state._xmlCache || '';
+  if (!content) return;
+  navigator.clipboard && navigator.clipboard.writeText(content).then(() => {
+    const btn = document.getElementById('btn-copy-preview');
+    if (btn) { const orig = btn.textContent; btn.textContent = t('copied'); setTimeout(() => btn.textContent = orig, 1800); }
+  });
+}
+
+// ── API calls ─────────────────────────────────────────────────────────────────
+async function callGenerate() {
+  showLoading(state.lang === 'vi' ? 'Đang tạo GA…' : 'Generating GAs…');
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        structure:  state.structure,
+        floors:     state.floors,
+        systems:    state.systems,
+        quantities: state.quantities,
+        manualGAs:  state.manualGAs,
+        ltSubs:     state.ltSubs,
+        hvacSubs:   state.hvacSubs
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Generate failed');
+    state.generatedGAs = data.gas;
+    renderPanel();
+    renderSidebar();
+    saveState();
+    showToast((state.lang === 'vi' ? `${data.count} GA đã tạo` : `${data.count} GAs generated`));
+  } catch (e) {
+    showToast(e.message, true);
+  } finally {
+    hideLoading();
+  }
+}
+
+async function callExportXML() {
+  if (!state.generatedGAs.length) { showToast(state.lang === 'vi' ? 'Chưa có GA nào' : 'No GAs to export', true); return; }
+  showLoading(state.lang === 'vi' ? 'Đang xuất XML…' : 'Building XML…');
+  try {
+    const fname = (document.getElementById('filename-input')?.value || 'KNX_GA').trim();
+    const res = await fetch('/api/export/xml', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        gas: state.generatedGAs,
+        opts: {
+          projectName: state.projectName,
+          floors:      state.floors,
+          includeDpt:  state.exportOpts.dpt,
+          includeDesc: state.exportOpts.desc
+        }
+      })
+    });
+    if (!res.ok) throw new Error((await res.json()).error);
+    const xml = await res.text();
+    triggerDownload(xml, fname + '.xml', 'application/xml');
+    showToast(t('file_ready'));
+  } catch (e) {
+    showToast(e.message, true);
+  } finally {
+    hideLoading();
+  }
+}
+
+async function callExportCSV() {
+  if (!state.generatedGAs.length) { showToast(state.lang === 'vi' ? 'Chưa có GA nào' : 'No GAs to export', true); return; }
+  showLoading(state.lang === 'vi' ? 'Đang xuất CSV…' : 'Building CSV…');
+  try {
+    const fname = (document.getElementById('filename-input')?.value || 'KNX_GA').trim();
+    const res = await fetch('/api/export/csv', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        gas:  state.generatedGAs,
+        opts: { floors: state.floors }
+      })
+    });
+    if (!res.ok) throw new Error((await res.json()).error);
+    const csv = await res.text();
+    triggerDownload(csv, fname + '.csv', 'text/plain');
+    showToast(t('file_ready'));
+  } catch (e) {
+    showToast(e.message, true);
+  } finally {
+    hideLoading();
+  }
+}
+
+async function callImportXML(rawStr) {
+  showLoading(state.lang === 'vi' ? 'Đang nhập XML…' : 'Importing XML…');
+  try {
+    const res = await fetch('/api/import/xml', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ xml: rawStr })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    let merged = 0;
+    data.gas.forEach(ig => {
+      const existing = state.generatedGAs.find(g => g.addr === ig.addr);
+      if (existing) { existing.name = ig.name; }
+      else { state.generatedGAs.push(ig); merged++; }
+    });
+    state.generatedGAs.sort((a, b) => {
+      const ap = a.addr.split('/').map(Number), bp = b.addr.split('/').map(Number);
+      for (let i = 0; i < 3; i++) { if (ap[i] !== bp[i]) return ap[i] - bp[i]; } return 0;
+    });
+    closeImportModal();
+    showToast((state.lang === 'vi' ? `Import: ${data.count} GA đã gộp` : `Import: ${data.count} GAs merged`));
+    renderPanel();
+    renderSidebar();
+    saveState();
+  } catch (e) {
+    showToast(e.message, true);
+  } finally {
+    hideLoading();
+  }
+}
+
+// ── Import modal ──────────────────────────────────────────────────────────────
+function openImportModal() {
+  state.importedXml = null;
+  const btn = document.getElementById('btn-confirm-import');
+  if (btn) { btn.disabled = true; }
+  document.getElementById('drop-zone-text').textContent = t('drop_here');
+  document.getElementById('import-modal').classList.remove('hidden');
+  document.getElementById('modal-title-import').textContent = t('import_xml');
+  document.getElementById('btn-cancel-import').textContent = t('cancel');
+  // Wire file input
+  const fi = document.getElementById('file-input');
+  fi.onchange = function () { handleXmlFile(this); };
+  // Wire drop zone drag/drop
+  const dz = document.getElementById('drop-zone');
+  dz.ondragover  = e => { e.preventDefault(); dz.classList.add('drag-over'); };
+  dz.ondragleave = () => dz.classList.remove('drag-over');
+  dz.ondrop      = e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f) readXmlFile(f);
+  };
+  // Wire confirm
+  document.getElementById('btn-confirm-import').onclick = () => {
+    if (state.importedXml) callImportXML(state.importedXml);
+  };
+}
+
+function closeImportModal() {
+  document.getElementById('import-modal').classList.add('hidden');
+  state.importedXml = null;
+}
+
+function handleXmlFile(input) {
+  const f = input.files[0];
+  if (f) readXmlFile(f);
+}
+
+function readXmlFile(f) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.importedXml = e.target.result;
+    const dzt = document.getElementById('drop-zone-text');
+    const btn = document.getElementById('btn-confirm-import');
+    if (dzt) dzt.textContent = '✓ ' + f.name;
+    if (btn) btn.disabled = false;
+  };
+  reader.readAsText(f);
+}
+
+// ── Loading overlay ───────────────────────────────────────────────────────────
+function showLoading(msg) {
+  const el = document.getElementById('loading-overlay');
+  const lm = document.getElementById('loading-msg');
+  if (lm) lm.textContent = msg || '';
+  if (el) el.classList.remove('hidden');
+}
+
+function hideLoading() {
+  const el = document.getElementById('loading-overlay');
+  if (el) el.classList.add('hidden');
+}
+
+function triggerDownload(content, filename, mime) {
+  const a = document.createElement('a');
+  a.href     = 'data:' + mime + ';charset=utf-8,' + encodeURIComponent(content);
+  a.download = filename;
+  a.click();
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function updateHeaderProject() {
+  const hp = document.getElementById('header-project');
+  const hn = document.getElementById('header-project-name');
+  if (state.projectName) { hp.style.display = ''; hn.textContent = state.projectName; }
+  else { hp.style.display = 'none'; }
+  debouncedSave();
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg, isError) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (isError ? ' toast-error' : '');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ''; }, 3000);
+}
+
+// ── localStorage persistence ──────────────────────────────────────────────────
+const STORAGE_KEY = 'knx_ga_planner_v1';
+const PERSIST_FIELDS = ['projectName','structure','systems','ltSubs','hvacSubs',
+  'floors','quantities','generatedGAs','manualGAs','exportFormat','exportOpts','lang'];
+
+function saveState() {
+  try {
+    const payload = {};
+    PERSIST_FIELDS.forEach(k => { payload[k] = state[k]; });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    // flash save indicator
+    const el = document.getElementById('save-indicator');
+    if (el) { el.classList.add('saved'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('saved'), 1500); }
+  } catch(e) { /* private mode or quota exceeded — silent fail */ }
+}
+
+let _saveTimer = null;
+function debouncedSave() {
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveState, 600);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const saved = JSON.parse(raw);
+    PERSIST_FIELDS.forEach(k => { if (saved[k] !== undefined) state[k] = saved[k]; });
+    return true;
+  } catch(e) { return false; }
+}
+
+function newProject() {
+  const hasData = state.projectName || state.generatedGAs.length > 0 ||
+    Object.values(state.quantities).length > 0;
+  if (hasData) {
+    if (!confirm(state.lang === 'vi'
+      ? 'Bắt đầu dự án mới? Dữ liệu hiện tại sẽ bị xóa.'
+      : 'Start a new project? Current data will be cleared.')) return;
+  }
+  localStorage.removeItem(STORAGE_KEY);
+  // Reset to defaults
+  Object.assign(state, {
+    step: 1, projectName: '', structure: 'function',
+    systems: { lt:true, pres:true, sht:true, hvac:true, sec:true, scn:true, av:false, nrg:false, sys:false },
+    ltSubs:  { onoff:true, dim:true, cct:true, rgb:true, facade:false },
+    hvacSubs:{ therm:true, split:true, fcu:false, ufh:false, hp:false },
+    floors: [
+    ],
+    quantities: {}, generatedGAs: [], manualGAs: [],
+    floorView: 'chip', gaView: 'tree', gaFilter: 'all',
+    exportFormat: 'xml', exportOpts: { dpt:true, desc:false, unused:false, floorFirst:false },
+    importedXml: null, _xmlCache: null
+  });
+  renderAll();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  loadState();
+  renderAll();
+});
+</script>
+
+</body>
+</html>
