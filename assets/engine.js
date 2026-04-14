@@ -14,7 +14,7 @@ const sysInfo = {
   sec:  { name_en: 'Security',      name_vi: 'An ninh',             desc_en: 'Burglar zones, door sensors, fire and siren.',    desc_vi: 'Vùng báo trộm, cảm biến cửa, báo cháy, còi.',       main: 10, icon: 'sec',   gaNames: ['ARM_AWAY','ARM_HOME','DISARM','STATUS_FB','ZONE_STATUS','FIRE','SIREN'] },
   scn:  { name_en: 'Scenes',        name_vi: 'Cảnh (Scenes)',       desc_en: 'Central and per-room scene activation.',          desc_vi: 'Kích hoạt cảnh trung tâm và theo từng phòng.',       main: 6, icon: 'scn',   gaNames: ['ACTIVATE','FB'] },
   av:   { name_en: 'Audio Visual',  name_vi: 'Nghe nhìn',           desc_en: 'TV/amp power, source, volume and mute.',          desc_vi: 'Nguồn TV/amp, chọn đầu vào, âm lượng, tắt tiếng.',  main: 7, midScheme: 'gatype', icon: 'av',    gaNames: ['POWER','SOURCE','VOL','VOL_FB','MUTE'] },
-  nrg:  { name_en: 'Energy',        name_vi: 'Giám sát điện',       desc_en: 'Power, energy, voltage and current per circuit.', desc_vi: 'Công suất, điện năng, điện áp, dòng điện.',         main: 8, icon: 'nrg',   gaNames: ['POWER','ENERGY','VOLTAGE','CURRENT'] },
+  nrg:  { name_en: 'Energy',        name_vi: 'Giám sát điện',       desc_en: 'Power, energy, voltage and current per circuit.', desc_vi: 'Công suất, điện năng, điện áp, dòng điện.',         main: 8, midScheme: 'gatype', icon: 'nrg',   gaNames: ['POWER','ENERGY','VOLTAGE','CURRENT','POWER_FACTOR'] },
   sys:  { name_en: 'System logic',  name_vi: 'Logic hệ thống',      desc_en: 'Time, date, sunrise/sunset and occupancy mode.',  desc_vi: 'Thời gian, ngày tháng, mặt trời và chế độ.',        main: 9, icon: 'sys',   gaNames: ['TIME','DATE','SUNRISE','SUNSET','OCC_MODE','HEARTBEAT'] }
 };
 
@@ -210,10 +210,11 @@ const circuitGaSet = {
     { n: 'NEXT',     full: 'Next track',     dpt: 'DPST-1-001', t: 'ctrl', mid: 7, midName: 'Next'     }
   ],
   nrg_meter: [
-    { n: 'POWER',   full: 'Active power W', dpt: 'DPST-14-056', t: 'fb' },
-    { n: 'ENERGY',  full: 'Energy kWh',     dpt: 'DPST-13-010', t: 'fb' },
-    { n: 'VOLTAGE', full: 'Voltage V',      dpt: 'DPST-14-027', t: 'fb' },
-    { n: 'CURRENT', full: 'Current A',      dpt: 'DPST-14-019', t: 'fb' }
+    { n: 'POWER',        full: 'Active power W',  dpt: 'DPST-14-056', t: 'fb', mid: 0, midName: 'Power'       },
+    { n: 'ENERGY',       full: 'Energy kWh',      dpt: 'DPST-13-010', t: 'fb', mid: 1, midName: 'Energy'      },
+    { n: 'VOLTAGE',      full: 'Voltage V',       dpt: 'DPST-14-027', t: 'fb', mid: 2, midName: 'Voltage'     },
+    { n: 'CURRENT',      full: 'Current A',       dpt: 'DPST-14-019', t: 'fb', mid: 3, midName: 'Current'     },
+    { n: 'POWER_FACTOR', full: 'Power factor',    dpt: 'DPST-14-057', t: 'fb', mid: 4, midName: 'PowerFactor' }
   ],
   sys_unit: [
     { n: 'TIME',      full: 'Current time',   dpt: 'DPST-10-001', t: 'fb'   },
