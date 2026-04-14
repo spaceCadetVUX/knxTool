@@ -8,8 +8,8 @@ const ALLOWED_ORIGINS = [
 // ─── SYSTEM INFO ──────────────────────────────────────────────────────────────
 const sysInfo = {
   lt:   { name_en: 'Lighting',      name_vi: 'Chiếu sáng',         desc_en: 'Switching, dimming, CCT and RGBW circuits.',      desc_vi: 'Điều khiển bật/tắt, dim, nhiệt độ màu, RGBW.',      main: 1, midScheme: 'gatype', icon: 'light', gaNames: ['SW','FB','DIM','VAL','VALFB','CCT','CCT_FB','RGB','RGB_FB'] },
-  pres: { name_en: 'Presence',      name_vi: 'Cảm biến hiện diện', desc_en: 'Motion sensors with lux value and lock.',         desc_vi: 'Cảm biến chuyển động với giá trị lux và khoá.',      main: 2, icon: 'pres',  gaNames: ['STATUS','LUX','LOCK'] },
-  sht:  { name_en: 'Shutter',       name_vi: 'Rèm / Mành',         desc_en: 'Up/down, position, tilt and safety lockout.',     desc_vi: 'Lên/xuống, vị trí, góc cánh và khoá an toàn.',      main: 3, icon: 'sht',   gaNames: ['MOVE','STEP','POS','POS_FB','TILT','TILT_FB','WIND','RAIN'] },
+  pres: { name_en: 'Presence',      name_vi: 'Cảm biến hiện diện', desc_en: 'Motion sensors with lux value and lock.',         desc_vi: 'Cảm biến chuyển động với giá trị lux và khoá.',      main: 2, midScheme: 'gatype', icon: 'pres',  gaNames: ['STATUS','LUX','LOCK'] },
+  sht:  { name_en: 'Shutter',       name_vi: 'Rèm / Mành',         desc_en: 'Up/down, position, tilt and safety lockout.',     desc_vi: 'Lên/xuống, vị trí, góc cánh và khoá an toàn.',      main: 3, midScheme: 'gatype', icon: 'sht',   gaNames: ['MOVE','STEP','POS','POS_FB','TILT','TILT_FB','WIND','RAIN'] },
   hvac: { name_en: 'HVAC',          name_vi: 'HVAC',                desc_en: 'Temperature, setpoint, mode and fan speed.',      desc_vi: 'Nhiệt độ, cài đặt, chế độ và tốc độ quạt.',         main: 4, mainFb: 5, nameFb_en: 'HVAC Feedback', nameFb_vi: 'HVAC - Phản hồi', icon: 'hvac',  gaNames: ['ENABLE','SETP','MODE','FAN','TEMP_ACT','SETP_FB','MODE_FB','FAN_FB','VALVE_FB','ENABLE_FB'] },
   sec:  { name_en: 'Security',      name_vi: 'An ninh',             desc_en: 'Burglar zones, door sensors, fire and siren.',    desc_vi: 'Vùng báo trộm, cảm biến cửa, báo cháy, còi.',       main: 10, icon: 'sec',   gaNames: ['ARM_AWAY','ARM_HOME','DISARM','STATUS_FB','ZONE_STATUS','FIRE','SIREN'] },
   scn:  { name_en: 'Scenes',        name_vi: 'Cảnh (Scenes)',       desc_en: 'Central and per-room scene activation.',          desc_vi: 'Kích hoạt cảnh trung tâm và theo từng phòng.',       main: 6, icon: 'scn',   gaNames: ['ACTIVATE','FB'] },
@@ -158,17 +158,17 @@ const circuitGaSet = {
     { n: 'RGB_FB', full: 'RGBW feedback',       dpt: 'DPST-232-600', t: 'fb',   mid: 6, midName: 'RGB'   }
   ],
   pres_sensor: [
-    { n: 'STATUS', full: 'Occupancy status', dpt: 'DPST-1-001', t: 'fb'   },
-    { n: 'LUX',    full: 'Brightness lux',   dpt: 'DPST-9-004', t: 'fb'   },
-    { n: 'LOCK',   full: 'Sensor lock',      dpt: 'DPST-1-001', t: 'ctrl' }
+    { n: 'STATUS', full: 'Occupancy status', dpt: 'DPST-1-001', t: 'fb',   mid: 0, midName: 'Status' },
+    { n: 'LOCK',   full: 'Sensor lock',      dpt: 'DPST-1-001', t: 'ctrl', mid: 1, midName: 'Lock'   },
+    { n: 'LUX',    full: 'Brightness lux',   dpt: 'DPST-9-004', t: 'fb',   mid: 2, midName: 'Lux'    }
   ],
   sht_motor: [
-    { n: 'MOVE',    full: 'Up/Down',           dpt: 'DPST-1-008', t: 'ctrl' },
-    { n: 'STEP',    full: 'Step/Stop',         dpt: 'DPST-1-007', t: 'ctrl' },
-    { n: 'POS',     full: 'Position',          dpt: 'DPST-5-001', t: 'ctrl' },
-    { n: 'POS_FB',  full: 'Position feedback', dpt: 'DPST-5-001', t: 'fb'   },
-    { n: 'TILT',    full: 'Slat angle',        dpt: 'DPST-5-001', t: 'ctrl' },
-    { n: 'TILT_FB', full: 'Slat feedback',     dpt: 'DPST-5-001', t: 'fb'   }
+    { n: 'MOVE',    full: 'Up/Down',           dpt: 'DPST-1-008', t: 'ctrl', mid: 0, midName: 'Move'    },
+    { n: 'STEP',    full: 'Step/Stop',         dpt: 'DPST-1-007', t: 'ctrl', mid: 1, midName: 'Step'    },
+    { n: 'POS',     full: 'Position',          dpt: 'DPST-5-001', t: 'ctrl', mid: 2, midName: 'Pos'     },
+    { n: 'POS_FB',  full: 'Position feedback', dpt: 'DPST-5-001', t: 'fb',   mid: 3, midName: 'PosFb'   },
+    { n: 'TILT',    full: 'Slat angle',        dpt: 'DPST-5-001', t: 'ctrl', mid: 4, midName: 'Tilt'    },
+    { n: 'TILT_FB', full: 'Slat feedback',     dpt: 'DPST-5-001', t: 'fb',   mid: 5, midName: 'TiltFb'  }
   ],
   hvac_unit: [
     { n: 'ENABLE',   full: 'On/Off',             dpt: 'DPST-1-001',  t: 'ctrl' },
@@ -245,7 +245,7 @@ function generateGAs({ structure, floors, systems, circuits = {}, manualGAs = []
   const subCounter = {};
   function nextSub(main, mid) {
     const k = `${main}/${mid}`;
-    if (subCounter[k] === undefined) subCounter[k] = 0;
+    if (subCounter[k] === undefined) subCounter[k] = 1;
     return subCounter[k];
   }
   function advanceSub(main, mid, count) {
