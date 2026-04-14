@@ -555,7 +555,7 @@ function renderFloorCard(floor, fi) {
   const roomTags = floor.rooms.map((r, ri) => `
     <div class="room-tag" id="chip-${fi}-${ri}">
       <span class="room-tag-text" ondblclick="startRenameRoomChip(${fi},${ri})">${escHtml(r)}</span>
-      <button class="room-tag-del" onclick="removeRoom(${fi},${ri})" title="${vi?'Xóa':'Remove'}">×</button>
+      <button class="room-tag-del" onclick="removeRoom(${fi},${ri})" title="${vi?'Xóa':'Remove'}">✕</button>
     </div>`).join('');
 
   return `
@@ -565,16 +565,14 @@ function renderFloorCard(floor, fi) {
       <input class="floor-name-field" value="${escHtml(floor.name)}"
         oninput="state.floors[${fi}].name=this.value;debouncedSave();renderSidebar()"
         title="${vi?'Click để đổi tên':'Click to rename'}" />
-      <span class="floor-room-count" id="frc-${fi}">${rc} ${vi?'phòng':rc===1?'room':'rooms'}</span>
-      <button class="btn-icon danger btn-sm" onclick="removeFloor(${fi})"
-        title="${vi?'Xóa tầng':'Remove floor'}" style="flex-shrink:0">✕</button>
+      <span class="floor-room-count ${rc===0?'zero':''}" id="frc-${fi}">${rc} ${vi?'phòng':rc===1?'room':'rooms'}</span>
+      <button class="floor-del" onclick="removeFloor(${fi})" title="${vi?'Xóa tầng':'Remove floor'}">✕</button>
     </div>
     <div class="floor-card-body">
       <div class="room-tags" id="rtags-${fi}">${roomTags}</div>
       <div class="room-add-row">
-        <span style="color:var(--teal-400);font-size:16px;line-height:1;flex-shrink:0">+</span>
         <input class="room-add-input" id="room-input-${fi}" type="text"
-          placeholder="${vi?'Thêm phòng… (Enter để lưu)':'Add a room… (Enter to save)'}"
+          placeholder="${vi?'+ Thêm phòng… (Enter để lưu)':'+ Add a room… (Enter to save)'}"
           onkeydown="handleRoomKey(event,${fi})" />
         <button class="room-add-btn" onclick="addRoomFromInput(${fi})">${vi?'Thêm':'Add'}</button>
       </div>
@@ -594,15 +592,16 @@ function renderFloorTree() {
         <span class="mid-badge">M${floor.mid}</span>
         <input class="floor-name-field" value="${escHtml(floor.name)}"
           oninput="state.floors[${fi}].name=this.value;debouncedSave();renderSidebar()"
-          onclick="event.stopPropagation()" style="flex:1" />
-        <span class="floor-room-count" id="frc-${fi}" style="flex-shrink:0">${rc} ${vi?'phòng':rc===1?'room':'rooms'}</span>
-        <button class="btn-icon danger btn-sm" onclick="event.stopPropagation();removeFloor(${fi})"
+          onclick="event.stopPropagation()" />
+        <span class="floor-room-count ${rc===0?'zero':''}" id="frc-${fi}" style="flex-shrink:0">${rc} ${vi?'phòng':rc===1?'room':'rooms'}</span>
+        <button class="floor-del" onclick="event.stopPropagation();removeFloor(${fi})"
           title="${vi?'Xóa tầng':'Remove floor'}">✕</button>
       </div>
       ${isOpen ? `
       <div class="tree-floor-body tree-connector">
         ${floor.rooms.map((r, ri) => `
         <div class="tree-room-row" id="troom-${fi}-${ri}">
+          <span class="tree-room-idx">${ri + 1}</span>
           <span class="tree-room-name" id="tname-${fi}-${ri}">${escHtml(r)}</span>
           <div class="tree-room-actions">
             <button class="tree-icon-btn" onclick="startRenameRoomTree(${fi},${ri})" title="${vi?'Đổi tên':'Rename'}">✎</button>
@@ -610,9 +609,8 @@ function renderFloorTree() {
           </div>
         </div>`).join('')}
         <div class="tree-add-room">
-          <span style="color:var(--teal-400);font-size:14px;line-height:1;flex-shrink:0">+</span>
           <input class="tree-add-room-inp" id="room-input-${fi}" type="text"
-            placeholder="${vi?'Thêm phòng… (Enter)':'Add a room… (Enter)'}"
+            placeholder="${vi?'+ Thêm phòng… (Enter)':'+ Add a room… (Enter)'}"
             onkeydown="handleRoomKey(event,${fi})" />
           <button class="room-add-btn" onclick="addRoomFromInput(${fi})">${vi?'Thêm':'Add'}</button>
         </div>

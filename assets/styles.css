@@ -911,24 +911,27 @@ label.field-label {
 .vt-btn.active { background: #fff; color: var(--gray-800); box-shadow: var(--shadow-sm); }
 
 /* ── Step 3 — Floor builder ─────────────────────────────────────────────── */
-.floors-list { display: flex; flex-direction: column; gap: 12px; }
+.floors-list { display: flex; flex-direction: column; gap: 10px; }
+
 .floor-card {
     background: #fff;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius);
     overflow: hidden;
-    transition: box-shadow .15s;
+    transition: box-shadow .15s, border-color .15s;
 }
-.floor-card:focus-within { box-shadow: 0 0 0 2px rgba(13,148,136,.15); border-color: var(--teal-300); }
+.floor-card:focus-within { box-shadow: 0 0 0 2px rgba(13,148,136,.12); border-color: var(--teal-300); }
+
 .floor-card-header {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 14px;
+    padding: 11px 12px 11px 0;
     background: var(--gray-50);
     border-bottom: 1px solid var(--gray-100);
+    border-left: 3px solid var(--teal-400);
+    padding-left: 12px;
 }
-.floor-card-header.fixed-floor { background: var(--teal-50); }
 .mid-badge {
     display: inline-flex;
     align-items: center;
@@ -947,190 +950,201 @@ label.field-label {
     flex: 1;
     border: none;
     background: transparent;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--gray-800);
     outline: none;
     min-width: 0;
+    transition: color .12s;
 }
-.floor-name-field:focus {
-    background: #fff;
-    border-radius: 4px;
-    box-shadow: 0 0 0 2px rgba(13,148,136,.2);
-    padding: 2px 6px;
-    margin: -2px -6px;
-}
+.floor-name-field:focus { color: var(--teal-700); }
+
 .floor-room-count {
     font-size: 11px;
-    color: var(--gray-400);
+    font-weight: 600;
+    background: var(--teal-50);
+    color: var(--teal-600);
+    padding: 2px 8px;
+    border-radius: 10px;
     white-space: nowrap;
     flex-shrink: 0;
 }
-.floor-card-body { padding: 12px 14px; }
-.room-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.floor-room-count.zero { background: var(--gray-100); color: var(--gray-400); }
+
+.floor-del {
+    width: 26px; height: 26px;
+    border: none; background: transparent;
+    color: var(--gray-300); font-size: 13px;
+    cursor: pointer; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .12s; flex-shrink: 0;
+}
+.floor-del:hover { background: #fee2e2; color: #ef4444; }
+
+.floor-card-body { padding: 14px 16px 12px; }
+
+/* Room tags */
+.room-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; min-height: 2px; }
 .room-tag {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    background: var(--gray-100);
+    padding: 5px 6px 5px 11px;
+    border-radius: 6px;
+    background: var(--gray-50);
     border: 1px solid var(--gray-200);
-    font-size: 12px;
+    font-size: 12.5px;
     color: var(--gray-700);
     cursor: default;
-    transition: background .1s;
+    transition: background .1s, border-color .1s;
+    gap: 0;
 }
-.room-tag:hover { background: var(--gray-200); }
-.room-tag.fixed-room { background: var(--teal-50); border-color: var(--teal-200); color: var(--teal-800); }
+.room-tag:hover { background: var(--gray-100); border-color: var(--gray-300); }
+.room-tag.fixed-room { background: var(--teal-50); border-color: var(--teal-200); color: var(--teal-700); }
+.room-tag-text { margin-right: 5px; }
 .room-tag-del {
-    background: none;
-    border: none;
-    padding: 0;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
+    width: 18px; height: 18px;
+    border: none; background: transparent;
+    color: var(--gray-300); font-size: 11px;
+    cursor: pointer; border-radius: 3px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px;
-    color: var(--gray-400);
-    cursor: pointer;
-    transition: all .1s;
-    flex-shrink: 0;
+    transition: all .1s; flex-shrink: 0;
 }
-.room-tag-del:hover { background: #fecaca; color: #dc2626; }
+.room-tag-del:hover { background: #fee2e2; color: #ef4444; }
+
+/* Add room row */
 .room-add-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: var(--gray-50);
     border: 1px dashed var(--gray-300);
     border-radius: var(--radius-sm);
-    padding: 6px 10px;
+    overflow: hidden;
     transition: all .15s;
 }
 .room-add-row:focus-within {
-    background: #fff;
-    border-color: var(--teal-400);
     border-style: solid;
-    box-shadow: 0 0 0 2px rgba(13,148,136,.12);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(13,148,136,.1);
 }
 .room-add-input {
     flex: 1;
-    border: none;
-    background: transparent;
-    font-size: 13px;
-    color: var(--gray-800);
-    outline: none;
+    border: none; background: transparent;
+    font-size: 12.5px; padding: 8px 10px;
+    color: var(--gray-800); outline: none;
 }
 .room-add-input::placeholder { color: var(--gray-400); }
 .room-add-btn {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    padding: 3px 10px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity .15s;
+    background: var(--accent); color: #fff;
+    border: none; padding: 8px 14px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer; opacity: 0;
+    transition: opacity .15s; white-space: nowrap;
 }
 .room-add-row:focus-within .room-add-btn { opacity: 1; }
+
+/* Add floor button */
 .add-floor-btn {
-    margin-top: 4px;
+    margin-top: 8px;
     background: transparent;
     border: 2px dashed var(--gray-200);
     border-radius: var(--radius);
-    padding: 12px;
+    padding: 14px;
     width: 100%;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 13px; font-weight: 500;
     color: var(--gray-400);
     cursor: pointer;
     transition: all .15s;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 .add-floor-btn:hover { border-color: var(--teal-400); color: var(--teal-600); background: var(--teal-50); }
 
 /* ── Step 3 — Room inline rename ────────────────────────────────────────── */
 .room-tag-rename {
     border: none; background: transparent; outline: none;
-    font-size: 12px; color: var(--gray-800);
+    font-size: 12.5px; color: var(--gray-800);
     min-width: 40px; max-width: 160px;
 }
-.room-tag.editing { background: #fff; border-color: var(--teal-400);
-    box-shadow: 0 0 0 2px rgba(13,148,136,.15); }
+.room-tag.editing {
+    background: #fff; border-color: var(--teal-400);
+    box-shadow: 0 0 0 2px rgba(13,148,136,.15);
+}
 
 /* ── Step 3 — Tree view ──────────────────────────────────────────────────── */
-.tree-list { display: flex; flex-direction: column; gap: 4px; }
-.tree-floor-node { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--gray-200); background: #fff; }
+.tree-list { display: flex; flex-direction: column; gap: 6px; }
+.tree-floor-node {
+    border-radius: var(--radius); overflow: hidden;
+    border: 1px solid var(--gray-200); background: #fff;
+    transition: border-color .15s, box-shadow .15s;
+}
 .tree-floor-node:focus-within { border-color: var(--teal-300); box-shadow: 0 0 0 2px rgba(13,148,136,.1); }
 .tree-floor-hd {
-    display: flex; align-items: center; gap: 6px;
-    padding: 8px 12px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 11px 12px 11px 0;
     background: var(--gray-50);
     border-bottom: 1px solid transparent;
+    border-left: 3px solid transparent;
     cursor: pointer; user-select: none;
+    padding-left: 12px;
+    transition: border-color .12s;
 }
-.tree-floor-hd.open { border-bottom-color: var(--gray-100); }
+.tree-floor-hd.open { border-bottom-color: var(--gray-100); border-left-color: var(--teal-400); }
 .tree-caret {
-    font-size: 10px; color: var(--gray-400);
+    font-size: 9px; color: var(--gray-400);
     transition: transform .15s; flex-shrink: 0;
 }
 .tree-caret.open { transform: rotate(90deg); }
-.tree-floor-body { padding: 6px 12px 10px 36px; }
+.tree-floor-body { padding: 8px 14px 12px 40px; }
+
 .tree-room-row {
-    display: flex; align-items: center; gap: 6px;
-    padding: 4px 6px; border-radius: var(--radius-sm);
-    font-size: 13px; color: var(--gray-700);
-    position: relative;
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; border-radius: var(--radius-sm);
+    color: var(--gray-700);
+    transition: background .1s;
 }
-.tree-room-row:hover { background: var(--gray-100); }
-.tree-room-row::before {
-    content: ''; position: absolute; left: -16px; top: 50%;
-    width: 10px; height: 1px; background: var(--gray-300);
+.tree-room-row:hover { background: var(--gray-50); }
+.tree-room-idx {
+    font-size: 10px; font-family: var(--font-mono);
+    color: var(--gray-300); width: 16px;
+    text-align: right; flex-shrink: 0;
 }
-.tree-room-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tree-room-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
 .tree-room-rename-inp {
     flex: 1; border: 1px solid var(--teal-400); border-radius: 4px;
-    padding: 1px 6px; font-size: 13px; outline: none;
+    padding: 2px 8px; font-size: 13px; outline: none;
     background: #fff; color: var(--gray-800);
 }
 .tree-room-actions { display: none; gap: 2px; flex-shrink: 0; }
 .tree-room-row:hover .tree-room-actions { display: flex; }
 .tree-icon-btn {
-    background: none; border: none; padding: 2px 4px; border-radius: 3px;
+    background: none; border: none; padding: 3px 5px; border-radius: 4px;
     cursor: pointer; font-size: 12px; color: var(--gray-400);
-    line-height: 1;
+    line-height: 1; transition: all .1s;
 }
-.tree-icon-btn:hover { background: var(--gray-200); color: var(--gray-700); }
-.tree-icon-btn.danger:hover { background: #fecaca; color: #dc2626; }
+.tree-icon-btn:hover { background: var(--gray-100); color: var(--gray-700); }
+.tree-icon-btn.danger:hover { background: #fee2e2; color: #dc2626; }
+
 .tree-add-room {
-    display: flex; align-items: center; gap: 6px;
-    padding: 4px 6px; margin-top: 4px;
-    border-radius: var(--radius-sm);
-    border: 1px dashed var(--gray-300); background: var(--gray-50);
-    font-size: 12px; color: var(--gray-400);
-    transition: all .15s;
+    display: flex; align-items: center;
+    margin-top: 6px; border-radius: var(--radius-sm);
+    border: 1px dashed var(--gray-300);
+    overflow: hidden; transition: all .15s;
 }
 .tree-add-room:focus-within {
-    border-color: var(--teal-400); border-style: solid;
-    background: #fff; color: var(--gray-700);
+    border-color: var(--accent); border-style: solid;
     box-shadow: 0 0 0 2px rgba(13,148,136,.1);
 }
 .tree-add-room-inp {
     flex: 1; border: none; background: transparent;
     font-size: 12px; outline: none; color: var(--gray-800);
+    padding: 7px 10px;
 }
 .tree-add-room-inp::placeholder { color: var(--gray-400); }
+.tree-add-room .room-add-btn { opacity: 0; padding: 7px 12px; font-size: 11px; }
+.tree-add-room:focus-within .room-add-btn { opacity: 1; }
+
 .tree-connector { position: relative; }
 .tree-connector::before {
     content: ''; position: absolute;
-    left: -16px; top: 0; bottom: 0;
+    left: -20px; top: 0; bottom: 0;
     width: 1px; background: var(--gray-200);
 }
 
