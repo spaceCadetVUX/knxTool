@@ -261,7 +261,7 @@ function generateGAs({ structure, floors, systems, circuits = {}, manualGAs = []
     // Per floor → per room → per circuit type → per unit quantity
     floors.forEach((floor, fi) => {
       if (floor.mid === 0) return;
-      const fp = floorPrefix[floor.mid] || `FL${floor.mid}`;
+      const fp = floor.name;
 
       floor.rooms.forEach((room, ri) => {
         if (room === 'All zones' || room === 'Scenes') return;
