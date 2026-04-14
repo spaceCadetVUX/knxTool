@@ -7,7 +7,7 @@ const ALLOWED_ORIGINS = [
 
 // ─── SYSTEM INFO ──────────────────────────────────────────────────────────────
 const sysInfo = {
-  lt:   { name_en: 'Lighting',      name_vi: 'Chiếu sáng',         desc_en: 'Switching, dimming, CCT and RGBW circuits.',      desc_vi: 'Điều khiển bật/tắt, dim, nhiệt độ màu, RGBW.',      main: 1, icon: 'light', gaNames: ['SW','FB','DIM','VAL','VALFB','CCT','CCT_FB','RGB','RGB_FB'] },
+  lt:   { name_en: 'Lighting',      name_vi: 'Chiếu sáng',         desc_en: 'Switching, dimming, CCT and RGBW circuits.',      desc_vi: 'Điều khiển bật/tắt, dim, nhiệt độ màu, RGBW.',      main: 1, midScheme: 'gatype', icon: 'light', gaNames: ['SW','FB','DIM','VAL','VALFB','CCT','CCT_FB','RGB','RGB_FB'] },
   pres: { name_en: 'Presence',      name_vi: 'Cảm biến hiện diện', desc_en: 'Motion sensors with lux value and lock.',         desc_vi: 'Cảm biến chuyển động với giá trị lux và khoá.',      main: 2, icon: 'pres',  gaNames: ['STATUS','LUX','LOCK'] },
   sht:  { name_en: 'Shutter',       name_vi: 'Rèm / Mành',         desc_en: 'Up/down, position, tilt and safety lockout.',     desc_vi: 'Lên/xuống, vị trí, góc cánh và khoá an toàn.',      main: 3, icon: 'sht',   gaNames: ['MOVE','STEP','POS','POS_FB','TILT','TILT_FB','WIND','RAIN'] },
   hvac: { name_en: 'HVAC',          name_vi: 'HVAC',                desc_en: 'Temperature, setpoint, mode and fan speed.',      desc_vi: 'Nhiệt độ, cài đặt, chế độ và tốc độ quạt.',         main: 4, mainFb: 5, nameFb_en: 'HVAC Feedback', nameFb_vi: 'HVAC - Phản hồi', icon: 'hvac',  gaNames: ['ENABLE','SETP','MODE','FAN','TEMP_ACT','SETP_FB','MODE_FB','FAN_FB','VALVE_FB','ENABLE_FB'] },
@@ -129,33 +129,33 @@ const circuitDefs = {
 // Subset of gasets used per circuit type — key: `${sysKey}_${circuitKey}`
 const circuitGaSet = {
   lt_onoff: [
-    { n: 'SW', full: 'Switch',          dpt: 'DPST-1-001', t: 'ctrl' },
-    { n: 'FB', full: 'Switch feedback', dpt: 'DPST-1-001', t: 'fb'   }
+    { n: 'SW', full: 'Switch',          dpt: 'DPST-1-001', t: 'ctrl', mid: 0, midName: 'SW' },
+    { n: 'FB', full: 'Switch feedback', dpt: 'DPST-1-001', t: 'fb',   mid: 1, midName: 'FB' }
   ],
   lt_dim: [
-    { n: 'SW',    full: 'Switch',              dpt: 'DPST-1-001', t: 'ctrl' },
-    { n: 'FB',    full: 'Switch feedback',     dpt: 'DPST-1-001', t: 'fb'   },
-    { n: 'DIM',   full: 'Dimming step',        dpt: 'DPST-3-007', t: 'ctrl' },
-    { n: 'VAL',   full: 'Brightness value',    dpt: 'DPST-5-001', t: 'ctrl' },
-    { n: 'VALFB', full: 'Brightness feedback', dpt: 'DPST-5-001', t: 'fb'   }
+    { n: 'SW',    full: 'Switch',              dpt: 'DPST-1-001', t: 'ctrl', mid: 0, midName: 'SW'    },
+    { n: 'FB',    full: 'Switch feedback',     dpt: 'DPST-1-001', t: 'fb',   mid: 1, midName: 'FB'    },
+    { n: 'DIM',   full: 'Dimming step',        dpt: 'DPST-3-007', t: 'ctrl', mid: 2, midName: 'DIM'   },
+    { n: 'VAL',   full: 'Brightness value',    dpt: 'DPST-5-001', t: 'ctrl', mid: 3, midName: 'VAL'   },
+    { n: 'VALFB', full: 'Brightness feedback', dpt: 'DPST-5-001', t: 'fb',   mid: 4, midName: 'VALFB' }
   ],
   lt_cct: [
-    { n: 'SW',     full: 'Switch',              dpt: 'DPST-1-001', t: 'ctrl' },
-    { n: 'FB',     full: 'Switch feedback',     dpt: 'DPST-1-001', t: 'fb'   },
-    { n: 'DIM',    full: 'Dimming step',        dpt: 'DPST-3-007', t: 'ctrl' },
-    { n: 'VAL',    full: 'Brightness value',    dpt: 'DPST-5-001', t: 'ctrl' },
-    { n: 'VALFB',  full: 'Brightness feedback', dpt: 'DPST-5-001', t: 'fb'   },
-    { n: 'CCT',    full: 'Colour temperature',  dpt: 'DPST-9-001', t: 'ctrl' },
-    { n: 'CCT_FB', full: 'CCT feedback',        dpt: 'DPST-9-001', t: 'fb'   }
+    { n: 'SW',     full: 'Switch',              dpt: 'DPST-1-001', t: 'ctrl', mid: 0, midName: 'SW'    },
+    { n: 'FB',     full: 'Switch feedback',     dpt: 'DPST-1-001', t: 'fb',   mid: 1, midName: 'FB'    },
+    { n: 'DIM',    full: 'Dimming step',        dpt: 'DPST-3-007', t: 'ctrl', mid: 2, midName: 'DIM'   },
+    { n: 'VAL',    full: 'Brightness value',    dpt: 'DPST-5-001', t: 'ctrl', mid: 3, midName: 'VAL'   },
+    { n: 'VALFB',  full: 'Brightness feedback', dpt: 'DPST-5-001', t: 'fb',   mid: 4, midName: 'VALFB' },
+    { n: 'CCT',    full: 'Colour temperature',  dpt: 'DPST-9-001', t: 'ctrl', mid: 5, midName: 'CCT'   },
+    { n: 'CCT_FB', full: 'CCT feedback',        dpt: 'DPST-9-001', t: 'fb',   mid: 5, midName: 'CCT'   }
   ],
   lt_rgb: [
-    { n: 'SW',     full: 'Switch',              dpt: 'DPST-1-001',   t: 'ctrl' },
-    { n: 'FB',     full: 'Switch feedback',     dpt: 'DPST-1-001',   t: 'fb'   },
-    { n: 'DIM',    full: 'Dimming step',        dpt: 'DPST-3-007',   t: 'ctrl' },
-    { n: 'VAL',    full: 'Brightness value',    dpt: 'DPST-5-001',   t: 'ctrl' },
-    { n: 'VALFB',  full: 'Brightness feedback', dpt: 'DPST-5-001',   t: 'fb'   },
-    { n: 'RGB',    full: 'RGBW colour',         dpt: 'DPST-232-600', t: 'ctrl' },
-    { n: 'RGB_FB', full: 'RGBW feedback',       dpt: 'DPST-232-600', t: 'fb'   }
+    { n: 'SW',     full: 'Switch',              dpt: 'DPST-1-001',   t: 'ctrl', mid: 0, midName: 'SW'    },
+    { n: 'FB',     full: 'Switch feedback',     dpt: 'DPST-1-001',   t: 'fb',   mid: 1, midName: 'FB'    },
+    { n: 'DIM',    full: 'Dimming step',        dpt: 'DPST-3-007',   t: 'ctrl', mid: 2, midName: 'DIM'   },
+    { n: 'VAL',    full: 'Brightness value',    dpt: 'DPST-5-001',   t: 'ctrl', mid: 3, midName: 'VAL'   },
+    { n: 'VALFB',  full: 'Brightness feedback', dpt: 'DPST-5-001',   t: 'fb',   mid: 4, midName: 'VALFB' },
+    { n: 'RGB',    full: 'RGBW colour',         dpt: 'DPST-232-600', t: 'ctrl', mid: 6, midName: 'RGB'   },
+    { n: 'RGB_FB', full: 'RGBW feedback',       dpt: 'DPST-232-600', t: 'fb',   mid: 6, midName: 'RGB'   }
   ],
   pres_sensor: [
     { n: 'STATUS', full: 'Occupancy status', dpt: 'DPST-1-001', t: 'fb'   },
@@ -283,7 +283,27 @@ function generateGAs({ structure, floors, systems, circuits = {}, manualGAs = []
           const circuitLabel = cdefs.length > 1 ? ` - [${clabel}] - ` : ' - ';
 
           names.forEach((name, ui) => {
-            if (si.mainFb) {
+            if (si.midScheme === 'gatype') {
+              // Lighting: middle group encodes GA type (SW=0, FB=1, DIM=2, VAL=3, VALFB=4, CCT=5, RGB=6)
+              // Sub counter is per main/gaMid across all floors
+              cset.forEach((ga, gi) => {
+                const gaMid = ga.mid;
+                const sub = nextSub(mainNum, gaMid);
+                gas.push({
+                  addr:     `${mainNum}/${gaMid}/${sub}`,
+                  name:     `${px} - ${fp} - ${room}${circuitLabel}${name} - ${ga.n}`,
+                  dpt:      ga.dpt,
+                  type:     ga.t,
+                  main:     mainNum,
+                  mid:      gaMid,
+                  midName:  ga.midName,
+                  mainName: si.name_en,
+                  room:     room,
+                  _id:      `${sk}_${fi}_${ri}_${ck}_${ui}_${gi}`
+                });
+                advanceSub(mainNum, gaMid, 1);
+              });
+            } else if (si.mainFb) {
               // Systems with separate ctrl / fb main groups (e.g. HVAC: ctrl=4, fb=5)
               const ctrlSet = cset.filter(ga => ga.t === 'ctrl');
               const fbSet   = cset.filter(ga => ga.t === 'fb');
@@ -416,7 +436,7 @@ function buildXML(gas, { projectName = '', floors = [], includeDpt = true, inclu
     }
     if (!mainGroups[g.main].mids[g.mid]) {
       const floor = floors.find(f => f.mid === g.mid);
-      mainGroups[g.main].mids[g.mid] = { name: floor ? floor.name : 'Zone', gas: [] };
+      mainGroups[g.main].mids[g.mid] = { name: g.midName || (floor ? floor.name : 'Zone'), gas: [] };
     }
     mainGroups[g.main].mids[g.mid].gas.push(g);
   });
@@ -471,7 +491,7 @@ function buildCSV(gas, { floors = [] } = {}) {
     }
     if (!mainGroups[g.main].mids[g.mid]) {
       const floor = floors.find(f => f.mid === g.mid);
-      mainGroups[g.main].mids[g.mid] = { name: floor ? floor.name : 'Zone', gas: [] };
+      mainGroups[g.main].mids[g.mid] = { name: g.midName || (floor ? floor.name : 'Zone'), gas: [] };
     }
     mainGroups[g.main].mids[g.mid].gas.push(g);
   });
@@ -507,23 +527,29 @@ function buildCSV(gas, { floors = [] } = {}) {
  * @returns {{ floors, circuits, systems, ltSubs, hvacSubs }}
  */
 function reconstructFromXML(xmlString) {
-  // 1. Parse floor names from middle-level GroupRange elements
-  //    e.g. <GroupRange Name="1/1 Tầng 1 " ...>  → mid=1, name="Tầng 1"
+  // 0. Identify gatype main groups (mid encodes GA type, not floor)
+  const gatypeMains = new Set();
+  Object.values(sysInfo).forEach(si => { if (si.midScheme === 'gatype') gatypeMains.add(si.main); });
+
+  // 1. Parse floor names from middle-level GroupRange elements (skip gatype mains)
+  //    e.g. <GroupRange Name="3/1 Tầng 1" ...>  → mid=1, name="Tầng 1"
   const floorNames = {};
   const grRegex = /<GroupRange\s[^>]*?Name="([^"]*)"/g;
   let grM;
   while ((grM = grRegex.exec(xmlString)) !== null) {
-    const midM = grM[1].match(/^\d+\/(\d+)\s+(.*)/);
+    const midM = grM[1].match(/^(\d+)\/(\d+)\s+(.*)/);
     if (midM) {
-      const mid = parseInt(midM[1]);
-      const fname = midM[2].trim();
+      const mainG = parseInt(midM[1]);
+      if (gatypeMains.has(mainG)) continue; // LT uses gatype: "1/0 SW" is not a floor name
+      const mid = parseInt(midM[2]);
+      const fname = midM[3].trim();
       if (mid > 0 && fname) floorNames[mid] = fname;
     }
   }
 
   // 2. Parse all GAs
   const gas = parseXML(xmlString);
-  if (!gas.length) return { floors: [], circuits: {}, systems: {}, ltSubs: {}, hvacSubs: {} };
+  if (!gas.length) return { floors: [], circuits: {}, systems: {}, ltSubs: {} };
 
   // 3. Helpers
   const prefixToSk = {};
@@ -535,27 +561,58 @@ function reconstructFromXML(xmlString) {
     defs.forEach(([ck, label]) => { labelToCk[sk][label] = ck; });
   });
 
-  // 4. Build unique circuit signatures per mid
+  // Reverse map: floor name → mid (from non-gatype GroupRanges)
+  const floorNameToMid = {};
+  Object.entries(floorNames).forEach(([mid, name]) => { floorNameToMid[name] = parseInt(mid); });
+
+  // For gatype-only projects: auto-assign mids by first appearance
+  const gatypeFloorMids = {}; // floorName → assigned mid
+  let nextAutoMid = 1;
+
+  // 4. Build unique circuit signatures per floorMid
   //    Signature = GA name without trailing " - GA_SHORT"
-  //    e.g. "LT - Tầng 1 - Phòng ăn - [Dimming] - Hắt trần" (deduplicates SW/FB/etc.)
-  const sigMap = {}; // mid → { sig → { sk, room, parts } }
+  const sigMap = {}; // floorMid → { sig → { sk, room, parts } }
   const systems = Object.fromEntries(Object.keys(sysInfo).map(k => [k, false]));
 
   gas.forEach(g => {
-    if (g.mid === 0) return;
     const parts = g.name.split(' - ');
     if (parts.length < 5) return; // min: PREFIX - FP - ROOM - NAME - GA_SHORT
     const sk = prefixToSk[parts[0].trim()];
     if (!sk) return;
     systems[sk] = true;
+
+    const si = sysInfo[sk];
+    let floorMid;
+
+    if (si.midScheme === 'gatype') {
+      // For gatype systems (LT), mid in address = GA type; floor name is in parts[1]
+      const fpName = parts[1].trim();
+      if (floorNameToMid[fpName] !== undefined) {
+        floorMid = floorNameToMid[fpName];
+      } else if (gatypeFloorMids[fpName] !== undefined) {
+        floorMid = gatypeFloorMids[fpName];
+      } else {
+        // Assign next available mid not already used
+        while (floorNames[nextAutoMid] !== undefined || Object.values(gatypeFloorMids).includes(nextAutoMid)) {
+          nextAutoMid++;
+        }
+        gatypeFloorMids[fpName] = nextAutoMid;
+        floorMid = nextAutoMid;
+        nextAutoMid++;
+      }
+    } else {
+      if (g.mid === 0) return;
+      floorMid = g.mid;
+    }
+
     const sig = parts.slice(0, -1).join(' - ');
     const room = parts[2].trim();
-    if (!sigMap[g.mid]) sigMap[g.mid] = {};
-    if (!sigMap[g.mid][sig]) sigMap[g.mid][sig] = { sk, room, parts };
+    if (!sigMap[floorMid]) sigMap[floorMid] = {};
+    if (!sigMap[floorMid][sig]) sigMap[floorMid][sig] = { sk, room, parts };
   });
 
   // 5. First pass: collect rooms from all signatures (room is always parts[2])
-  const midRooms = {}; // mid → string[] unique ordered
+  const midRooms = {}; // floorMid → string[] unique ordered
   Object.entries(sigMap).forEach(([midStr, sigs]) => {
     const mid = parseInt(midStr);
     midRooms[mid] = [];
@@ -568,10 +625,20 @@ function reconstructFromXML(xmlString) {
   const floorMap = {};
   Object.entries(midRooms).forEach(([midStr, rooms]) => {
     const mid = parseInt(midStr);
-    floorMap[mid] = { id: 'f' + mid, mid, name: floorNames[mid] || floorPrefix[mid] || ('Floor ' + mid), rooms: [...rooms] };
+    let fname = floorNames[mid];
+    if (!fname) {
+      const entry = Object.entries(gatypeFloorMids).find(([, m]) => m === mid);
+      if (entry) fname = entry[0];
+    }
+    floorMap[mid] = { id: 'f' + mid, mid, name: fname || floorPrefix[mid] || ('Floor ' + mid), rooms: [...rooms] };
   });
-  gas.forEach(g => { // cover floors without bracket-extractable rooms
-    if (g.mid === 0 || floorMap[g.mid]) return;
+  // Cover floors appearing in non-gatype GAs but with no extractable rooms
+  gas.forEach(g => {
+    const parts = g.name.split(' - ');
+    const sk = prefixToSk[(parts[0] || '').trim()];
+    if (!sk) return;
+    const si = sysInfo[sk];
+    if (si.midScheme === 'gatype' || g.mid === 0 || floorMap[g.mid]) return;
     floorMap[g.mid] = { id: 'f' + g.mid, mid: g.mid, name: floorNames[g.mid] || floorPrefix[g.mid] || ('Floor ' + g.mid), rooms: [] };
   });
   const floors = Object.values(floorMap).sort((a, b) => a.mid - b.mid);
@@ -582,7 +649,7 @@ function reconstructFromXML(xmlString) {
   const roomIdx = {};
   floors.forEach((f, fi) => { roomIdx[fi] = {}; f.rooms.forEach((r, ri) => { roomIdx[fi][r] = ri; }); });
 
-  // 8. Second pass: build circuits + detect lt/hvac subtypes
+  // 8. Second pass: build circuits + detect lt subtypes
   const circuits = {};
   const ltSubsFound = {};
 

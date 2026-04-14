@@ -82,7 +82,6 @@ const state = {
   structure: 'function',
   systems: { lt:true, pres:true, sht:true, hvac:true, sec:true, scn:true, av:false, nrg:false, sys:false },
   ltSubs:   { onoff:true, dim:true, cct:true, rgb:true },
-  hvacSubs: { therm:true, split:true, fcu:false, ufh:false, hp:false },
   floors: [],
   circuits:      {},
   generatedGAs:  [],
@@ -217,8 +216,7 @@ const sysIconSvg = {
 // Return only circuit defs enabled by sub-type selections
 function activeDefs(sk) {
   const all = circuitDefs[sk] || [];
-  if (sk === 'lt')   return all.filter(([ck]) => state.ltSubs[ck]);
-  if (sk === 'hvac') return all.filter(([ck]) => state.hvacSubs[ck]);
+  if (sk === 'lt') return all.filter(([ck]) => state.ltSubs[ck]);
   return all;
 }
 
@@ -441,8 +439,7 @@ function renderStep2() {
     </div>`;
   }
 
-  const ltSubChips  = [['onoff','On/Off'],['dim','Dimming'],['cct','CCT'],['rgb','RGBW']];
-  const hvacSubChips = [['therm','Thermostat'],['split','Split AC'],['fcu','FCU'],['ufh','UFH'],['hp','Heat pump']];
+  const ltSubChips = [['onoff','On/Off'],['dim','Dimming'],['cct','CCT'],['rgb','RGBW']];
 
   return `
   <div class="two-col">
@@ -462,11 +459,6 @@ function renderStep2() {
         ${ltSubChips.map(([k,l]) => `<div class="chip ${state.ltSubs[k] ? 'active' : ''}" onclick="state.ltSubs['${k}']=!state.ltSubs['${k}'];this.classList.toggle('active')">${l}</div>`).join('')}
       </div>` : ''}
 
-      ${state.systems.hvac ? `
-      <div class="sb-label">${t('hvac_subopts')}</div>
-      <div class="sub-chips">
-        ${hvacSubChips.map(([k,l]) => `<div class="chip ${state.hvacSubs[k] ? 'active' : ''}" onclick="state.hvacSubs['${k}']=!state.hvacSubs['${k}'];this.classList.toggle('active')">${l}</div>`).join('')}
-      </div>` : ''}
     </div>
     <div>
       <div class="ga-set-preview" id="ga-detail-pane">
@@ -1247,8 +1239,7 @@ function callGenerate() {
       systems:    state.systems,
       circuits:   state.circuits,
       manualGAs:  state.manualGAs,
-      ltSubs:     state.ltSubs,
-      hvacSubs:   state.hvacSubs
+      ltSubs:     state.ltSubs
     });
     state.generatedGAs = gas;
     renderPanel();
@@ -1297,7 +1288,6 @@ function callImportXML(rawStr) {
       const result = reconstructFromXML(rawStr);
       state.systems      = result.systems;
       state.ltSubs       = result.ltSubs;
-      state.hvacSubs     = result.hvacSubs;
       state.floors       = result.floors;
       state.circuits     = result.circuits;
       state.generatedGAs = [];
@@ -1464,7 +1454,7 @@ function showToast(msg, isError) {
 
 // ── localStorage persistence ──────────────────────────────────────────────────
 const STORAGE_KEY = 'knx_ga_planner_v2';
-const PERSIST_FIELDS = ['projectName','structure','systems','ltSubs','hvacSubs',
+const PERSIST_FIELDS = ['projectName','structure','systems','ltSubs',
   'floors','circuits','generatedGAs','manualGAs','exportFormat','exportOpts','lang'];
 
 function saveState() {
@@ -1508,7 +1498,6 @@ function newProject() {
     step: 1, projectName: '', structure: 'function',
     systems: { lt:true, pres:true, sht:true, hvac:true, sec:true, scn:true, av:false, nrg:false, sys:false },
     ltSubs:  { onoff:true, dim:true, cct:true, rgb:true },
-    hvacSubs:{ therm:true, split:true, fcu:false, ufh:false, hp:false },
     floors: [
     ],
     circuits: {}, generatedGAs: [], manualGAs: [],
