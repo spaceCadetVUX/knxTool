@@ -915,14 +915,9 @@ function renderStep5() {
       }).join('')}
     </div>
     <div style="display:flex;gap:8px;margin-left:auto;align-items:center">
-      ${isTree ? `
       <div class="view-toggle">
         <button class="vt-btn ${state.gaTreeGroup === 'mid'  ? 'active' : ''}" onclick="state.gaTreeGroup='mid';renderPanel()">${state.lang === 'vi' ? 'Theo tầng' : 'By Floor'}</button>
         <button class="vt-btn ${state.gaTreeGroup === 'main' ? 'active' : ''}" onclick="state.gaTreeGroup='main';renderPanel()">${state.lang === 'vi' ? 'Theo hệ thống' : 'By System'}</button>
-      </div>` : ''}
-      <div class="view-toggle">
-        <button class="vt-btn ${isTree ? 'active' : ''}" onclick="state.gaView='tree';renderPanel()">Tree</button>
-        <button class="vt-btn ${!isTree ? 'active' : ''}" onclick="state.gaView='table';renderPanel()">Table</button>
       </div>
       <button class="btn btn-secondary btn-sm" onclick="openImportModal()">${t('import_xml')}</button>
       <button class="btn btn-secondary btn-sm" onclick="callGenerate()">${t('regenerate')}</button>
@@ -931,9 +926,7 @@ function renderStep5() {
 
   ${total === 0
     ? `<div class="card" style="text-align:center;padding:40px;color:var(--gray-400)">${t('no_gas')}</div>`
-    : (isTree
-        ? (state.gaTreeGroup === 'main' ? renderGaTreeByMain(filtered) : renderGaTree(filtered))
-        : renderGaTable(filtered))
+    : (state.gaTreeGroup === 'main' ? renderGaTreeByMain(filtered) : renderGaTree(filtered))
   }
 
   <div class="card mt-4">
@@ -1077,25 +1070,31 @@ function renderGaTreeByMain(filtered) {
 }
 
 function renderGaTable(filtered) {
+  const addrLbl = state.lang === 'vi' ? 'Địa chỉ' : 'Address';
+  const nameLbl = state.lang === 'vi' ? 'Tên GA'  : 'GA Name';
+  const sysLbl  = state.lang === 'vi' ? 'Hệ thống': 'System';
+  const typeLbl = state.lang === 'vi' ? 'Loại'    : 'Type';
   return `<div class="ga-table-wrap">
     <table class="ga-table">
       <thead><tr>
-        <th style="width:72px">${state.lang === 'vi' ? 'Địa chỉ' : 'Address'}</th>
-        <th>${state.lang === 'vi' ? 'Tên' : 'Name'}</th>
-        <th style="width:120px">DPT</th>
-        <th style="width:60px">${state.lang === 'vi' ? 'Loại' : 'Type'}</th>
-        <th style="width:32px"></th>
+        <th class="col-addr">${addrLbl}</th>
+        <th>${nameLbl}</th>
+        <th class="col-sys">${sysLbl}</th>
+        <th class="col-dpt">DPT</th>
+        <th class="col-type">${typeLbl}</th>
+        <th class="col-del"></th>
       </tr></thead>
       <tbody>${filtered.map(g => `<tr>
-        <td style="font-family:var(--font-mono);color:var(--teal-700);font-weight:500">${g.addr}</td>
+        <td class="col-addr">${g.addr}</td>
         <td>
           <span class="ga-name-text" onclick="startGaEdit(this)">${escHtml(g.name)}</span>
           <input class="input-inline ga-name-input" data-addr="${g.addr}"
             onblur="stopGaEdit(this)" onkeydown="keyGaEdit(event,this)" />
         </td>
-        <td style="font-family:var(--font-mono);font-size:11px;color:var(--gray-400)">${g.dpt}</td>
-        <td><span class="badge ${g.type === 'ctrl' ? 'badge-teal' : 'badge-gray'}">${g.type === 'ctrl' ? t('ctrl_short') : t('fb_short')}</span></td>
-        <td><button class="btn-icon danger" onclick="deleteGA('${g.addr}')">✕</button></td>
+        <td class="col-sys"><span class="badge badge-gray" style="font-size:11px">${escHtml(g.mainName || '')}</span></td>
+        <td class="col-dpt">${g.dpt}</td>
+        <td class="col-type"><span class="badge ${g.type === 'ctrl' ? 'badge-teal' : 'badge-gray'}">${g.type === 'ctrl' ? t('ctrl_short') : t('fb_short')}</span></td>
+        <td class="col-del"><button class="btn-icon danger" onclick="deleteGA('${g.addr}')">✕</button></td>
       </tr>`).join('')}</tbody>
     </table>
   </div>`;

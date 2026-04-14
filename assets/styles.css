@@ -626,31 +626,39 @@ label.field-label {
 .ga-row .type { font-size: 10px; }
 .ga-row .actions { display: flex; gap: 4px; opacity: 0; transition: opacity .1s; }
 .ga-row:hover .actions { opacity: 1; }
-.ga-table-wrap { overflow-x: auto; }
+.ga-table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--gray-200); }
 .ga-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12px;
-    font-family: var(--font-mono);
+    font-size: 13px;
+    font-family: var(--font-sans);
 }
 .ga-table th {
-    padding: 7px 10px;
+    padding: 10px 14px;
     background: var(--gray-50);
     border-bottom: 2px solid var(--gray-200);
     font-weight: 600;
     text-align: left;
-    font-family: var(--font-sans);
     font-size: 11px;
     color: var(--gray-500);
     text-transform: uppercase;
     letter-spacing: .4px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 .ga-table td {
-    padding: 5px 10px;
+    padding: 9px 14px;
     border-bottom: 1px solid var(--gray-100);
     vertical-align: middle;
 }
+.ga-table tbody tr:last-child td { border-bottom: none; }
 .ga-table tr:hover td { background: var(--gray-50); }
+.ga-table .col-addr  { width: 96px;  font-family: var(--font-mono); font-weight: 600; color: var(--teal-700); font-size: 13px; }
+.ga-table .col-sys   { width: 130px; }
+.ga-table .col-dpt   { width: 136px; font-family: var(--font-mono); font-size: 12px; color: var(--gray-400); }
+.ga-table .col-type  { width: 64px;  }
+.ga-table .col-del   { width: 36px;  text-align: center; }
 .add-manual-form {
     display: flex;
     gap: 8px;
