@@ -10,7 +10,7 @@ const sysInfo = {
   lt:   { name_en: 'Lighting',      name_vi: 'Chiếu sáng',         desc_en: 'Switching, dimming, CCT and RGBW circuits.',      desc_vi: 'Điều khiển bật/tắt, dim, nhiệt độ màu, RGBW.',      main: 1, midScheme: 'gatype', icon: 'light', gaNames: ['SW','FB','DIM','VAL','VALFB','CCT','CCT_FB','RGB','RGB_FB'] },
   pres: { name_en: 'Presence',      name_vi: 'Cảm biến hiện diện', desc_en: 'Motion sensors with lux value and lock.',         desc_vi: 'Cảm biến chuyển động với giá trị lux và khoá.',      main: 2, midScheme: 'gatype', icon: 'pres',  gaNames: ['STATUS','LUX','LOCK'] },
   sht:  { name_en: 'Shutter',       name_vi: 'Rèm / Mành',         desc_en: 'Up/down, position, tilt and safety lockout.',     desc_vi: 'Lên/xuống, vị trí, góc cánh và khoá an toàn.',      main: 3, midScheme: 'gatype', icon: 'sht',   gaNames: ['MOVE','STEP','POS','POS_FB','TILT','TILT_FB','WIND','RAIN'] },
-  hvac: { name_en: 'HVAC',          name_vi: 'HVAC',                desc_en: 'Temperature, setpoint, mode and fan speed.',      desc_vi: 'Nhiệt độ, cài đặt, chế độ và tốc độ quạt.',         main: 4, mainFb: 5, nameFb_en: 'HVAC Feedback', nameFb_vi: 'HVAC - Phản hồi', icon: 'hvac',  gaNames: ['ENABLE','SETP','MODE','FAN','TEMP_ACT','SETP_FB','MODE_FB','FAN_FB','VALVE_FB','ENABLE_FB'] },
+  hvac: { name_en: 'HVAC',          name_vi: 'HVAC',                desc_en: 'Temperature, setpoint, mode and fan speed.',      desc_vi: 'Nhiệt độ, cài đặt, chế độ và tốc độ quạt.',         main: 4, mainFb: 5, nameFb_en: 'HVAC Feedback', nameFb_vi: 'HVAC - Phản hồi', midScheme: 'gatype', icon: 'hvac',  gaNames: ['ENABLE','SETP','MODE','FAN','TEMP_ACT','SETP_FB','MODE_FB','FAN_FB','VALVE_FB','ENABLE_FB'] },
   sec:  { name_en: 'Security',      name_vi: 'An ninh',             desc_en: 'Burglar zones, door sensors, fire and siren.',    desc_vi: 'Vùng báo trộm, cảm biến cửa, báo cháy, còi.',       main: 10, icon: 'sec',   gaNames: ['ARM_AWAY','ARM_HOME','DISARM','STATUS_FB','ZONE_STATUS','FIRE','SIREN'] },
   scn:  { name_en: 'Scenes',        name_vi: 'Cảnh (Scenes)',       desc_en: 'Central and per-room scene activation.',          desc_vi: 'Kích hoạt cảnh trung tâm và theo từng phòng.',       main: 6, icon: 'scn',   gaNames: ['ACTIVATE','FB'] },
   av:   { name_en: 'Audio Visual',  name_vi: 'Nghe nhìn',           desc_en: 'TV/amp power, source, volume and mute.',          desc_vi: 'Nguồn TV/amp, chọn đầu vào, âm lượng, tắt tiếng.',  main: 7, icon: 'av',    gaNames: ['POWER','SOURCE','VOL','VOL_FB','MUTE'] },
@@ -171,15 +171,21 @@ const circuitGaSet = {
     { n: 'TILT_FB', full: 'Slat feedback',     dpt: 'DPST-5-001', t: 'fb',   mid: 5, midName: 'TiltFb'  }
   ],
   hvac_unit: [
-    { n: 'ENABLE',   full: 'On/Off',             dpt: 'DPST-1-001',  t: 'ctrl' },
-    { n: 'SETP',     full: 'Setpoint',           dpt: 'DPST-9-001',  t: 'ctrl' },
-    { n: 'MODE',     full: 'HVAC mode',          dpt: 'DPST-20-102', t: 'ctrl' },
-    { n: 'FAN',      full: 'Fan speed',          dpt: 'DPST-5-001',  t: 'ctrl' },
-    { n: 'TEMP_ACT', full: 'Actual temperature', dpt: 'DPST-9-001',  t: 'fb'   },
-    { n: 'SETP_FB',  full: 'Setpoint feedback',  dpt: 'DPST-9-001',  t: 'fb'   },
-    { n: 'MODE_FB',  full: 'Mode feedback',      dpt: 'DPST-20-102', t: 'fb'   },
-    { n: 'FAN_FB',   full: 'Fan feedback',       dpt: 'DPST-5-001',  t: 'fb'   },
-    { n: 'ENABLE_FB',full: 'On/Off feedback',    dpt: 'DPST-1-001',  t: 'fb'   }
+    { n: 'ENABLE',      full: 'On/Off',             dpt: 'DPST-1-001',  t: 'ctrl', mid: 0, midName: 'Enable'     },
+    { n: 'SETP',        full: 'Setpoint',           dpt: 'DPST-9-001',  t: 'ctrl', mid: 1, midName: 'Setp'       },
+    { n: 'MODE',        full: 'HVAC mode',          dpt: 'DPST-20-102', t: 'ctrl', mid: 2, midName: 'Mode'       },
+    { n: 'FAN',         full: 'Fan speed',          dpt: 'DPST-5-001',  t: 'ctrl', mid: 3, midName: 'Fan'        },
+    { n: 'SETP_OFFSET', full: 'Setpoint offset',    dpt: 'DPST-9-002',  t: 'ctrl', mid: 4, midName: 'SeptOffset' },
+    { n: 'VALVE_CMD',   full: 'Valve command',      dpt: 'DPST-5-001',  t: 'ctrl', mid: 5, midName: 'ValveCmd'   },
+    { n: 'SWING',       full: 'Swing / louver',     dpt: 'DPST-5-010',  t: 'ctrl', mid: 6, midName: 'Swing'      },
+    { n: 'LOCK',        full: 'Remote lock',        dpt: 'DPST-1-001',  t: 'ctrl', mid: 7, midName: 'Lock'       },
+    { n: 'TEMP_ACT',    full: 'Actual temperature', dpt: 'DPST-9-001',  t: 'fb',   mid: 0, midName: 'TempAct'    },
+    { n: 'SETP_FB',     full: 'Setpoint feedback',  dpt: 'DPST-9-001',  t: 'fb',   mid: 1, midName: 'SeptFb'     },
+    { n: 'MODE_FB',     full: 'Mode feedback',      dpt: 'DPST-20-102', t: 'fb',   mid: 2, midName: 'ModeFb'     },
+    { n: 'FAN_FB',      full: 'Fan feedback',       dpt: 'DPST-5-001',  t: 'fb',   mid: 3, midName: 'FanFb'      },
+    { n: 'VALVE_FB',    full: 'Valve feedback',     dpt: 'DPST-5-001',  t: 'fb',   mid: 4, midName: 'ValveFb'    },
+    { n: 'HUMIDITY',    full: 'Humidity',           dpt: 'DPST-9-007',  t: 'fb',   mid: 5, midName: 'Humidity'   },
+    { n: 'ENABLE_FB',   full: 'On/Off feedback',    dpt: 'DPST-1-001',  t: 'fb',   mid: 7, midName: 'EnableFb'   }
   ],
   sec_zone: [
     { n: 'ARM_AWAY',  full: 'Arm away',     dpt: 'DPST-1-001', t: 'ctrl' },
@@ -284,24 +290,25 @@ function generateGAs({ structure, floors, systems, circuits = {}, manualGAs = []
 
           names.forEach((name, ui) => {
             if (si.midScheme === 'gatype') {
-              // Lighting: middle group encodes GA type (SW=0, FB=1, DIM=2, VAL=3, VALFB=4, CCT=5, RGB=6)
-              // Sub counter is per main/gaMid across all floors
+              // Middle group encodes GA type; ctrl uses mainNum, fb uses mainFb if defined (e.g. HVAC)
               cset.forEach((ga, gi) => {
-                const gaMid = ga.mid;
-                const sub = nextSub(mainNum, gaMid);
+                const gaMid  = ga.mid;
+                const mainG  = (ga.t === 'fb' && si.mainFb) ? si.mainFb : mainNum;
+                const mName  = (ga.t === 'fb' && si.mainFb) ? (si.nameFb_en || si.name_en) : si.name_en;
+                const sub    = nextSub(mainG, gaMid);
                 gas.push({
-                  addr:     `${mainNum}/${gaMid}/${sub}`,
+                  addr:     `${mainG}/${gaMid}/${sub}`,
                   name:     `${px} - ${fp} - ${room}${circuitLabel}${name} - ${ga.n}`,
                   dpt:      ga.dpt,
                   type:     ga.t,
-                  main:     mainNum,
+                  main:     mainG,
                   mid:      gaMid,
                   midName:  ga.midName,
-                  mainName: si.name_en,
+                  mainName: mName,
                   room:     room,
                   _id:      `${sk}_${fi}_${ri}_${ck}_${ui}_${gi}`
                 });
-                advanceSub(mainNum, gaMid, 1);
+                advanceSub(mainG, gaMid, 1);
               });
             } else if (si.mainFb) {
               // Systems with separate ctrl / fb main groups (e.g. HVAC: ctrl=4, fb=5)
