@@ -15,7 +15,7 @@ const sysInfo = {
   scn:  { name_en: 'Scenes',        name_vi: 'Cảnh (Scenes)',       desc_en: 'Central and per-room scene activation.',          desc_vi: 'Kích hoạt cảnh trung tâm và theo từng phòng.',       main: 6, icon: 'scn',   gaNames: ['ACTIVATE','FB'] },
   av:   { name_en: 'Audio Visual',  name_vi: 'Nghe nhìn',           desc_en: 'TV/amp power, source, volume and mute.',          desc_vi: 'Nguồn TV/amp, chọn đầu vào, âm lượng, tắt tiếng.',  main: 7, midScheme: 'gatype', icon: 'av',    gaNames: ['POWER','SOURCE','VOL','VOL_FB','MUTE'] },
   nrg:  { name_en: 'Energy',        name_vi: 'Giám sát điện',       desc_en: 'Power, energy, voltage and current per circuit.', desc_vi: 'Công suất, điện năng, điện áp, dòng điện.',         main: 8, midScheme: 'gatype', icon: 'nrg',   gaNames: ['POWER','ENERGY','VOLTAGE','CURRENT','POWER_FACTOR'] },
-  sys:  { name_en: 'System logic',  name_vi: 'Logic hệ thống',      desc_en: 'Time, date, sunrise/sunset and occupancy mode.',  desc_vi: 'Thời gian, ngày tháng, mặt trời và chế độ.',        main: 9, icon: 'sys',   gaNames: ['TIME','DATE','SUNRISE','SUNSET','OCC_MODE','HEARTBEAT'] }
+  sys:  { name_en: 'System logic',  name_vi: 'Logic hệ thống',      desc_en: 'Time, date, sunrise/sunset and occupancy mode.',  desc_vi: 'Thời gian, ngày tháng, mặt trời và chế độ.',        main: 9, midScheme: 'gatype', global: true, icon: 'sys',   gaNames: ['TIME','DATE','SUNRISE','SUNSET','OCC_MODE','NIGHT_MODE','GUEST_MODE','HEARTBEAT','BUS_VOLTAGE'] }
 };
 
 // ─── PREFIX MAPS ──────────────────────────────────────────────────────────────
@@ -217,10 +217,15 @@ const circuitGaSet = {
     { n: 'POWER_FACTOR', full: 'Power factor',    dpt: 'DPST-14-057', t: 'fb', mid: 4, midName: 'PowerFactor' }
   ],
   sys_unit: [
-    { n: 'TIME',      full: 'Current time',   dpt: 'DPST-10-001', t: 'fb'   },
-    { n: 'DATE',      full: 'Current date',   dpt: 'DPST-11-001', t: 'fb'   },
-    { n: 'OCC_MODE',  full: 'Occupancy mode', dpt: 'DPST-5-001',  t: 'ctrl' },
-    { n: 'HEARTBEAT', full: 'Heartbeat',      dpt: 'DPST-1-001',  t: 'fb'   }
+    { n: 'TIME',        full: 'Time',             dpt: 'DPST-10-001', t: 'fb',   mid: 0, midName: 'TimeDate' },
+    { n: 'DATE',        full: 'Date',             dpt: 'DPST-11-001', t: 'fb',   mid: 0, midName: 'TimeDate' },
+    { n: 'SUNRISE',     full: 'Sunrise',          dpt: 'DPST-10-001', t: 'fb',   mid: 0, midName: 'TimeDate' },
+    { n: 'SUNSET',      full: 'Sunset',           dpt: 'DPST-10-001', t: 'fb',   mid: 0, midName: 'TimeDate' },
+    { n: 'OCC_MODE',    full: 'Occupancy_Mode',   dpt: 'DPST-5-001',  t: 'ctrl', mid: 1, midName: 'Mode'     },
+    { n: 'NIGHT_MODE',  full: 'Night_Mode',       dpt: 'DPST-1-001',  t: 'ctrl', mid: 1, midName: 'Mode'     },
+    { n: 'GUEST_MODE',  full: 'Guest_Mode',       dpt: 'DPST-1-001',  t: 'ctrl', mid: 1, midName: 'Mode'     },
+    { n: 'HEARTBEAT',   full: 'IP_GW_Heartbeat',  dpt: 'DPST-1-001',  t: 'fb',   mid: 2, midName: 'Diag'     },
+    { n: 'BUS_VOLTAGE', full: 'Bus_Voltage',      dpt: 'DPST-14-027', t: 'fb',   mid: 2, midName: 'Diag'     }
   ]
 };
 
@@ -272,6 +277,28 @@ function generateGAs({ structure, floors, systems, circuits = {}, manualGAs = []
     const si = sysInfo[sk];
     const mainNum = si.main;
     const px = prefix[sk];
+
+    // ── GLOBAL systems — generate once, no floor/room loop ──────────────────
+    if (si.global) {
+      const cset = circuitGaSet[`${sk}_unit`] || gasets[sk];
+      cset.forEach((ga, gi) => {
+        const sub = nextSub(mainNum, ga.mid);
+        gas.push({
+          addr:     `${mainNum}/${ga.mid}/${sub}`,
+          name:     `${px} - ${ga.full}`,
+          dpt:      ga.dpt,
+          type:     ga.t,
+          main:     mainNum,
+          mid:      ga.mid,
+          midName:  ga.midName,
+          mainName: si.name_en,
+          _id:      `${sk}_global_${gi}`
+        });
+        advanceSub(mainNum, ga.mid, 1);
+      });
+      return;
+    }
+
     const allDefs = circuitDefs[sk] || [];
     const cdefs = allDefs.filter(([ck]) => {
       if (sk === 'lt') return ltFilter(ck);
