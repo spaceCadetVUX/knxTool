@@ -35,11 +35,6 @@
     <main id="panel"></main>
   </div>
 
-  <!-- Bottom bar -->
-  <footer id="bottombar">
-    <button class="btn btn-ghost" id="btn-back" onclick="goStep(state.step-1)">← Back</button>
-    <button class="btn btn-primary" id="btn-next" onclick="goStep(state.step+1)">Next →</button>
-  </footer>
 
 </div>
 
@@ -261,7 +256,6 @@ function renderAll() {
   renderStepBar();
   renderSidebar();
   renderPanel();
-  renderBottomBar();
 
   // Update header project badge
   const hp = document.getElementById('header-project');
@@ -346,22 +340,18 @@ function renderSidebar() {
 function renderPanel() {
   const renders = [null, renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6];
   const fn = renders[state.step];
-  document.getElementById('panel').innerHTML = fn ? fn() : '';
-}
-
-function renderBottomBar() {
-  const back = document.getElementById('btn-back');
-  const next = document.getElementById('btn-next');
-
-  back.style.visibility = state.step === 1 ? 'hidden' : '';
-  back.textContent = t('prev');
-
   const nextLabels = {
     1: t('next_systems'), 2: t('next_floors'), 3: t('next_assign'),
-    4: t('next_generate'), 5: t('next_export'), 6: ''
+    4: t('next_generate'), 5: t('next_export')
   };
-  next.textContent = nextLabels[state.step] || 'Next →';
-  next.style.display = state.step === 6 ? 'none' : '';
+  const nextLabel = nextLabels[state.step];
+  const nav = `
+  <div class="step-nav">
+    <button class="btn btn-ghost" onclick="goStep(state.step-1)"
+      style="${state.step === 1 ? 'visibility:hidden' : ''}">${t('prev')}</button>
+    ${nextLabel ? `<button class="btn btn-primary" onclick="goStep(state.step+1)">${nextLabel}</button>` : ''}
+  </div>`;
+  document.getElementById('panel').innerHTML = (fn ? fn() : '') + nav;
 }
 
 function goStep(n) {
@@ -1162,8 +1152,8 @@ function renderStep6() {
       <div class="card" style="margin-bottom:14px">
         <div class="card-title" style="margin-bottom:10px">${t('export_format')}</div>
         <div class="format-selector">
-          <div class="format-btn ${state.exportFormat === 'xml' ? 'active' : ''}" onclick="state.exportFormat='xml';renderPanel()">XML</div>
-          <div class="format-btn ${state.exportFormat === 'csv' ? 'active' : ''}" onclick="state.exportFormat='csv';renderPanel()">CSV</div>
+          <div class="format-btn ${state.exportFormat === 'xml' ? 'active' : ''}" onclick="state.exportFormat='xml';renderPanel();refreshPreview()">XML</div>
+          <div class="format-btn ${state.exportFormat === 'csv' ? 'active' : ''}" onclick="state.exportFormat='csv';renderPanel();refreshPreview()">CSV</div>
         </div>
         <div style="font-size:12px;color:var(--gray-500)">
           ${state.exportFormat === 'xml' ? t('xml_desc') : t('csv_desc')}
@@ -1172,7 +1162,7 @@ function renderStep6() {
 
       <div class="card" style="margin-bottom:14px">
         <div class="card-title" style="margin-bottom:10px">${t('options')}</div>
-        ${[['dpt', t('include_dpt')], ['desc', t('include_desc')], ['unused', t('include_unused')], ['floorFirst', t('group_floor')]].map(([k, l]) => `
+        ${[['dpt', t('include_dpt')], ['desc', t('include_desc')]].map(([k, l]) => `
         <div class="toggle-row">
           <span class="toggle-label">${l}</span>
           <label class="toggle">
