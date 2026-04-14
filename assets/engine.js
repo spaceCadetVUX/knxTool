@@ -10,8 +10,8 @@ const sysInfo = {
   lt:   { name_en: 'Lighting',      name_vi: 'Chiếu sáng',         desc_en: 'Switching, dimming, CCT and RGBW circuits.',      desc_vi: 'Điều khiển bật/tắt, dim, nhiệt độ màu, RGBW.',      main: 1, icon: 'light', gaNames: ['SW','FB','DIM','VAL','VALFB','CCT','CCT_FB','RGB','RGB_FB'] },
   pres: { name_en: 'Presence',      name_vi: 'Cảm biến hiện diện', desc_en: 'Motion sensors with lux value and lock.',         desc_vi: 'Cảm biến chuyển động với giá trị lux và khoá.',      main: 2, icon: 'pres',  gaNames: ['STATUS','LUX','LOCK'] },
   sht:  { name_en: 'Shutter',       name_vi: 'Rèm / Mành',         desc_en: 'Up/down, position, tilt and safety lockout.',     desc_vi: 'Lên/xuống, vị trí, góc cánh và khoá an toàn.',      main: 3, icon: 'sht',   gaNames: ['MOVE','STEP','POS','POS_FB','TILT','TILT_FB','WIND','RAIN'] },
-  hvac: { name_en: 'HVAC',          name_vi: 'HVAC',                desc_en: 'Temperature, setpoint, mode and fan speed.',      desc_vi: 'Nhiệt độ, cài đặt, chế độ và tốc độ quạt.',         main: 4, icon: 'hvac',  gaNames: ['TEMP','SETP','MODE','FAN','ENABLE','OUTPUT_FB'] },
-  sec:  { name_en: 'Security',      name_vi: 'An ninh',             desc_en: 'Burglar zones, door sensors, fire and siren.',    desc_vi: 'Vùng báo trộm, cảm biến cửa, báo cháy, còi.',       main: 5, icon: 'sec',   gaNames: ['ARM_AWAY','ARM_HOME','DISARM','ALARM_FB','ZONE_STATUS','FIRE','SIREN'] },
+  hvac: { name_en: 'HVAC',          name_vi: 'HVAC',                desc_en: 'Temperature, setpoint, mode and fan speed.',      desc_vi: 'Nhiệt độ, cài đặt, chế độ và tốc độ quạt.',         main: 4, mainFb: 5, nameFb_en: 'HVAC Feedback', nameFb_vi: 'HVAC - Phản hồi', icon: 'hvac',  gaNames: ['ENABLE','SETP','MODE','FAN','TEMP_ACT','SETP_FB','MODE_FB','FAN_FB','VALVE_FB','ENABLE_FB'] },
+  sec:  { name_en: 'Security',      name_vi: 'An ninh',             desc_en: 'Burglar zones, door sensors, fire and siren.',    desc_vi: 'Vùng báo trộm, cảm biến cửa, báo cháy, còi.',       main: 10, icon: 'sec',   gaNames: ['ARM_AWAY','ARM_HOME','DISARM','STATUS_FB','ZONE_STATUS','FIRE','SIREN'] },
   scn:  { name_en: 'Scenes',        name_vi: 'Cảnh (Scenes)',       desc_en: 'Central and per-room scene activation.',          desc_vi: 'Kích hoạt cảnh trung tâm và theo từng phòng.',       main: 6, icon: 'scn',   gaNames: ['ACTIVATE','FB'] },
   av:   { name_en: 'Audio Visual',  name_vi: 'Nghe nhìn',           desc_en: 'TV/amp power, source, volume and mute.',          desc_vi: 'Nguồn TV/amp, chọn đầu vào, âm lượng, tắt tiếng.',  main: 7, icon: 'av',    gaNames: ['POWER','SOURCE','VOL','VOL_FB','MUTE'] },
   nrg:  { name_en: 'Energy',        name_vi: 'Giám sát điện',       desc_en: 'Power, energy, voltage and current per circuit.', desc_vi: 'Công suất, điện năng, điện áp, dòng điện.',         main: 8, icon: 'nrg',   gaNames: ['POWER','ENERGY','VOLTAGE','CURRENT'] },
@@ -59,18 +59,27 @@ const gasets = {
     { o: '+7', n: 'RAIN',    full: 'Rain alarm',         dpt: 'DPST-1-005', t: 'fb'   }
   ],
   hvac: [
-    { o: '+0', n: 'TEMP',      full: 'Actual temperature', dpt: 'DPST-9-001',  t: 'fb'   },
-    { o: '+1', n: 'SETP',      full: 'Setpoint',           dpt: 'DPST-9-001',  t: 'ctrl' },
-    { o: '+2', n: 'MODE',      full: 'HVAC mode',          dpt: 'DPST-20-102', t: 'ctrl' },
-    { o: '+3', n: 'FAN',       full: 'Fan speed',          dpt: 'DPST-5-001',  t: 'ctrl' },
-    { o: '+4', n: 'ENABLE',    full: 'On / Off',           dpt: 'DPST-1-001',  t: 'ctrl' },
-    { o: '+5', n: 'OUTPUT_FB', full: 'Valve output FB',    dpt: 'DPST-5-001',  t: 'fb'   }
+    { o:  '+0', n: 'ENABLE',      full: 'On / Off',              dpt: 'DPST-1-001',  t: 'ctrl' },
+    { o:  '+1', n: 'SETP',        full: 'Setpoint',              dpt: 'DPST-9-001',  t: 'ctrl' },
+    { o:  '+2', n: 'MODE',        full: 'HVAC mode',             dpt: 'DPST-20-102', t: 'ctrl' },
+    { o:  '+3', n: 'FAN',         full: 'Fan speed',             dpt: 'DPST-5-001',  t: 'ctrl' },
+    { o:  '+4', n: 'SETP_OFFSET', full: 'Setpoint offset',       dpt: 'DPST-9-002',  t: 'ctrl' },
+    { o:  '+5', n: 'VALVE_CMD',   full: 'Valve command',         dpt: 'DPST-5-001',  t: 'ctrl' },
+    { o:  '+6', n: 'SWING',       full: 'Swing / louver',        dpt: 'DPST-5-010',  t: 'ctrl' },
+    { o:  '+7', n: 'LOCK',        full: 'Remote lock',           dpt: 'DPST-1-001',  t: 'ctrl' },
+    { o:  '+8', n: 'TEMP_ACT',    full: 'Actual temperature',    dpt: 'DPST-9-001',  t: 'fb'   },
+    { o:  '+9', n: 'SETP_FB',     full: 'Setpoint feedback',     dpt: 'DPST-9-001',  t: 'fb'   },
+    { o: '+10', n: 'MODE_FB',     full: 'Mode feedback',         dpt: 'DPST-20-102', t: 'fb'   },
+    { o: '+11', n: 'FAN_FB',      full: 'Fan speed feedback',    dpt: 'DPST-5-001',  t: 'fb'   },
+    { o: '+12', n: 'VALVE_FB',    full: 'Valve output feedback', dpt: 'DPST-5-001',  t: 'fb'   },
+    { o: '+13', n: 'HUMIDITY',    full: 'Humidity',              dpt: 'DPST-9-007',  t: 'fb'   },
+    { o: '+14', n: 'ENABLE_FB',   full: 'On/Off feedback',       dpt: 'DPST-1-001',  t: 'fb'   }
   ],
   sec: [
     { o: '+0', n: 'ARM_AWAY',    full: 'Arm away',     dpt: 'DPST-1-001', t: 'ctrl' },
     { o: '+1', n: 'ARM_HOME',    full: 'Arm home',     dpt: 'DPST-1-001', t: 'ctrl' },
     { o: '+2', n: 'DISARM',      full: 'Disarm',       dpt: 'DPST-1-001', t: 'ctrl' },
-    { o: '+3', n: 'ALARM_FB',    full: 'Alarm status', dpt: 'DPST-1-005', t: 'fb'   },
+    { o: '+3', n: 'STATUS_FB',   full: 'Arm status',   dpt: 'DPST-1-001', t: 'fb'   },
     { o: '+4', n: 'ZONE_STATUS', full: 'Zone status',  dpt: 'DPST-1-005', t: 'fb'   },
     { o: '+5', n: 'FIRE',        full: 'Fire alarm',   dpt: 'DPST-1-005', t: 'fb'   },
     { o: '+6', n: 'SIREN',       full: 'Siren output', dpt: 'DPST-1-001', t: 'ctrl' }
@@ -87,10 +96,10 @@ const gasets = {
     { o: '+4', n: 'MUTE',   full: 'Mute toggle',     dpt: 'DPST-1-001', t: 'ctrl' }
   ],
   nrg: [
-    { o: '+0', n: 'POWER',   full: 'Active power W', dpt: 'DPST-9-024',  t: 'fb' },
-    { o: '+1', n: 'ENERGY',  full: 'Energy kWh',     dpt: 'DPST-13-010', t: 'fb' },
-    { o: '+2', n: 'VOLTAGE', full: 'Voltage V',       dpt: 'DPST-9-020',  t: 'fb' },
-    { o: '+3', n: 'CURRENT', full: 'Current A',       dpt: 'DPST-9-021',  t: 'fb' }
+    { o: '+0', n: 'POWER',   full: 'Active power W',   dpt: 'DPST-14-056', t: 'fb' },
+    { o: '+1', n: 'ENERGY',  full: 'Energy kWh',       dpt: 'DPST-13-010', t: 'fb' },
+    { o: '+2', n: 'VOLTAGE', full: 'Voltage V',        dpt: 'DPST-14-027', t: 'fb' },
+    { o: '+3', n: 'CURRENT', full: 'Current A',        dpt: 'DPST-14-019', t: 'fb' }
   ],
   sys: [
     { o: '+0', n: 'TIME',      full: 'Current time',    dpt: 'DPST-10-001', t: 'fb'   },
@@ -108,7 +117,7 @@ const circuitDefs = {
   lt:   [['onoff', 'On/Off'], ['dim', 'Dimming'], ['cct', 'CCT'], ['rgb', 'RGBW']],
   pres: [['sensor', 'Sensor']],
   sht:  [['motor', 'Motor']],
-  hvac: [['therm', 'Thermostat'], ['split', 'Split AC'], ['fcu', 'FCU'], ['ufh', 'UFH'], ['hp', 'Heat pump']],
+  hvac: [['unit', 'HVAC unit']],
   sec:  [['zone', 'Zone']],
   scn:  [['scene', 'Scene group']],
   av:   [['unit', 'AV unit']],
@@ -161,21 +170,24 @@ const circuitGaSet = {
     { n: 'TILT',    full: 'Slat angle',        dpt: 'DPST-5-001', t: 'ctrl' },
     { n: 'TILT_FB', full: 'Slat feedback',     dpt: 'DPST-5-001', t: 'fb'   }
   ],
-  hvac_zone: [
-    { n: 'TEMP',      full: 'Actual temperature', dpt: 'DPST-9-001',  t: 'fb'   },
-    { n: 'SETP',      full: 'Setpoint',           dpt: 'DPST-9-001',  t: 'ctrl' },
-    { n: 'MODE',      full: 'HVAC mode',          dpt: 'DPST-20-102', t: 'ctrl' },
-    { n: 'FAN',       full: 'Fan speed',          dpt: 'DPST-5-001',  t: 'ctrl' },
-    { n: 'ENABLE',    full: 'On/Off',             dpt: 'DPST-1-001',  t: 'ctrl' },
-    { n: 'OUTPUT_FB', full: 'Valve output',       dpt: 'DPST-5-001',  t: 'fb'   }
+  hvac_unit: [
+    { n: 'ENABLE',   full: 'On/Off',             dpt: 'DPST-1-001',  t: 'ctrl' },
+    { n: 'SETP',     full: 'Setpoint',           dpt: 'DPST-9-001',  t: 'ctrl' },
+    { n: 'MODE',     full: 'HVAC mode',          dpt: 'DPST-20-102', t: 'ctrl' },
+    { n: 'FAN',      full: 'Fan speed',          dpt: 'DPST-5-001',  t: 'ctrl' },
+    { n: 'TEMP_ACT', full: 'Actual temperature', dpt: 'DPST-9-001',  t: 'fb'   },
+    { n: 'SETP_FB',  full: 'Setpoint feedback',  dpt: 'DPST-9-001',  t: 'fb'   },
+    { n: 'MODE_FB',  full: 'Mode feedback',      dpt: 'DPST-20-102', t: 'fb'   },
+    { n: 'FAN_FB',   full: 'Fan feedback',       dpt: 'DPST-5-001',  t: 'fb'   },
+    { n: 'ENABLE_FB',full: 'On/Off feedback',    dpt: 'DPST-1-001',  t: 'fb'   }
   ],
   sec_zone: [
-    { n: 'ARM_AWAY', full: 'Arm away',     dpt: 'DPST-1-001', t: 'ctrl' },
-    { n: 'ARM_HOME', full: 'Arm home',     dpt: 'DPST-1-001', t: 'ctrl' },
-    { n: 'DISARM',   full: 'Disarm',       dpt: 'DPST-1-001', t: 'ctrl' },
-    { n: 'ALARM_FB', full: 'Alarm status', dpt: 'DPST-1-005', t: 'fb'   },
-    { n: 'FIRE',     full: 'Fire alarm',   dpt: 'DPST-1-005', t: 'fb'   },
-    { n: 'SIREN',    full: 'Siren',        dpt: 'DPST-1-001', t: 'ctrl' }
+    { n: 'ARM_AWAY',  full: 'Arm away',     dpt: 'DPST-1-001', t: 'ctrl' },
+    { n: 'ARM_HOME',  full: 'Arm home',     dpt: 'DPST-1-001', t: 'ctrl' },
+    { n: 'DISARM',    full: 'Disarm',       dpt: 'DPST-1-001', t: 'ctrl' },
+    { n: 'STATUS_FB', full: 'Arm status',   dpt: 'DPST-1-001', t: 'fb'   },
+    { n: 'FIRE',      full: 'Fire alarm',   dpt: 'DPST-1-005', t: 'fb'   },
+    { n: 'SIREN',     full: 'Siren',        dpt: 'DPST-1-001', t: 'ctrl' }
   ],
   scn_scene: [
     { n: 'ACTIVATE', full: 'Scene activate', dpt: 'DPST-18-001', t: 'ctrl' },
@@ -189,10 +201,10 @@ const circuitGaSet = {
     { n: 'MUTE',   full: 'Mute',            dpt: 'DPST-1-001', t: 'ctrl' }
   ],
   nrg_meter: [
-    { n: 'POWER',   full: 'Active power W', dpt: 'DPST-9-024',  t: 'fb' },
+    { n: 'POWER',   full: 'Active power W', dpt: 'DPST-14-056', t: 'fb' },
     { n: 'ENERGY',  full: 'Energy kWh',     dpt: 'DPST-13-010', t: 'fb' },
-    { n: 'VOLTAGE', full: 'Voltage',        dpt: 'DPST-9-020',  t: 'fb' },
-    { n: 'CURRENT', full: 'Current',        dpt: 'DPST-9-021',  t: 'fb' }
+    { n: 'VOLTAGE', full: 'Voltage V',      dpt: 'DPST-14-027', t: 'fb' },
+    { n: 'CURRENT', full: 'Current A',      dpt: 'DPST-14-019', t: 'fb' }
   ],
   sys_unit: [
     { n: 'TIME',      full: 'Current time',   dpt: 'DPST-10-001', t: 'fb'   },
@@ -227,8 +239,7 @@ function generateGAs({ structure, floors, systems, circuits = {}, manualGAs = []
   const sysList = Object.keys(systems).filter(k => systems[k]);
 
   // Build active-sub filters — empty object means "all enabled"
-  const ltFilter   = Object.keys(ltSubs).length   > 0 ? ck => !!ltSubs[ck]   : () => true;
-  const hvacFilter = Object.keys(hvacSubs).length > 0 ? ck => !!hvacSubs[ck] : () => true;
+  const ltFilter = Object.keys(ltSubs).length > 0 ? ck => !!ltSubs[ck] : () => true;
 
   // sub-address counter per "main/mid" key — increments to avoid collisions
   const subCounter = {};
@@ -253,8 +264,7 @@ function generateGAs({ structure, floors, systems, circuits = {}, manualGAs = []
     const px = prefix[sk];
     const allDefs = circuitDefs[sk] || [];
     const cdefs = allDefs.filter(([ck]) => {
-      if (sk === 'lt')   return ltFilter(ck);
-      if (sk === 'hvac') return hvacFilter(ck);
+      if (sk === 'lt') return ltFilter(ck);
       return true;
     });
 
@@ -270,24 +280,60 @@ function generateGAs({ structure, floors, systems, circuits = {}, manualGAs = []
           const names = getNames(fi, ri, sk, ck);
           if (names.length === 0) return;
           const cset = circuitGaSet[`${sk}_${ck}`] || gasets[sk];
-          const circuitLabel = cdefs.length > 1 ? ` [${clabel}]` : '';
+          const circuitLabel = cdefs.length > 1 ? ` - [${clabel}] - ` : ' - ';
 
           names.forEach((name, ui) => {
-            const sub = nextSub(mainNum, floor.mid);
-            cset.forEach((ga, gi) => {
-              gas.push({
-                addr:     `${mainNum}/${floor.mid}/${sub + gi}`,
-                name:     `${px} - ${fp} - ${room}${circuitLabel} ${name} - ${ga.n}`,
-                dpt:      ga.dpt,
-                type:     ga.t,
-                main:     mainNum,
-                mid:      floor.mid,
-                mainName: si.name_en,
-                room:     room,
-                _id:      `${sk}_${fi}_${ri}_${ck}_${ui}_${gi}`
+            if (si.mainFb) {
+              // Systems with separate ctrl / fb main groups (e.g. HVAC: ctrl=4, fb=5)
+              const ctrlSet = cset.filter(ga => ga.t === 'ctrl');
+              const fbSet   = cset.filter(ga => ga.t === 'fb');
+              const ctrlSub = nextSub(mainNum, floor.mid);
+              ctrlSet.forEach((ga, gi) => {
+                gas.push({
+                  addr:     `${mainNum}/${floor.mid}/${ctrlSub + gi}`,
+                  name:     `${px} - ${fp} - ${room}${circuitLabel}${name} - ${ga.n}`,
+                  dpt:      ga.dpt,
+                  type:     ga.t,
+                  main:     mainNum,
+                  mid:      floor.mid,
+                  mainName: si.name_en,
+                  room:     room,
+                  _id:      `${sk}_${fi}_${ri}_${ck}_${ui}_c${gi}`
+                });
               });
-            });
-            advanceSub(mainNum, floor.mid, cset.length);
+              advanceSub(mainNum, floor.mid, ctrlSet.length);
+              const fbSub = nextSub(si.mainFb, floor.mid);
+              fbSet.forEach((ga, gi) => {
+                gas.push({
+                  addr:     `${si.mainFb}/${floor.mid}/${fbSub + gi}`,
+                  name:     `${px} - ${fp} - ${room}${circuitLabel}${name} - ${ga.n}`,
+                  dpt:      ga.dpt,
+                  type:     ga.t,
+                  main:     si.mainFb,
+                  mid:      floor.mid,
+                  mainName: si['nameFb_en'] || (si.name_en + ' FB'),
+                  room:     room,
+                  _id:      `${sk}_${fi}_${ri}_${ck}_${ui}_f${gi}`
+                });
+              });
+              advanceSub(si.mainFb, floor.mid, fbSet.length);
+            } else {
+              const sub = nextSub(mainNum, floor.mid);
+              cset.forEach((ga, gi) => {
+                gas.push({
+                  addr:     `${mainNum}/${floor.mid}/${sub + gi}`,
+                  name:     `${px} - ${fp} - ${room}${circuitLabel}${name} - ${ga.n}`,
+                  dpt:      ga.dpt,
+                  type:     ga.t,
+                  main:     mainNum,
+                  mid:      floor.mid,
+                  mainName: si.name_en,
+                  room:     room,
+                  _id:      `${sk}_${fi}_${ri}_${ck}_${ui}_${gi}`
+                });
+              });
+              advanceSub(mainNum, floor.mid, cset.length);
+            }
           });
         });
       });
@@ -454,8 +500,8 @@ function buildCSV(gas, { floors = [] } = {}) {
  * circuits, and active systems so every wizard step is pre-populated.
  *
  * GA name format produced by this tool:
- *   With bracket  : "PREFIX - FP - ROOM [TYPE] NAME - GA_SHORT"   (lt when >1 type)
- *   Without bracket: "PREFIX - FP - ROOM NAME - GA_SHORT"          (all single-type systems)
+ *   With bracket  : "PREFIX - FP - ROOM - [TYPE] - NAME - GA_SHORT"   (lt when >1 type)
+ *   Without bracket: "PREFIX - FP - ROOM - NAME - GA_SHORT"            (all single-type systems)
  *
  * @param {string} xmlString
  * @returns {{ floors, circuits, systems, ltSubs, hvacSubs }}
@@ -491,32 +537,29 @@ function reconstructFromXML(xmlString) {
 
   // 4. Build unique circuit signatures per mid
   //    Signature = GA name without trailing " - GA_SHORT"
-  //    e.g. "LT - BAS - Sảnh [On/Off] đèn sảnh" (deduplicates SW/FB/etc.)
-  const sigMap = {}; // mid → { sig → { sk, roomTypeName } }
+  //    e.g. "LT - Tầng 1 - Phòng ăn - [Dimming] - Hắt trần" (deduplicates SW/FB/etc.)
+  const sigMap = {}; // mid → { sig → { sk, room, parts } }
   const systems = Object.fromEntries(Object.keys(sysInfo).map(k => [k, false]));
 
   gas.forEach(g => {
     if (g.mid === 0) return;
     const parts = g.name.split(' - ');
-    if (parts.length < 4) return;
+    if (parts.length < 5) return; // min: PREFIX - FP - ROOM - NAME - GA_SHORT
     const sk = prefixToSk[parts[0].trim()];
     if (!sk) return;
     systems[sk] = true;
     const sig = parts.slice(0, -1).join(' - ');
-    const roomTypeName = parts[2].trim();
+    const room = parts[2].trim();
     if (!sigMap[g.mid]) sigMap[g.mid] = {};
-    if (!sigMap[g.mid][sig]) sigMap[g.mid][sig] = { sk, roomTypeName };
+    if (!sigMap[g.mid][sig]) sigMap[g.mid][sig] = { sk, room, parts };
   });
 
-  // 5. First pass: extract rooms from bracket entries ("ROOM [TYPE] NAME")
+  // 5. First pass: collect rooms from all signatures (room is always parts[2])
   const midRooms = {}; // mid → string[] unique ordered
   Object.entries(sigMap).forEach(([midStr, sigs]) => {
     const mid = parseInt(midStr);
     midRooms[mid] = [];
-    Object.values(sigs).forEach(({ roomTypeName }) => {
-      const bi = roomTypeName.indexOf(' [');
-      if (bi === -1) return;
-      const room = roomTypeName.substring(0, bi).trim();
+    Object.values(sigs).forEach(({ room }) => {
       if (room && !midRooms[mid].includes(room)) midRooms[mid].push(room);
     });
   });
@@ -542,33 +585,26 @@ function reconstructFromXML(xmlString) {
   // 8. Second pass: build circuits + detect lt/hvac subtypes
   const circuits = {};
   const ltSubsFound = {};
-  const hvacSubsFound = {};
 
   Object.entries(sigMap).forEach(([midStr, sigs]) => {
     const mid = parseInt(midStr);
     const fi = midToFi[mid];
     if (fi === undefined) return;
 
-    Object.values(sigs).forEach(({ sk, roomTypeName }) => {
-      let room, ck, circuitName;
-      const bi = roomTypeName.indexOf(' [');
+    Object.values(sigs).forEach(({ sk, room, parts }) => {
+      let ck, circuitName;
+      const typeOrName = parts[3].trim(); // parts[3] = "[TYPE]" or circuit name
 
-      if (bi !== -1) {
-        // Bracket format: "ROOM [TYPE] NAME"
-        room = roomTypeName.substring(0, bi).trim();
-        const be = roomTypeName.indexOf(']');
-        const typeLabel = roomTypeName.substring(bi + 2, be).trim(); // skip ' ['
-        circuitName = roomTypeName.substring(be + 2).trim();         // skip '] '
+      if (typeOrName.startsWith('[') && typeOrName.endsWith(']')) {
+        // Bracket format: PREFIX - FP - ROOM - [TYPE] - NAME - GA_SHORT
+        const typeLabel = typeOrName.slice(1, -1);
+        circuitName = parts[4] ? parts[4].trim() : '';
         ck = (labelToCk[sk] || {})[typeLabel] || ((circuitDefs[sk] || [[]])[0] || [])[0];
         if (sk === 'lt' && ck) ltSubsFound[ck] = true;
       } else {
-        // No-bracket format: "ROOM NAME" — match room against known rooms for this floor
-        const knownRooms = floors[fi] ? floors[fi].rooms : [];
-        room = knownRooms.find(r => roomTypeName === r || roomTypeName.startsWith(r + ' '));
-        if (!room) return;
-        circuitName = roomTypeName.substring(room.length).trim();
+        // No-bracket format: PREFIX - FP - ROOM - NAME - GA_SHORT
+        circuitName = typeOrName;
         ck = ((circuitDefs[sk] || [[]])[0] || [])[0];
-        if (sk === 'hvac' && ck) hvacSubsFound[ck] = true;
       }
 
       if (!room || !ck || !circuitName) return;
@@ -584,13 +620,11 @@ function reconstructFromXML(xmlString) {
     });
   });
 
-  // 9. Build ltSubs / hvacSubs with correct default keys
-  const ltSubs   = { onoff: false, dim: false, cct: false, rgb: false, facade: false };
-  const hvacSubs = { therm: false, split: false, fcu: false, ufh: false, hp: false };
-  Object.keys(ltSubsFound).forEach(k   => { if (k in ltSubs)   ltSubs[k]   = true; });
-  Object.keys(hvacSubsFound).forEach(k => { if (k in hvacSubs) hvacSubs[k] = true; });
+  // 9. Build ltSubs from found circuit types
+  const ltSubs = { onoff: false, dim: false, cct: false, rgb: false };
+  Object.keys(ltSubsFound).forEach(k => { if (k in ltSubs) ltSubs[k] = true; });
 
-  return { floors, circuits, systems, ltSubs, hvacSubs };
+  return { floors, circuits, systems, ltSubs };
 }
 
 if (typeof module !== 'undefined') module.exports = {

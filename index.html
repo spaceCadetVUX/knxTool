@@ -81,7 +81,7 @@ const state = {
   projectName: '',
   structure: 'function',
   systems: { lt:true, pres:true, sht:true, hvac:true, sec:true, scn:true, av:false, nrg:false, sys:false },
-  ltSubs:   { onoff:true, dim:true, cct:true, rgb:true, facade:false },
+  ltSubs:   { onoff:true, dim:true, cct:true, rgb:true },
   hvacSubs: { therm:true, split:true, fcu:false, ufh:false, hp:false },
   floors: [],
   circuits:      {},
@@ -441,7 +441,7 @@ function renderStep2() {
     </div>`;
   }
 
-  const ltSubChips  = [['onoff','On/Off'],['dim','Dimming'],['cct','CCT'],['rgb','RGBW'],['facade','Facade']];
+  const ltSubChips  = [['onoff','On/Off'],['dim','Dimming'],['cct','CCT'],['rgb','RGBW']];
   const hvacSubChips = [['therm','Thermostat'],['split','Split AC'],['fcu','FCU'],['ufh','UFH'],['hp','Heat pump']];
 
   return `
@@ -1507,7 +1507,7 @@ function newProject() {
   Object.assign(state, {
     step: 1, projectName: '', structure: 'function',
     systems: { lt:true, pres:true, sht:true, hvac:true, sec:true, scn:true, av:false, nrg:false, sys:false },
-    ltSubs:  { onoff:true, dim:true, cct:true, rgb:true, facade:false },
+    ltSubs:  { onoff:true, dim:true, cct:true, rgb:true },
     hvacSubs:{ therm:true, split:true, fcu:false, ufh:false, hp:false },
     floors: [
     ],
