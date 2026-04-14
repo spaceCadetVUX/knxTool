@@ -13,7 +13,7 @@ const sysInfo = {
   hvac: { name_en: 'HVAC',          name_vi: 'HVAC',                desc_en: 'Temperature, setpoint, mode and fan speed.',      desc_vi: 'Nhiệt độ, cài đặt, chế độ và tốc độ quạt.',         main: 4, mainFb: 5, nameFb_en: 'HVAC Feedback', nameFb_vi: 'HVAC - Phản hồi', midScheme: 'gatype', icon: 'hvac',  gaNames: ['ENABLE','SETP','MODE','FAN','TEMP_ACT','SETP_FB','MODE_FB','FAN_FB','VALVE_FB','ENABLE_FB'] },
   sec:  { name_en: 'Security',      name_vi: 'An ninh',             desc_en: 'Burglar zones, door sensors, fire and siren.',    desc_vi: 'Vùng báo trộm, cảm biến cửa, báo cháy, còi.',       main: 10, icon: 'sec',   gaNames: ['ARM_AWAY','ARM_HOME','DISARM','STATUS_FB','ZONE_STATUS','FIRE','SIREN'] },
   scn:  { name_en: 'Scenes',        name_vi: 'Cảnh (Scenes)',       desc_en: 'Central and per-room scene activation.',          desc_vi: 'Kích hoạt cảnh trung tâm và theo từng phòng.',       main: 6, icon: 'scn',   gaNames: ['ACTIVATE','FB'] },
-  av:   { name_en: 'Audio Visual',  name_vi: 'Nghe nhìn',           desc_en: 'TV/amp power, source, volume and mute.',          desc_vi: 'Nguồn TV/amp, chọn đầu vào, âm lượng, tắt tiếng.',  main: 7, icon: 'av',    gaNames: ['POWER','SOURCE','VOL','VOL_FB','MUTE'] },
+  av:   { name_en: 'Audio Visual',  name_vi: 'Nghe nhìn',           desc_en: 'TV/amp power, source, volume and mute.',          desc_vi: 'Nguồn TV/amp, chọn đầu vào, âm lượng, tắt tiếng.',  main: 7, midScheme: 'gatype', icon: 'av',    gaNames: ['POWER','SOURCE','VOL','VOL_FB','MUTE'] },
   nrg:  { name_en: 'Energy',        name_vi: 'Giám sát điện',       desc_en: 'Power, energy, voltage and current per circuit.', desc_vi: 'Công suất, điện năng, điện áp, dòng điện.',         main: 8, icon: 'nrg',   gaNames: ['POWER','ENERGY','VOLTAGE','CURRENT'] },
   sys:  { name_en: 'System logic',  name_vi: 'Logic hệ thống',      desc_en: 'Time, date, sunrise/sunset and occupancy mode.',  desc_vi: 'Thời gian, ngày tháng, mặt trời và chế độ.',        main: 9, icon: 'sys',   gaNames: ['TIME','DATE','SUNRISE','SUNSET','OCC_MODE','HEARTBEAT'] }
 };
@@ -171,16 +171,16 @@ const circuitGaSet = {
     { n: 'TILT_FB', full: 'Slat feedback',     dpt: 'DPST-5-001', t: 'fb',   mid: 5, midName: 'TiltFb'  }
   ],
   hvac_unit: [
-    { n: 'ENABLE',      full: 'On/Off',             dpt: 'DPST-1-001',  t: 'ctrl', mid: 0, midName: 'Enable'     },
-    { n: 'SETP',        full: 'Setpoint',           dpt: 'DPST-9-001',  t: 'ctrl', mid: 1, midName: 'Setp'       },
+    { n: 'CTR',         full: 'On/Off',             dpt: 'DPST-1-001',  t: 'ctrl', mid: 0, midName: 'Enable'     },
+    { n: 'SETPoint',    full: 'Setpoint',           dpt: 'DPST-9-001',  t: 'ctrl', mid: 1, midName: 'Setp'       },
     { n: 'MODE',        full: 'HVAC mode',          dpt: 'DPST-20-102', t: 'ctrl', mid: 2, midName: 'Mode'       },
     { n: 'FAN',         full: 'Fan speed',          dpt: 'DPST-5-001',  t: 'ctrl', mid: 3, midName: 'Fan'        },
     { n: 'SETP_OFFSET', full: 'Setpoint offset',    dpt: 'DPST-9-002',  t: 'ctrl', mid: 4, midName: 'SeptOffset' },
     { n: 'VALVE_CMD',   full: 'Valve command',      dpt: 'DPST-5-001',  t: 'ctrl', mid: 5, midName: 'ValveCmd'   },
     { n: 'SWING',       full: 'Swing / louver',     dpt: 'DPST-5-010',  t: 'ctrl', mid: 6, midName: 'Swing'      },
     { n: 'LOCK',        full: 'Remote lock',        dpt: 'DPST-1-001',  t: 'ctrl', mid: 7, midName: 'Lock'       },
-    { n: 'TEMP_ACT',    full: 'Actual temperature', dpt: 'DPST-9-001',  t: 'fb',   mid: 0, midName: 'TempAct'    },
-    { n: 'SETP_FB',     full: 'Setpoint feedback',  dpt: 'DPST-9-001',  t: 'fb',   mid: 1, midName: 'SeptFb'     },
+    { n: 'CTR_FB',      full: 'Actual temperature', dpt: 'DPST-9-001',  t: 'fb',   mid: 0, midName: 'TempAct'    },
+    { n: 'SETPoint_FB', full: 'Setpoint feedback',  dpt: 'DPST-9-001',  t: 'fb',   mid: 1, midName: 'SeptFb'     },
     { n: 'MODE_FB',     full: 'Mode feedback',      dpt: 'DPST-20-102', t: 'fb',   mid: 2, midName: 'ModeFb'     },
     { n: 'FAN_FB',      full: 'Fan feedback',       dpt: 'DPST-5-001',  t: 'fb',   mid: 3, midName: 'FanFb'      },
     { n: 'VALVE_FB',    full: 'Valve feedback',     dpt: 'DPST-5-001',  t: 'fb',   mid: 4, midName: 'ValveFb'    },
@@ -200,11 +200,14 @@ const circuitGaSet = {
     { n: 'FB',       full: 'Scene feedback', dpt: 'DPST-18-001', t: 'fb'   }
   ],
   av_unit: [
-    { n: 'POWER',  full: 'Power on/off',    dpt: 'DPST-1-001', t: 'ctrl' },
-    { n: 'SOURCE', full: 'Source select',   dpt: 'DPST-5-001', t: 'ctrl' },
-    { n: 'VOL',    full: 'Volume',          dpt: 'DPST-5-001', t: 'ctrl' },
-    { n: 'VOL_FB', full: 'Volume feedback', dpt: 'DPST-5-001', t: 'fb'   },
-    { n: 'MUTE',   full: 'Mute',            dpt: 'DPST-1-001', t: 'ctrl' }
+    { n: 'POWER',  full: 'Power on/off',    dpt: 'DPST-1-001', t: 'ctrl', mid: 0, midName: 'Power'  },
+    { n: 'SOURCE', full: 'Source select',   dpt: 'DPST-5-001', t: 'ctrl', mid: 1, midName: 'Source' },
+    { n: 'VOL',    full: 'Volume',          dpt: 'DPST-5-001', t: 'ctrl', mid: 2, midName: 'Vol'    },
+    { n: 'VOL_FB', full: 'Volume feedback', dpt: 'DPST-5-001', t: 'fb',   mid: 8, midName: 'VolFb'  },
+    { n: 'MUTE',     full: 'Mute',            dpt: 'DPST-1-001', t: 'ctrl', mid: 3, midName: 'Mute'     },
+    { n: 'PREVIOUS', full: 'Previous track', dpt: 'DPST-1-001', t: 'ctrl', mid: 4, midName: 'Previous' },
+    { n: 'PAUSE',    full: 'Play / Pause',   dpt: 'DPST-1-001', t: 'ctrl', mid: 5, midName: 'Pause'    },
+    { n: 'NEXT',     full: 'Next track',     dpt: 'DPST-1-001', t: 'ctrl', mid: 7, midName: 'Next'     }
   ],
   nrg_meter: [
     { n: 'POWER',   full: 'Active power W', dpt: 'DPST-14-056', t: 'fb' },
