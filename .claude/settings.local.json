@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node assets/server.js)",
+      "Bash(curl -s -X POST http://localhost:3000/api/generate -H 'Content-Type: application/json' -d '{\"structure\":\"function\",\"floors\":[],\"systems\":{\"lt\":true},\"quantities\":{},\"manualGAs\":[]}')",
+      "Bash(node -e \"const d=JSON.parse\\(require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\)\\); console.log\\('count:',d.count\\)\" echo \"--- block engine.js ---\" curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/assets/engine.js echo \"\" echo \"--- index.html ---\" curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/ kill %1 true)"
+    ]
+  }
+}

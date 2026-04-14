@@ -13,6 +13,31 @@ const {
 
 const PORT = process.env.PORT || 3000;
 
+// ── STATIC FILES ───────────────────────────────────────────────
+if (method === 'GET' && !url.startsWith('/api')) {
+  const filePath = path.join(__dirname, url === '/' ? '/index.html' : url);
+
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    const ext = path.extname(filePath);
+
+    const contentTypes = {
+      '.html': 'text/html',
+      '.css': 'text/css',
+      '.js': 'application/javascript',
+      '.json': 'application/json',
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.svg': 'image/svg+xml'
+    };
+
+    const contentType = contentTypes[ext] || 'application/octet-stream';
+    const file = fs.readFileSync(filePath);
+
+    send(res, 200, file, contentType);
+    return;
+  }
+}
+
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
 function readBody(req) {

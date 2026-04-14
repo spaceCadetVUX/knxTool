@@ -7,15 +7,15 @@ const ALLOWED_ORIGINS = [
 
 // ─── SYSTEM INFO ──────────────────────────────────────────────────────────────
 const sysInfo = {
-  lt:   { name_en: 'Lighting',      name_vi: 'Chiếu sáng',         desc_en: 'Switching, dimming, CCT and RGBW circuits.',      desc_vi: 'Điều khiển bật/tắt, dim, nhiệt độ màu, RGBW.',      main: 1, icon: 'light' },
-  pres: { name_en: 'Presence',      name_vi: 'Cảm biến hiện diện', desc_en: 'Motion sensors with lux value and lock.',         desc_vi: 'Cảm biến chuyển động với giá trị lux và khoá.',      main: 2, icon: 'pres'  },
-  sht:  { name_en: 'Shutter',       name_vi: 'Rèm / Mành',         desc_en: 'Up/down, position, tilt and safety lockout.',     desc_vi: 'Lên/xuống, vị trí, góc cánh và khoá an toàn.',      main: 3, icon: 'sht'   },
-  hvac: { name_en: 'HVAC',          name_vi: 'HVAC',                desc_en: 'Temperature, setpoint, mode and fan speed.',      desc_vi: 'Nhiệt độ, cài đặt, chế độ và tốc độ quạt.',         main: 4, icon: 'hvac'  },
-  sec:  { name_en: 'Security',      name_vi: 'An ninh',             desc_en: 'Burglar zones, door sensors, fire and siren.',    desc_vi: 'Vùng báo trộm, cảm biến cửa, báo cháy, còi.',       main: 5, icon: 'sec'   },
-  scn:  { name_en: 'Scenes',        name_vi: 'Cảnh (Scenes)',       desc_en: 'Central and per-room scene activation.',          desc_vi: 'Kích hoạt cảnh trung tâm và theo từng phòng.',       main: 6, icon: 'scn'   },
-  av:   { name_en: 'Audio Visual',  name_vi: 'Nghe nhìn',           desc_en: 'TV/amp power, source, volume and mute.',          desc_vi: 'Nguồn TV/amp, chọn đầu vào, âm lượng, tắt tiếng.',  main: 7, icon: 'av'    },
-  nrg:  { name_en: 'Energy',        name_vi: 'Giám sát điện',       desc_en: 'Power, energy, voltage and current per circuit.', desc_vi: 'Công suất, điện năng, điện áp, dòng điện.',         main: 8, icon: 'nrg'   },
-  sys:  { name_en: 'System logic',  name_vi: 'Logic hệ thống',      desc_en: 'Time, date, sunrise/sunset and occupancy mode.',  desc_vi: 'Thời gian, ngày tháng, mặt trời và chế độ.',        main: 9, icon: 'sys'   }
+  lt:   { name_en: 'Lighting',      name_vi: 'Chiếu sáng',         desc_en: 'Switching, dimming, CCT and RGBW circuits.',      desc_vi: 'Điều khiển bật/tắt, dim, nhiệt độ màu, RGBW.',      main: 1, icon: 'light', gaNames: ['SW','FB','DIM','VAL','VALFB','CCT','CCT_FB','RGB','RGB_FB'] },
+  pres: { name_en: 'Presence',      name_vi: 'Cảm biến hiện diện', desc_en: 'Motion sensors with lux value and lock.',         desc_vi: 'Cảm biến chuyển động với giá trị lux và khoá.',      main: 2, icon: 'pres',  gaNames: ['STATUS','LUX','LOCK'] },
+  sht:  { name_en: 'Shutter',       name_vi: 'Rèm / Mành',         desc_en: 'Up/down, position, tilt and safety lockout.',     desc_vi: 'Lên/xuống, vị trí, góc cánh và khoá an toàn.',      main: 3, icon: 'sht',   gaNames: ['MOVE','STEP','POS','POS_FB','TILT','TILT_FB','WIND','RAIN'] },
+  hvac: { name_en: 'HVAC',          name_vi: 'HVAC',                desc_en: 'Temperature, setpoint, mode and fan speed.',      desc_vi: 'Nhiệt độ, cài đặt, chế độ và tốc độ quạt.',         main: 4, icon: 'hvac',  gaNames: ['TEMP','SETP','MODE','FAN','ENABLE','OUTPUT_FB'] },
+  sec:  { name_en: 'Security',      name_vi: 'An ninh',             desc_en: 'Burglar zones, door sensors, fire and siren.',    desc_vi: 'Vùng báo trộm, cảm biến cửa, báo cháy, còi.',       main: 5, icon: 'sec',   gaNames: ['ARM_AWAY','ARM_HOME','DISARM','ALARM_FB','ZONE_STATUS','FIRE','SIREN'] },
+  scn:  { name_en: 'Scenes',        name_vi: 'Cảnh (Scenes)',       desc_en: 'Central and per-room scene activation.',          desc_vi: 'Kích hoạt cảnh trung tâm và theo từng phòng.',       main: 6, icon: 'scn',   gaNames: ['ACTIVATE','FB'] },
+  av:   { name_en: 'Audio Visual',  name_vi: 'Nghe nhìn',           desc_en: 'TV/amp power, source, volume and mute.',          desc_vi: 'Nguồn TV/amp, chọn đầu vào, âm lượng, tắt tiếng.',  main: 7, icon: 'av',    gaNames: ['POWER','SOURCE','VOL','VOL_FB','MUTE'] },
+  nrg:  { name_en: 'Energy',        name_vi: 'Giám sát điện',       desc_en: 'Power, energy, voltage and current per circuit.', desc_vi: 'Công suất, điện năng, điện áp, dòng điện.',         main: 8, icon: 'nrg',   gaNames: ['POWER','ENERGY','VOLTAGE','CURRENT'] },
+  sys:  { name_en: 'System logic',  name_vi: 'Logic hệ thống',      desc_en: 'Time, date, sunrise/sunset and occupancy mode.',  desc_vi: 'Thời gian, ngày tháng, mặt trời và chế độ.',        main: 9, icon: 'sys',   gaNames: ['TIME','DATE','SUNRISE','SUNSET','OCC_MODE','HEARTBEAT'] }
 };
 
 // ─── PREFIX MAPS ──────────────────────────────────────────────────────────────
@@ -103,7 +103,7 @@ const gasets = {
 };
 
 // ─── CIRCUIT DEFINITIONS ──────────────────────────────────────────────────────
-// quantities[fi][ri][sk][circuitKey] = number
+// circuits[fi][ri][sk][circuitKey] = string[] (user-given names)
 const circuitDefs = {
   lt:   [['onoff', 'On/Off'], ['dim', 'Dimming'], ['cct', 'CCT'], ['rgb', 'RGBW']],
   pres: [['sensor', 'Sensor']],
@@ -218,11 +218,11 @@ const defaultFloors = [
  * @param {string}  payload.structure   - 'function' | 'building'
  * @param {object}  payload.floors      - floor array [{id, mid, name, rooms[]}]
  * @param {object}  payload.systems     - { lt: true|false, ... }
- * @param {object}  payload.quantities  - [fi][ri][sk][ck] = number
+ * @param {object}  payload.circuits    - [fi][ri][sk][ck] = string[] (circuit names)
  * @param {Array}   payload.manualGAs   - manually added GAs preserved across regenerate
  * @returns {Array} GA[]  { addr, name, dpt, type, main, mid, mainName, _id }
  */
-function generateGAs({ structure, floors, systems, quantities, manualGAs = [], ltSubs = {}, hvacSubs = {} }) {
+function generateGAs({ structure, floors, systems, circuits = {}, manualGAs = [], ltSubs = {}, hvacSubs = {} }) {
   const gas = [];
   const sysList = Object.keys(systems).filter(k => systems[k]);
 
@@ -242,9 +242,9 @@ function generateGAs({ structure, floors, systems, quantities, manualGAs = [], l
     subCounter[k] = (subCounter[k] || 0) + count;
   }
 
-  // safe quantity lookup — never mutates quantities object
-  function getQty(fi, ri, sk, ck) {
-    return ((((quantities[fi] || {})[ri] || {})[sk] || {})[ck]) || 0;
+  // circuit name lookup — returns array of user-given names
+  function getNames(fi, ri, sk, ck) {
+    return ((((circuits[fi] || {})[ri] || {})[sk] || {})[ck]) || [];
   }
 
   sysList.forEach(sk => {
@@ -286,29 +286,28 @@ function generateGAs({ structure, floors, systems, quantities, manualGAs = [], l
         if (room === 'All zones' || room === 'Scenes') return;
 
         cdefs.forEach(([ck, clabel]) => {
-          const qty = getQty(fi, ri, sk, ck);
-          if (qty === 0) return;
+          const names = getNames(fi, ri, sk, ck);
+          if (names.length === 0) return;
           const cset = circuitGaSet[`${sk}_${ck}`] || gasets[sk];
+          const circuitLabel = cdefs.length > 1 ? ` [${clabel}]` : '';
 
-          for (let unit = 1; unit <= qty; unit++) {
+          names.forEach((name, ui) => {
             const sub = nextSub(mainNum, floor.mid);
-            const unitLabel    = qty > 1        ? ` ${unit}`      : '';
-            const circuitLabel = cdefs.length > 1 ? ` [${clabel}]` : '';
-
             cset.forEach((ga, gi) => {
               gas.push({
                 addr:     `${mainNum}/${floor.mid}/${sub + gi}`,
-                name:     `${px} - ${fp} - ${room}${circuitLabel}${unitLabel} - ${ga.n}`,
+                name:     `${px} - ${fp} - ${room}${circuitLabel} ${name} - ${ga.n}`,
                 dpt:      ga.dpt,
                 type:     ga.t,
                 main:     mainNum,
                 mid:      floor.mid,
                 mainName: si.name_en,
-                _id:      `${sk}_${fi}_${ri}_${ck}_${unit}_${gi}`
+                room:     room,
+                _id:      `${sk}_${fi}_${ri}_${ck}_${ui}_${gi}`
               });
             });
             advanceSub(mainNum, floor.mid, cset.length);
-          }
+          });
         });
       });
     });
@@ -466,8 +465,8 @@ function buildCSV(gas, { floors = [] } = {}) {
   return lines.join('\n');
 }
 
-// ─── EXPORTS ──────────────────────────────────────────────────────────────────
-module.exports = {
+// ─── EXPORTS (Node.js only — not used in browser) ─────────────────────────────
+if (typeof module !== 'undefined') module.exports = {
   ALLOWED_ORIGINS,
   sysInfo,
   prefix,

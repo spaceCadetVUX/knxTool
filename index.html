@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,1294 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    /* ── Design tokens ─────────────────────────────────────────────────────── */
-    :root {
-      --teal-50:  #f0fdfa;
-      --teal-100: #ccfbf1;
-      --teal-200: #99f6e4;
-      --teal-300: #5eead4;
-      --teal-400: #2dd4bf;
-      --teal-500: #14b8a6;
-      --teal-600: #0d9488;
-      --teal-700: #0f766e;
-      --teal-800: #115e59;
-      --teal-900: #134e4a;
-
-      --gray-50:  #f9fafb;
-      --gray-100: #f3f4f6;
-      --gray-200: #e5e7eb;
-      --gray-300: #d1d5db;
-      --gray-400: #9ca3af;
-      --gray-500: #6b7280;
-      --gray-600: #4b5563;
-      --gray-700: #374151;
-      --gray-800: #1f2937;
-      --gray-900: #111827;
-
-      --accent:   var(--teal-600);
-      --accent-h: var(--teal-700);
-      --accent-l: var(--teal-50);
-
-      --font-sans: 'DM Sans', system-ui, sans-serif;
-      --font-mono: 'DM Mono', monospace;
-
-      --radius-sm: 6px;
-      --radius:    10px;
-      --radius-lg: 16px;
-
-      --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
-      --shadow:    0 2px 8px rgba(0,0,0,.10);
-      --shadow-lg: 0 8px 24px rgba(0,0,0,.12);
-
-      --header-h:  60px;
-      --sidebar-w: 280px;
-      --bottom-h:  64px;
-      --step-h:    52px;
-    }
-
-    /* ── Reset ─────────────────────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
-    body {
-      font-family: var(--font-sans);
-      font-size: 14px;
-      line-height: 1.5;
-      color: var(--gray-800);
-      background: var(--gray-50);
-      overflow: hidden;
-    }
-    button { cursor: pointer; font-family: inherit; }
-    input, select, textarea { font-family: inherit; font-size: inherit; }
-    a { color: inherit; text-decoration: none; }
-
-    /* ── App shell ──────────────────────────────────────────────────────────── */
-    #app {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    /* ── Header ─────────────────────────────────────────────────────────────── */
-    #header {
-      height: var(--header-h);
-      background: var(--gray-900);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      gap: 16px;
-      flex-shrink: 0;
-      z-index: 100;
-    }
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      font-size: 16px;
-      letter-spacing: -0.3px;
-    }
-    .header-brand .logo-knx {
-      background: var(--teal-500);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      padding: 3px 7px;
-      border-radius: 4px;
-    }
-    .header-sep { flex: 1; }
-    .header-project {
-      font-size: 13px;
-      color: var(--gray-300);
-      max-width: 220px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .header-project span {
-      color: #fff;
-      font-weight: 500;
-      margin-left: 4px;
-    }
-    .btn-lang {
-      background: transparent;
-      border: 1px solid var(--gray-600);
-      color: var(--gray-300);
-      border-radius: var(--radius-sm);
-      padding: 4px 10px;
-      font-size: 12px;
-      font-weight: 500;
-      transition: all .15s;
-    }
-    .btn-lang:hover {
-      border-color: var(--teal-400);
-      color: var(--teal-300);
-    }
-
-    /* ── Step bar ───────────────────────────────────────────────────────────── */
-    #stepbar {
-      height: var(--step-h);
-      background: #fff;
-      border-bottom: 1px solid var(--gray-200);
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      gap: 4px;
-      flex-shrink: 0;
-      overflow-x: auto;
-    }
-    .step-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--gray-400);
-      cursor: pointer;
-      transition: all .15s;
-      white-space: nowrap;
-      border: none;
-      background: transparent;
-    }
-    .step-item:hover { color: var(--gray-700); background: var(--gray-100); }
-    .step-item.active { color: var(--accent); background: var(--teal-50); }
-    .step-item.done { color: var(--gray-600); }
-    .step-item.done:hover { color: var(--gray-800); }
-    .step-num {
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      background: var(--gray-200);
-      color: var(--gray-500);
-      font-size: 11px;
-      font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .step-item.active .step-num {
-      background: var(--accent);
-      color: #fff;
-    }
-    .step-item.done .step-num {
-      background: var(--teal-100);
-      color: var(--teal-700);
-    }
-    .step-arrow {
-      color: var(--gray-300);
-      font-size: 12px;
-      user-select: none;
-    }
-
-    /* ── Workspace ──────────────────────────────────────────────────────────── */
-    #workspace {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* ── Sidebar ────────────────────────────────────────────────────────────── */
-    #sidebar {
-      width: var(--sidebar-w);
-      background: #fff;
-      border-right: 1px solid var(--gray-200);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-      overflow-y: auto;
-    }
-    .sidebar-section {
-      padding: 16px;
-      border-bottom: 1px solid var(--gray-100);
-    }
-    .sidebar-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .6px;
-      color: var(--gray-400);
-      margin-bottom: 10px;
-    }
-    .sidebar-summary-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 13px;
-      color: var(--gray-600);
-      padding: 3px 0;
-    }
-    .sidebar-summary-row strong { color: var(--gray-800); }
-    .sidebar-stat {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 4px;
-    }
-    .stat-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .stat-val {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--teal-600);
-    }
-    .stat-label { font-size: 12px; color: var(--gray-500); }
-
-    /* ── Main panel ─────────────────────────────────────────────────────────── */
-    #panel {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* ── Bottom bar ─────────────────────────────────────────────────────────── */
-    #bottombar {
-      height: var(--bottom-h);
-      background: #fff;
-      border-top: 1px solid var(--gray-200);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      flex-shrink: 0;
-    }
-
-    /* ── Buttons ────────────────────────────────────────────────────────────── */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 18px;
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      font-weight: 500;
-      border: none;
-      transition: all .15s;
-      cursor: pointer;
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-    }
-    .btn-primary:hover { background: var(--accent-h); }
-    .btn-secondary {
-      background: var(--gray-100);
-      color: var(--gray-700);
-      border: 1px solid var(--gray-200);
-    }
-    .btn-secondary:hover { background: var(--gray-200); }
-    .btn-ghost {
-      background: transparent;
-      color: var(--gray-600);
-      border: 1px solid transparent;
-    }
-    .btn-ghost:hover { background: var(--gray-100); border-color: var(--gray-200); }
-    .btn-danger {
-      background: #fee2e2;
-      color: #dc2626;
-    }
-    .btn-danger:hover { background: #fecaca; }
-    .btn-sm { padding: 5px 12px; font-size: 12px; }
-    .btn-xs { padding: 3px 8px; font-size: 11px; }
-    .btn:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
-    .btn-icon {
-      background: transparent;
-      border: none;
-      color: var(--gray-400);
-      padding: 4px;
-      border-radius: var(--radius-sm);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .15s;
-    }
-    .btn-icon:hover { color: var(--gray-700); background: var(--gray-100); }
-    .btn-icon.danger:hover { color: #dc2626; background: #fee2e2; }
-
-    /* ── Cards ──────────────────────────────────────────────────────────────── */
-    .card {
-      background: #fff;
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 16px;
-    }
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .card-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray-800);
-    }
-    .card.selected {
-      border-color: var(--accent);
-      background: var(--teal-50);
-    }
-
-    /* ── Chips ──────────────────────────────────────────────────────────────── */
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      border: 1px solid var(--gray-200);
-      background: var(--gray-50);
-      color: var(--gray-600);
-      cursor: pointer;
-      transition: all .15s;
-      user-select: none;
-    }
-    .chip:hover { border-color: var(--teal-300); color: var(--teal-700); }
-    .chip.active {
-      background: var(--teal-100);
-      border-color: var(--teal-400);
-      color: var(--teal-800);
-    }
-    .chip-remove {
-      background: none;
-      border: none;
-      padding: 0;
-      color: inherit;
-      opacity: .6;
-      cursor: pointer;
-      font-size: 14px;
-      line-height: 1;
-    }
-    .chip-remove:hover { opacity: 1; }
-
-    /* ── Inputs ─────────────────────────────────────────────────────────────── */
-    .input {
-      width: 100%;
-      padding: 8px 12px;
-      border: 1px solid var(--gray-300);
-      border-radius: var(--radius-sm);
-      font-size: 14px;
-      color: var(--gray-800);
-      background: #fff;
-      transition: border-color .15s, box-shadow .15s;
-      outline: none;
-    }
-    .input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(13,148,136,.12);
-    }
-    .input-sm { padding: 5px 9px; font-size: 12px; }
-    .input-inline {
-      border: 1px solid var(--teal-400);
-      border-radius: 4px;
-      padding: 2px 6px;
-      font-size: 13px;
-      outline: none;
-      background: #fff;
-      box-shadow: 0 0 0 2px rgba(13,148,136,.15);
-    }
-    select.input { appearance: auto; }
-    label.field-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--gray-600);
-      margin-bottom: 5px;
-    }
-    .field { margin-bottom: 14px; }
-
-    /* ── Toggle ─────────────────────────────────────────────────────────────── */
-    .toggle {
-      position: relative;
-      display: inline-block;
-      width: 36px;
-      height: 20px;
-    }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider {
-      position: absolute;
-      inset: 0;
-      background: var(--gray-300);
-      border-radius: 20px;
-      transition: .2s;
-      cursor: pointer;
-    }
-    .toggle-slider::before {
-      content: '';
-      position: absolute;
-      width: 14px; height: 14px;
-      left: 3px; top: 3px;
-      background: #fff;
-      border-radius: 50%;
-      transition: .2s;
-    }
-    .toggle input:checked + .toggle-slider { background: var(--accent); }
-    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 6px 0;
-    }
-    .toggle-label { font-size: 13px; color: var(--gray-700); }
-
-    /* ── Badge ──────────────────────────────────────────────────────────────── */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .badge-teal { background: var(--teal-100); color: var(--teal-800); }
-    .badge-gray { background: var(--gray-100); color: var(--gray-600); }
-    .badge-red  { background: #fee2e2; color: #dc2626; }
-
-    /* ── Step 1 — Structure ─────────────────────────────────────────────────── */
-    .structure-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    .structure-card {
-      border: 2px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 20px;
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .structure-card:hover { border-color: var(--teal-300); }
-    .structure-card.selected { border-color: var(--accent); background: var(--teal-50); }
-    .structure-card .sc-icon { font-size: 28px; margin-bottom: 10px; }
-    .structure-card .sc-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
-    .structure-card .sc-desc { font-size: 12px; color: var(--gray-500); }
-
-    /* ── Step 2 — Systems ───────────────────────────────────────────────────── */
-    .systems-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 10px;
-    }
-    .sys-card {
-      border: 2px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 14px;
-      cursor: pointer;
-      transition: all .15s;
-      text-align: center;
-    }
-    .sys-card:hover { border-color: var(--teal-300); }
-    .sys-card.active { border-color: var(--accent); background: var(--teal-50); }
-    .sys-card .sys-icon { font-size: 24px; margin-bottom: 6px; }
-    .sys-card .sys-name { font-size: 12px; font-weight: 600; color: var(--gray-700); }
-    .sys-card .sys-main { font-size: 11px; color: var(--gray-400); }
-    .sub-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .ga-preview { font-family: var(--font-mono); font-size: 11px; color: var(--gray-600); }
-    .ga-preview-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 3px 0;
-      border-bottom: 1px solid var(--gray-100);
-    }
-    .ga-preview-row:last-child { border-bottom: none; }
-    .ga-addr { color: var(--teal-700); font-weight: 500; min-width: 40px; }
-    .ga-dpt { color: var(--gray-400); }
-    .ga-type-ctrl { color: #3b82f6; }
-    .ga-type-fb   { color: var(--gray-400); }
-
-    /* ── Step 3 — Floors (compact style block) ──────────────────────────────── */
-    .floor-grid { display: flex; flex-direction: column; gap: 10px; }
-    .room-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-
-    /* ── Step 4 — Quantities ────────────────────────────────────────────────── */
-    .qty-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-    .qty-table th {
-      text-align: left;
-      padding: 8px 10px;
-      background: var(--gray-50);
-      border-bottom: 2px solid var(--gray-200);
-      font-weight: 600;
-      color: var(--gray-600);
-      font-size: 12px;
-    }
-    .qty-table td {
-      padding: 6px 10px;
-      border-bottom: 1px solid var(--gray-100);
-      vertical-align: middle;
-    }
-    .qty-table tr:hover td { background: var(--gray-50); }
-    .qty-input {
-      width: 60px;
-      text-align: center;
-      border: 1px solid var(--gray-300);
-      border-radius: 4px;
-      padding: 4px 6px;
-      font-size: 13px;
-    }
-    .qty-input:focus { border-color: var(--accent); outline: none; }
-
-    /* ── Step 5 — GA List ───────────────────────────────────────────────────── */
-    .stat-bar {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-    .stat-card {
-      background: #fff;
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-    }
-    .stat-card .val {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--teal-600);
-      line-height: 1;
-    }
-    .stat-card .lbl { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
-    .ga-toolbar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-    .ga-tree { font-size: 13px; }
-    .ga-main-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 10px;
-      background: var(--gray-800);
-      color: #fff;
-      border-radius: var(--radius-sm);
-      margin-bottom: 4px;
-      cursor: pointer;
-    }
-    .ga-main-name { font-weight: 600; font-size: 13px; }
-    .ga-mid-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px 6px 24px;
-      background: var(--gray-100);
-      border-radius: var(--radius-sm);
-      margin-bottom: 2px;
-      cursor: pointer;
-    }
-    .ga-mid-name { font-weight: 600; color: var(--gray-700); }
-    .ga-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 10px 5px 40px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-mono);
-      font-size: 12px;
-    }
-    .ga-row:hover { background: var(--gray-50); }
-    .ga-row .addr { color: var(--teal-700); font-weight: 500; min-width: 50px; }
-    .ga-row .name { flex: 1; color: var(--gray-700); }
-    .ga-row .dpt  { color: var(--gray-400); font-size: 11px; }
-    .ga-row .type { font-size: 10px; }
-    .ga-row .actions { display: flex; gap: 4px; opacity: 0; transition: opacity .1s; }
-    .ga-row:hover .actions { opacity: 1; }
-    .ga-table-wrap { overflow-x: auto; }
-    .ga-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      font-family: var(--font-mono);
-    }
-    .ga-table th {
-      padding: 7px 10px;
-      background: var(--gray-50);
-      border-bottom: 2px solid var(--gray-200);
-      font-weight: 600;
-      text-align: left;
-      font-family: var(--font-sans);
-      font-size: 11px;
-      color: var(--gray-500);
-      text-transform: uppercase;
-      letter-spacing: .4px;
-    }
-    .ga-table td {
-      padding: 5px 10px;
-      border-bottom: 1px solid var(--gray-100);
-      vertical-align: middle;
-    }
-    .ga-table tr:hover td { background: var(--gray-50); }
-    .add-manual-form {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      padding: 8px 10px 8px 40px;
-      background: var(--teal-50);
-      border-radius: var(--radius-sm);
-      margin-top: 4px;
-    }
-    .add-manual-form .input { padding: 4px 8px; font-size: 12px; }
-
-    /* ── Step 6 — Export ────────────────────────────────────────────────────── */
-    .export-layout {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      gap: 20px;
-      align-items: start;
-    }
-    .export-panel .card { height: 100%; }
-    .format-selector {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .format-btn {
-      flex: 1;
-      padding: 10px;
-      border: 2px solid var(--gray-200);
-      border-radius: var(--radius-sm);
-      background: var(--gray-50);
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--gray-500);
-      cursor: pointer;
-      text-align: center;
-      transition: all .15s;
-    }
-    .format-btn.active {
-      border-color: var(--accent);
-      background: var(--teal-50);
-      color: var(--accent);
-    }
-    .xml-preview {
-      background: var(--gray-900);
-      color: #e2e8f0;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      border-radius: var(--radius);
-      padding: 16px;
-      overflow: auto;
-      max-height: 420px;
-      white-space: pre;
-      tab-size: 2;
-    }
-    .xml-preview .tag   { color: #7dd3fc; }
-    .xml-preview .attr  { color: #86efac; }
-    .xml-preview .val   { color: #fde68a; }
-    .xml-preview .cmt   { color: #94a3b8; font-style: italic; }
-    .preview-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .preview-title { font-weight: 600; font-size: 13px; color: var(--gray-700); }
-
-    /* ── Import modal ───────────────────────────────────────────────────────── */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 500;
-    }
-    .modal-overlay.hidden { display: none; }
-    .modal {
-      background: #fff;
-      border-radius: var(--radius-lg);
-      padding: 28px;
-      width: 480px;
-      max-width: calc(100vw - 40px);
-      box-shadow: var(--shadow-lg);
-    }
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-    .modal-title { font-size: 16px; font-weight: 700; }
-    .modal-close {
-      background: none;
-      border: none;
-      font-size: 20px;
-      color: var(--gray-400);
-      cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-    .modal-close:hover { color: var(--gray-700); background: var(--gray-100); }
-    .drop-zone {
-      border: 2px dashed var(--gray-300);
-      border-radius: var(--radius);
-      padding: 32px;
-      text-align: center;
-      color: var(--gray-400);
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .drop-zone:hover, .drop-zone.drag-over {
-      border-color: var(--teal-400);
-      background: var(--teal-50);
-      color: var(--teal-600);
-    }
-    .drop-zone-icon { font-size: 32px; margin-bottom: 10px; }
-    .drop-zone-text { font-size: 13px; }
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    /* ── Loading overlay ────────────────────────────────────────────────────── */
-    #loading-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(255,255,255,.75);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      z-index: 900;
-    }
-    #loading-overlay.hidden { display: none; }
-    .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid var(--gray-200);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-msg { font-size: 14px; color: var(--gray-500); }
-
-    /* ── Toast ──────────────────────────────────────────────────────────────── */
-    #toast {
-      position: fixed;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--gray-900);
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 24px;
-      font-size: 13px;
-      font-weight: 500;
-      box-shadow: var(--shadow-lg);
-      z-index: 800;
-      opacity: 0;
-      transition: all .25s;
-      pointer-events: none;
-      white-space: nowrap;
-    }
-    #toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-    #toast.toast-error { background: #dc2626; }
-
-    /* ── Misc utils ─────────────────────────────────────────────────────────── */
-    .hidden { display: none !important; }
-    .text-sm { font-size: 12px; }
-    .text-muted { color: var(--gray-400); }
-    .mt-2 { margin-top: 8px; }
-    .mt-3 { margin-top: 12px; }
-    .mt-4 { margin-top: 16px; }
-    .flex { display: flex; }
-    .flex-col { flex-direction: column; }
-    .items-center { align-items: center; }
-    .gap-2 { gap: 8px; }
-    .gap-3 { gap: 12px; }
-    .section-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--gray-800);
-      margin-bottom: 4px;
-    }
-    .section-desc { font-size: 13px; color: var(--gray-500); margin-bottom: 18px; }
-    .divider { height: 1px; background: var(--gray-100); margin: 12px 0; }
-
-    /* ── Step 2 — Two col layout ─────────────────────────────────────────────── */
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 20px;
-      align-items: start;
-    }
-    .ga-set-preview {
-      background: #fff;
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 16px;
-      position: sticky;
-      top: 0;
-    }
-    .ga-set-empty {
-      text-align: center;
-      color: var(--gray-400);
-      font-size: 13px;
-      padding: 24px 0;
-    }
-    .ga-set-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 0;
-      border-bottom: 1px solid var(--gray-100);
-      font-size: 12px;
-    }
-    .ga-set-row:last-child { border-bottom: none; }
-    .ga-offset { font-family: var(--font-mono); color: var(--gray-400); min-width: 30px; font-size: 11px; }
-    .ga-set-name { flex: 1; color: var(--gray-700); }
-    .ga-type-badge {
-      font-size: 10px;
-      padding: 1px 6px;
-      border-radius: 8px;
-      font-weight: 600;
-    }
-    .ga-type-badge.ctrl { background: #dbeafe; color: #1d4ed8; }
-    .ga-type-badge.fb   { background: var(--gray-100); color: var(--gray-500); }
-    .sel-count { font-size: 12px; color: var(--gray-500); }
-
-    /* ── View toggle (Step 2/3) ──────────────────────────────────────────────── */
-    .view-toggle {
-      display: flex;
-      gap: 4px;
-      background: var(--gray-100);
-      border-radius: var(--radius-sm);
-      padding: 3px;
-    }
-    .vt-btn {
-      padding: 4px 12px;
-      border-radius: 4px;
-      border: none;
-      background: transparent;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--gray-500);
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .vt-btn.active { background: #fff; color: var(--gray-800); box-shadow: var(--shadow-sm); }
-
-    /* ── Step 3 — Floor builder ─────────────────────────────────────────────── */
-    .floors-list { display: flex; flex-direction: column; gap: 12px; }
-    .floor-card {
-      background: #fff;
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius);
-      overflow: hidden;
-      transition: box-shadow .15s;
-    }
-    .floor-card:focus-within { box-shadow: 0 0 0 2px rgba(13,148,136,.15); border-color: var(--teal-300); }
-    .floor-card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      background: var(--gray-50);
-      border-bottom: 1px solid var(--gray-100);
-    }
-    .floor-card-header.fixed-floor { background: var(--teal-50); }
-    .mid-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 28px;
-      height: 22px;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 0 7px;
-      border-radius: 10px;
-      background: var(--teal-100);
-      color: var(--teal-800);
-      flex-shrink: 0;
-    }
-    .floor-name-field {
-      flex: 1;
-      border: none;
-      background: transparent;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--gray-800);
-      outline: none;
-      min-width: 0;
-    }
-    .floor-name-field:focus {
-      background: #fff;
-      border-radius: 4px;
-      box-shadow: 0 0 0 2px rgba(13,148,136,.2);
-      padding: 2px 6px;
-      margin: -2px -6px;
-    }
-    .floor-room-count {
-      font-size: 11px;
-      color: var(--gray-400);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .floor-card-body { padding: 12px 14px; }
-    .room-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-    .room-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 10px;
-      border-radius: 20px;
-      background: var(--gray-100);
-      border: 1px solid var(--gray-200);
-      font-size: 12px;
-      color: var(--gray-700);
-      cursor: default;
-      transition: background .1s;
-    }
-    .room-tag:hover { background: var(--gray-200); }
-    .room-tag.fixed-room { background: var(--teal-50); border-color: var(--teal-200); color: var(--teal-800); }
-    .room-tag-del {
-      background: none;
-      border: none;
-      padding: 0;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px;
-      color: var(--gray-400);
-      cursor: pointer;
-      transition: all .1s;
-      flex-shrink: 0;
-    }
-    .room-tag-del:hover { background: #fecaca; color: #dc2626; }
-    .room-add-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--gray-50);
-      border: 1px dashed var(--gray-300);
-      border-radius: var(--radius-sm);
-      padding: 6px 10px;
-      transition: all .15s;
-    }
-    .room-add-row:focus-within {
-      background: #fff;
-      border-color: var(--teal-400);
-      border-style: solid;
-      box-shadow: 0 0 0 2px rgba(13,148,136,.12);
-    }
-    .room-add-input {
-      flex: 1;
-      border: none;
-      background: transparent;
-      font-size: 13px;
-      color: var(--gray-800);
-      outline: none;
-    }
-    .room-add-input::placeholder { color: var(--gray-400); }
-    .room-add-btn {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      padding: 3px 10px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity .15s;
-    }
-    .room-add-row:focus-within .room-add-btn { opacity: 1; }
-    .add-floor-btn {
-      margin-top: 4px;
-      background: transparent;
-      border: 2px dashed var(--gray-200);
-      border-radius: var(--radius);
-      padding: 12px;
-      width: 100%;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--gray-400);
-      cursor: pointer;
-      transition: all .15s;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .add-floor-btn:hover { border-color: var(--teal-400); color: var(--teal-600); background: var(--teal-50); }
-
-    /* ── Step 3 — Room inline rename ────────────────────────────────────────── */
-    .room-tag-rename {
-      border: none; background: transparent; outline: none;
-      font-size: 12px; color: var(--gray-800);
-      min-width: 40px; max-width: 160px;
-    }
-    .room-tag.editing { background: #fff; border-color: var(--teal-400);
-      box-shadow: 0 0 0 2px rgba(13,148,136,.15); }
-
-    /* ── Step 3 — Tree view ──────────────────────────────────────────────────── */
-    .tree-list { display: flex; flex-direction: column; gap: 4px; }
-    .tree-floor-node { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--gray-200); background: #fff; }
-    .tree-floor-node:focus-within { border-color: var(--teal-300); box-shadow: 0 0 0 2px rgba(13,148,136,.1); }
-    .tree-floor-hd {
-      display: flex; align-items: center; gap: 6px;
-      padding: 8px 12px;
-      background: var(--gray-50);
-      border-bottom: 1px solid transparent;
-      cursor: pointer; user-select: none;
-    }
-    .tree-floor-hd.open { border-bottom-color: var(--gray-100); }
-    .tree-caret {
-      font-size: 10px; color: var(--gray-400);
-      transition: transform .15s; flex-shrink: 0;
-    }
-    .tree-caret.open { transform: rotate(90deg); }
-    .tree-floor-body { padding: 6px 12px 10px 36px; }
-    .tree-room-row {
-      display: flex; align-items: center; gap: 6px;
-      padding: 4px 6px; border-radius: var(--radius-sm);
-      font-size: 13px; color: var(--gray-700);
-      position: relative;
-    }
-    .tree-room-row:hover { background: var(--gray-100); }
-    .tree-room-row::before {
-      content: ''; position: absolute; left: -16px; top: 50%;
-      width: 10px; height: 1px; background: var(--gray-300);
-    }
-    .tree-room-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .tree-room-rename-inp {
-      flex: 1; border: 1px solid var(--teal-400); border-radius: 4px;
-      padding: 1px 6px; font-size: 13px; outline: none;
-      background: #fff; color: var(--gray-800);
-    }
-    .tree-room-actions { display: none; gap: 2px; flex-shrink: 0; }
-    .tree-room-row:hover .tree-room-actions { display: flex; }
-    .tree-icon-btn {
-      background: none; border: none; padding: 2px 4px; border-radius: 3px;
-      cursor: pointer; font-size: 12px; color: var(--gray-400);
-      line-height: 1;
-    }
-    .tree-icon-btn:hover { background: var(--gray-200); color: var(--gray-700); }
-    .tree-icon-btn.danger:hover { background: #fecaca; color: #dc2626; }
-    .tree-add-room {
-      display: flex; align-items: center; gap: 6px;
-      padding: 4px 6px; margin-top: 4px;
-      border-radius: var(--radius-sm);
-      border: 1px dashed var(--gray-300); background: var(--gray-50);
-      font-size: 12px; color: var(--gray-400);
-      transition: all .15s;
-    }
-    .tree-add-room:focus-within {
-      border-color: var(--teal-400); border-style: solid;
-      background: #fff; color: var(--gray-700);
-      box-shadow: 0 0 0 2px rgba(13,148,136,.1);
-    }
-    .tree-add-room-inp {
-      flex: 1; border: none; background: transparent;
-      font-size: 12px; outline: none; color: var(--gray-800);
-    }
-    .tree-add-room-inp::placeholder { color: var(--gray-400); }
-    .tree-connector { position: relative; }
-    .tree-connector::before {
-      content: ''; position: absolute;
-      left: -16px; top: 0; bottom: 0;
-      width: 1px; background: var(--gray-200);
-    }
-
-    /* Step 3 empty state */
-    .floors-empty {
-      text-align: center; padding: 48px 24px;
-      border: 2px dashed var(--gray-200); border-radius: var(--radius);
-      color: var(--gray-400);
-    }
-    .floors-empty-icon { font-size: 32px; margin-bottom: 12px; }
-    .floors-empty p { font-size: 13px; margin: 0 0 16px; }
-
-    /* ── Step 4 — Assign layout ─────────────────────────────────────────────── */
-    .assign-layout {
-      display: grid;
-      grid-template-columns: 200px 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-    .assign-left {
-      background: #fff;
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .assign-floor-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
-      padding: 10px 12px;
-      border: none;
-      background: transparent;
-      font-size: 13px;
-      color: var(--gray-700);
-      cursor: pointer;
-      border-bottom: 1px solid var(--gray-100);
-      text-align: left;
-      transition: background .1s;
-    }
-    .assign-floor-btn:hover { background: var(--gray-50); }
-    .assign-floor-btn.active { background: var(--teal-50); color: var(--teal-800); font-weight: 600; }
-    .assign-floor-btn:last-child { border-bottom: none; }
-    .room-tab-bar {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      padding: 10px 12px;
-      background: var(--gray-50);
-      border-bottom: 1px solid var(--gray-200);
-      border-radius: var(--radius) var(--radius) 0 0;
-    }
-    .room-tab {
-      padding: 5px 12px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--gray-200);
-      background: #fff;
-      font-size: 12px;
-      color: var(--gray-600);
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .room-tab:hover { border-color: var(--teal-300); }
-    .room-tab.active { border-color: var(--accent); background: var(--teal-50); color: var(--teal-800); font-weight: 600; }
-    .room-qty-area {
-      background: #fff;
-      border: 1px solid var(--gray-200);
-      border-top: none;
-      border-radius: 0 0 var(--radius) var(--radius);
-      padding: 12px;
-    }
-    .sys-section-head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 0 6px;
-      margin-top: 8px;
-      border-bottom: 2px solid var(--gray-200);
-      margin-bottom: 2px;
-    }
-    .sys-section-head:first-child { margin-top: 0; }
-    .sys-section-icon { width: 18px; height: 18px; color: var(--accent); flex-shrink: 0; }
-    .sys-section-icon svg { width: 100%; height: 100%; }
-    .sys-section-label { font-weight: 600; font-size: 13px; flex: 1; }
-    .qty-sum-badge {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 10px;
-      background: var(--teal-100);
-      color: var(--teal-800);
-      font-weight: 600;
-    }
-    .qty-sum-badge.zero { background: var(--gray-100); color: var(--gray-400); }
-    .qty-stepper {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      justify-content: center;
-    }
-    .qty-stepper-btn {
-      width: 24px; height: 24px;
-      border-radius: 4px;
-      border: 1px solid var(--gray-300);
-      background: var(--gray-50);
-      cursor: pointer;
-      font-size: 14px;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--gray-600);
-      transition: all .1s;
-    }
-    .qty-stepper-btn:hover { border-color: var(--teal-400); color: var(--teal-700); background: var(--teal-50); }
-
-    /* ── Sidebar styles ──────────────────────────────────────────────────────── */
-    .sb-section { padding: 14px 16px; border-bottom: 1px solid var(--gray-100); }
-    .sb-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--gray-400); margin-bottom: 8px; }
-    .sb-step-btn {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      width: 100%;
-      padding: 7px 8px;
-      border: none;
-      background: transparent;
-      border-radius: var(--radius-sm);
-      font-size: 13px;
-      color: var(--gray-500);
-      cursor: pointer;
-      text-align: left;
-      transition: all .1s;
-    }
-    .sb-step-btn:hover { background: var(--gray-100); color: var(--gray-800); }
-    .sb-step-btn.active { background: var(--teal-50); color: var(--teal-800); font-weight: 600; }
-    .sb-step-btn.done { color: var(--gray-600); }
-    .sb-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--gray-300);
-      flex-shrink: 0;
-    }
-    .sb-step-btn.active .sb-dot { background: var(--accent); }
-    .sb-step-btn.done .sb-dot { background: var(--teal-300); }
-    .sb-info-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: var(--gray-600);
-      padding: 3px 0;
-    }
-    .sb-info-row strong { color: var(--gray-800); }
-    .sb-sys-chips { display: flex; flex-wrap: wrap; gap: 4px; }
-    .sb-sys-chip {
-      font-size: 10px;
-      padding: 2px 7px;
-      border-radius: 10px;
-      background: var(--teal-100);
-      color: var(--teal-800);
-      font-weight: 600;
-    }
-
-    /* ── Save indicator ─────────────────────────────────────────────────────── */
-    #save-indicator {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--gray-600);
-      opacity: 0;
-      transition: opacity .3s;
-      white-space: nowrap;
-    }
-    #save-indicator.saved { opacity: 1; color: var(--teal-400); }
-
-    /* ── GA name editing ─────────────────────────────────────────────────────── */
-    .ga-name-text { cursor: text; flex: 1; }
-    .ga-name-input { display: none; flex: 1; }
-    .ga-name-input.visible { display: block; }
-  </style>
+  <link rel="stylesheet" href="./assets/styles.css">
 </head>
 <body>
 
@@ -1363,6 +76,7 @@
 <!-- Toast -->
 <div id="toast"></div>
 
+<script src="assets/engine.js"></script>
 <script>
 'use strict';
 
@@ -1376,7 +90,7 @@ const state = {
   ltSubs:   { onoff:true, dim:true, cct:true, rgb:true, facade:false },
   hvacSubs: { therm:true, split:true, fcu:false, ufh:false, hp:false },
   floors: [],
-  quantities:    {},
+  circuits:      {},
   generatedGAs:  [],
   manualGAs:     [],
   floorView:     'chip',
@@ -1397,7 +111,7 @@ const i18n = {
     step2_desc:  'Choose which systems are in this project. Click a card to preview its GA set.',
     step3_title: 'Floors & rooms',
     step3_desc:  'Each floor maps to one middle group (0–7). Add rooms within each floor.',
-    step4_title: 'Assign systems & quantities',
+    step4_title: 'Assign circuits',
     step4_desc:  'Enter the number of each circuit type per room.',
     step5_title: 'Generated group addresses',
     step5_desc:  'Review and edit before export.',
@@ -1426,9 +140,11 @@ const i18n = {
     next_floors: 'Next: Floors & Rooms →', next_assign: 'Next: Assign →',
     next_generate: 'Next: Generate →', next_export: 'Next: Export →',
     regenerate: 'Regenerate', file_ready: 'File ready — check your downloads',
+    start_new: 'New project', start_new_desc: 'Configure structure, floors and systems from scratch',
+    start_import: 'Import from ETS XML', start_import_desc: 'Load group addresses from an existing ETS export',
     structure_type: 'Structure type', xml_preview: 'XML preview',
     no_rooms: 'No rooms in this floor. Go back to Step 3 to add rooms.',
-    no_gas: 'No GAs yet. Enter quantities in Step 4 then click Regenerate.',
+    no_gas: 'No GAs yet. Add circuits in Step 4 then click Regenerate.',
     add_ga_manual: 'Add GA manually', add_ga: 'Add GA',
     generate_prompt: 'Click "Generate" in Step 4 or go back and enter quantities.'
   },
@@ -1469,6 +185,8 @@ const i18n = {
     next_floors: 'Tiếp: Tầng & Phòng →', next_assign: 'Tiếp: Phân gán →',
     next_generate: 'Tiếp: Tạo GA →', next_export: 'Tiếp: Xuất file →',
     regenerate: 'Tạo lại', file_ready: 'File đã sẵn — kiểm tra mục tải xuống',
+    start_new: 'Dự án mới', start_new_desc: 'Cấu hình cấu trúc, tầng và hệ thống từ đầu',
+    start_import: 'Nhập từ ETS XML', start_import_desc: 'Tải địa chỉ nhóm từ file ETS đã xuất',
     structure_type: 'Kiểu cấu trúc', xml_preview: 'Xem trước XML',
     no_rooms: 'Tầng này chưa có phòng. Quay lại Step 3 để thêm phòng.',
     no_gas: 'Chưa có GA nào. Nhập số lượng ở Step 4 rồi nhấn Tạo lại.',
@@ -1485,45 +203,7 @@ function setLang(lang) {
   renderAll();
 }
 
-// ── UI-only system metadata (display only — no GA generation logic) ─────────
-const sysInfo = {
-  lt:   { name_en:'Lighting',      name_vi:'Chiếu sáng',         main:1, icon:'light',
-          desc_en:'Switching, dimming, CCT and RGBW circuits.',
-          desc_vi:'Điều khiển bật/tắt, dim, nhiệt độ màu, RGBW.',
-          gaNames: ['SW','FB','DIM','VAL','VALFB','CCT','CCT_FB','RGB','RGB_FB'] },
-  pres: { name_en:'Presence',      name_vi:'Cảm biến hiện diện', main:2, icon:'pres',
-          desc_en:'Motion sensors with lux value and lock.',
-          desc_vi:'Cảm biến chuyển động với giá trị lux và khoá.',
-          gaNames: ['STATUS','LUX','LOCK'] },
-  sht:  { name_en:'Shutter',       name_vi:'Rèm / Mành',         main:3, icon:'sht',
-          desc_en:'Up/down, position, tilt and safety lockout.',
-          desc_vi:'Lên/xuống, vị trí, góc cánh và khoá an toàn.',
-          gaNames: ['MOVE','STEP','POS','POS_FB','TILT','TILT_FB','WIND','RAIN'] },
-  hvac: { name_en:'HVAC',          name_vi:'HVAC',               main:4, icon:'hvac',
-          desc_en:'Temperature, setpoint, mode and fan speed.',
-          desc_vi:'Nhiệt độ, cài đặt, chế độ và tốc độ quạt.',
-          gaNames: ['TEMP','SETP','MODE','FAN','ENABLE','OUTPUT_FB'] },
-  sec:  { name_en:'Security',      name_vi:'An ninh',            main:5, icon:'sec',
-          desc_en:'Burglar zones, door sensors, fire and siren.',
-          desc_vi:'Vùng báo trộm, cảm biến cửa, báo cháy, còi.',
-          gaNames: ['ARM_AWAY','ARM_HOME','DISARM','ALARM_FB','ZONE_STATUS','FIRE','SIREN'] },
-  scn:  { name_en:'Scenes',        name_vi:'Cảnh (Scenes)',      main:6, icon:'scn',
-          desc_en:'Central and per-room scene activation.',
-          desc_vi:'Kích hoạt cảnh trung tâm và theo từng phòng.',
-          gaNames: ['ACTIVATE','FB'] },
-  av:   { name_en:'Audio Visual',  name_vi:'Nghe nhìn',          main:7, icon:'av',
-          desc_en:'TV/amp power, source, volume and mute.',
-          desc_vi:'Nguồn TV/amp, chọn đầu vào, âm lượng, tắt tiếng.',
-          gaNames: ['POWER','SOURCE','VOL','VOL_FB','MUTE'] },
-  nrg:  { name_en:'Energy',        name_vi:'Giám sát điện',      main:8, icon:'nrg',
-          desc_en:'Power, energy, voltage and current per circuit.',
-          desc_vi:'Công suất, điện năng, điện áp, dòng điện.',
-          gaNames: ['POWER','ENERGY','VOLTAGE','CURRENT'] },
-  sys:  { name_en:'System logic',  name_vi:'Logic hệ thống',     main:9, icon:'sys',
-          desc_en:'Time, date, sunrise/sunset and occupancy mode.',
-          desc_vi:'Thời gian, ngày tháng, mặt trời và chế độ.',
-          gaNames: ['TIME','DATE','SUNRISE','SUNSET','OCC_MODE','HEARTBEAT'] }
-};
+// sysInfo and circuitDefs are provided by assets/engine.js
 
 const sysIconSvg = {
   light: '<circle cx="7.5" cy="6" r="3.5"/><line x1="7.5" y1="1" x2="7.5" y2="2.2"/><line x1="7.5" y1="9.8" x2="7.5" y2="11"/><line x1="2.5" y1="6" x2="1.2" y2="6"/><line x1="13.8" y1="6" x2="12.5" y2="6"/><path d="M5.5,11 L9.5,11 L9,13.5 L6,13.5 Z"/>',
@@ -1537,18 +217,6 @@ const sysIconSvg = {
   sys:   '<circle cx="7.5" cy="7.5" r="5.5"/><line x1="7.5" y1="4" x2="7.5" y2="7.5"/><line x1="7.5" y1="7.5" x2="10" y2="9"/>'
 };
 
-// Circuit type labels per system — UI only (no GA data / DPTs)
-const circuitDefs = {
-  lt:   [['onoff','On/Off'],['dim','Dimming'],['cct','CCT'],['rgb','RGBW']],
-  pres: [['sensor','Sensor']],
-  sht:  [['motor','Motor']],
-  hvac: [['therm','Thermostat'],['split','Split AC'],['fcu','FCU'],['ufh','UFH'],['hp','Heat pump']],
-  sec:  [['zone','Zone']],
-  scn:  [['scene','Scene group']],
-  av:   [['unit','AV unit']],
-  nrg:  [['meter','Meter']],
-  sys:  [['unit','Unit']]
-};
 
 // Return only circuit defs enabled by sub-type selections
 function activeDefs(sk) {
@@ -1558,22 +226,33 @@ function activeDefs(sk) {
   return all;
 }
 
-// ── Quantity helpers ──────────────────────────────────────────────────────────
-function getQty(fi, ri, sk, ck) {
-  return ((state.quantities[fi] || {})[ri] || {})[sk]?.[ck] || 0;
+// ── Circuit helpers ───────────────────────────────────────────────────────────
+function getCircuits(fi, ri, sk, ck) {
+  return ((((state.circuits[fi] || {})[ri] || {})[sk] || {})[ck]) || [];
 }
 
-function setQty(fi, ri, sk, ck, val) {
-  if (!state.quantities[fi])         state.quantities[fi] = {};
-  if (!state.quantities[fi][ri])     state.quantities[fi][ri] = {};
-  if (!state.quantities[fi][ri][sk]) state.quantities[fi][ri][sk] = {};
-  state.quantities[fi][ri][sk][ck] = Math.max(0, parseInt(val) || 0);
+function addCircuit(fi, ri, sk, ck) {
+  if (!state.circuits[fi])             state.circuits[fi] = {};
+  if (!state.circuits[fi][ri])         state.circuits[fi][ri] = {};
+  if (!state.circuits[fi][ri][sk])     state.circuits[fi][ri][sk] = {};
+  if (!state.circuits[fi][ri][sk][ck]) state.circuits[fi][ri][sk][ck] = [];
+  const n = state.circuits[fi][ri][sk][ck].length + 1;
+  state.circuits[fi][ri][sk][ck].push(String(n));
   debouncedSave();
+  renderPanel();
 }
 
-function adjQty(fi, ri, sk, ck, delta) {
-  setQty(fi, ri, sk, ck, getQty(fi, ri, sk, ck) + delta);
+function removeCircuit(fi, ri, sk, ck, idx) {
+  const arr = state.circuits[fi]?.[ri]?.[sk]?.[ck];
+  if (!arr) return;
+  arr.splice(idx, 1);
+  debouncedSave();
   renderPanel();
+}
+
+function setCircuitName(fi, ri, sk, ck, idx, val) {
+  const arr = state.circuits[fi]?.[ri]?.[sk]?.[ck];
+  if (arr) { arr[idx] = val; debouncedSave(); }
 }
 
 // ── Core render ───────────────────────────────────────────────────────────────
@@ -1686,10 +365,11 @@ function renderBottomBar() {
 
 function goStep(n) {
   if (n < 1 || n > 6) return;
+  const prev = state.step;
   state.step = n;
   renderAll();
-  if (n === 5 && state.generatedGAs.length === 0) callGenerate();
-  if (n === 6 && state.generatedGAs.length > 0)  loadXmlPreview();
+  if (n === 5 && prev < 5) callGenerate();
+  if (n === 6 && state.generatedGAs.length > 0) loadXmlPreview();
 }
 
 // ── Step 1 — Structure ────────────────────────────────────────────────────────
@@ -1697,6 +377,23 @@ function renderStep1() {
   return `
   <div class="section-title">${t('step1_title')}</div>
   <div class="section-desc">${t('step1_desc')}</div>
+
+  <div class="start-options">
+    <div class="start-card active">
+      <div class="start-card-icon">📋</div>
+      <div>
+        <div class="start-card-title">${t('start_new')}</div>
+        <div class="start-card-desc">${t('start_new_desc')}</div>
+      </div>
+    </div>
+    <div class="start-card" onclick="openImportModal()">
+      <div class="start-card-icon">📂</div>
+      <div>
+        <div class="start-card-title">${t('start_import')}</div>
+        <div class="start-card-desc">${t('start_import_desc')}</div>
+      </div>
+    </div>
+  </div>
 
   <div class="sb-label" style="margin-bottom:10px">${t('structure_type')}</div>
   <div class="structure-grid">
@@ -1746,11 +443,10 @@ function renderStep2() {
   function sysCard(sk) {
     const si  = sysInfo[sk];
     const on  = state.systems[sk];
-    const icon = `<svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${sysIconSvg[si.icon]}</svg>`;
+    const icon = `<svg class="sys-icon" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${sysIconSvg[si.icon]}</svg>`;
     return `<div class="sys-card ${on ? 'active' : ''}" onclick="toggleSys('${sk}');showGaDetail('${sk}')">
-      <div class="sys-icon">${icon}</div>
-      <div class="sys-name">${si['name_' + state.lang] || si.name_en}</div>
-      <div class="sys-main" style="font-size:10px;color:var(--gray-400)">Main ${si.main} · ${si.gaNames.length} GAs</div>
+      ${icon}
+      <span class="sys-name">${si['name_' + state.lang] || si.name_en}</span>
     </div>`;
   }
 
@@ -2067,7 +763,7 @@ function removeRoom(fi, ri) {
   saveState();
 }
 
-// ── Step 4 — Quantities ───────────────────────────────────────────────────────
+// ── Step 4 — Assign circuits ──────────────────────────────────────────────────
 let assignFloor = 0;
 let assignRoom  = 0;
 
@@ -2082,60 +778,50 @@ function renderStep4() {
       ${vi ? 'Chưa có tầng nào. Quay lại bước Tầng & Phòng để thêm.' : 'No floors defined. Go back to Floors & Rooms to add some.'}
     </div>`;
 
-  // Clamp assignFloor if floors changed
   if (assignFloor >= state.floors.length) assignFloor = 0;
-  const floor = state.floors[assignFloor];
-  const validRooms = (floor.rooms || []);
+  const floor      = state.floors[assignFloor];
+  const validRooms = floor.rooms || [];
   if (assignRoom >= validRooms.length) assignRoom = 0;
 
   function floorTotal(fi) {
-    const fl = state.floors[fi];
-    return (fl.rooms || []).reduce((a, _, ri) =>
+    return (state.floors[fi].rooms || []).reduce((a, _, ri) =>
       a + sysList.reduce((b, sk) =>
-        b + activeDefs(sk).reduce((c, [ck]) => c + getQty(fi, ri, sk, ck), 0), 0), 0);
+        b + activeDefs(sk).reduce((c, [ck]) => c + getCircuits(fi, ri, sk, ck).length, 0), 0), 0);
   }
 
   function roomTotal(fi, ri) {
     return sysList.reduce((a, sk) =>
-      a + activeDefs(sk).reduce((b, [ck]) => b + getQty(fi, ri, sk, ck), 0), 0);
+      a + activeDefs(sk).reduce((b, [ck]) => b + getCircuits(fi, ri, sk, ck).length, 0), 0);
   }
 
-  function renderRoomQty(fi, ri) {
+  function renderRoomCircuits(fi, ri) {
     return sysList.map(sk => {
       const si    = sysInfo[sk];
       const cdefs = activeDefs(sk);
-      const sysTotal = cdefs.reduce((a, [ck]) => a + getQty(fi, ri, sk, ck), 0);
+      const total = cdefs.reduce((a, [ck]) => a + getCircuits(fi, ri, sk, ck).length, 0);
       return `
       <div class="sys-section-head">
         <div class="sys-section-icon">
           <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${sysIconSvg[si.icon]}</svg>
         </div>
         <span class="sys-section-label">${si['name_' + state.lang] || si.name_en}</span>
-        <span class="qty-sum-badge ${sysTotal === 0 ? 'zero' : ''}">${sysTotal === 0 ? (state.lang === 'vi' ? 'chưa có' : 'none') : sysTotal + ' unit' + (sysTotal > 1 ? 's' : '')}</span>
+        <span class="qty-sum-badge ${total === 0 ? 'zero' : ''}">${total === 0 ? (vi ? 'chưa có' : 'none') : total + ' circuit' + (total > 1 ? 's' : '')}</span>
       </div>
-      <table class="qty-table" style="margin-bottom:8px">
-        <thead><tr>
-          <th style="width:160px">${state.lang === 'vi' ? 'Loại mạch' : 'Circuit type'}</th>
-          <th>${state.lang === 'vi' ? 'Số lượng' : 'Quantity'}</th>
-        </tr></thead>
-        <tbody>
-          ${cdefs.map(([ck, clabel]) => {
-            const qty = getQty(fi, ri, sk, ck);
-            return `<tr>
-              <td>${clabel}</td>
-              <td>
-                <div class="qty-stepper">
-                  <button class="qty-stepper-btn" onclick="adjQty(${fi},${ri},'${sk}','${ck}',-1)">−</button>
-                  <input class="qty-input" type="number" min="0" max="99" value="${qty}"
-                    onchange="setQty(${fi},${ri},'${sk}','${ck}',this.value);renderPanel()"
-                    onblur="setQty(${fi},${ri},'${sk}','${ck}',this.value);renderPanel()" />
-                  <button class="qty-stepper-btn" onclick="adjQty(${fi},${ri},'${sk}','${ck}',1)">+</button>
-                </div>
-              </td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
+      ${cdefs.map(([ck, clabel]) => {
+        const names = getCircuits(fi, ri, sk, ck);
+        return `
+        <div style="margin-bottom:12px">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${clabel}</div>
+          ${names.map((name, idx) => `
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">
+            <input class="input input-sm" style="flex:1;max-width:260px" value="${escHtml(name)}"
+              oninput="setCircuitName(${fi},${ri},'${sk}','${ck}',${idx},this.value)" />
+            <button class="btn-icon danger btn-xs" onclick="removeCircuit(${fi},${ri},'${sk}','${ck}',${idx})">×</button>
+          </div>`).join('')}
+          <button class="btn btn-ghost btn-sm" style="margin-top:2px"
+            onclick="addCircuit(${fi},${ri},'${sk}','${ck}')">+ ${vi ? 'Thêm' : 'Add'} ${clabel}</button>
+        </div>`;
+      }).join('')}`;
     }).join('');
   }
 
@@ -2172,8 +858,8 @@ function renderStep4() {
         ${validRooms.length === 0
           ? `<div style="padding:24px;text-align:center;color:var(--gray-400);font-size:13px">${t('no_rooms')}</div>`
           : (sysList.length === 0
-            ? `<div style="padding:24px;text-align:center;color:var(--gray-400);font-size:13px">${state.lang === 'vi' ? 'Chưa chọn hệ thống nào.' : 'No systems selected.'}</div>`
-            : renderRoomQty(assignFloor, assignRoom))}
+            ? `<div style="padding:24px;text-align:center;color:var(--gray-400);font-size:13px">${vi ? 'Chưa chọn hệ thống nào.' : 'No systems selected.'}</div>`
+            : renderRoomCircuits(assignFloor, assignRoom))}
       </div>
     </div>
   </div>`;
@@ -2280,44 +966,51 @@ function renderStep5() {
 }
 
 function renderGaTree(filtered) {
-  const mainGroups = {};
+  // Group by mid (floor) → room
+  const floorGroups = {};
   filtered.forEach(g => {
-    if (!mainGroups[g.main]) mainGroups[g.main] = { name: g.mainName, mids: {} };
-    if (!mainGroups[g.main].mids[g.mid]) {
-      const fl = state.floors.find(f => f.mid === g.mid);
-      mainGroups[g.main].mids[g.mid] = { name: fl ? fl.name : 'Zone', gas: [] };
-    }
-    mainGroups[g.main].mids[g.mid].gas.push(g);
+    if (!floorGroups[g.mid]) floorGroups[g.mid] = {};
+    const roomKey = g.room || '—';
+    if (!floorGroups[g.mid][roomKey]) floorGroups[g.mid][roomKey] = [];
+    floorGroups[g.mid][roomKey].push(g);
   });
 
-  if (!Object.keys(mainGroups).length) return `<div class="card" style="padding:32px;text-align:center;color:var(--gray-400)">${t('no_gas')}</div>`;
+  if (!Object.keys(floorGroups).length) return `<div class="card" style="padding:32px;text-align:center;color:var(--gray-400)">${t('no_gas')}</div>`;
 
-  return Object.entries(mainGroups).map(([mn, mg]) => {
-    const total = Object.values(mg.mids).reduce((a, m) => a + m.gas.length, 0);
-    return `
-    <div style="margin-bottom:8px">
-      <div class="ga-main-row" onclick="toggleBlock('gm-${mn}')">
-        <span style="font-family:var(--font-mono);font-size:11px;opacity:.6">${mn}</span>
-        <span class="ga-main-name">${mg.name}</span>
-        <span class="badge badge-teal" style="margin-left:auto">${total} GAs</span>
-        <span style="margin-left:8px;opacity:.5;font-size:12px" id="arr-gm-${mn}">▼</span>
-      </div>
-      <div id="gm-${mn}">
-        ${Object.entries(mg.mids).map(([mid, mm]) => `
-        <div style="margin-bottom:4px">
-          <div class="ga-mid-row" onclick="toggleBlock('gmid-${mn}-${mid}')">
-            <span style="font-family:var(--font-mono);font-size:11px;color:var(--gray-400)">${mn}/${mid}</span>
-            <span class="ga-mid-name">${escHtml(mm.name)}</span>
-            <span class="badge badge-gray" style="margin-left:auto">${mm.gas.length}</span>
-            <span style="margin-left:8px;opacity:.4;font-size:11px" id="arr-gmid-${mn}-${mid}">▼</span>
-          </div>
-          <div id="gmid-${mn}-${mid}">
-            ${mm.gas.map(g => gaRow(g)).join('')}
-          </div>
-        </div>`).join('')}
-      </div>
-    </div>`;
-  }).join('');
+  return Object.entries(floorGroups)
+    .sort((a, b) => Number(a[0]) - Number(b[0]))
+    .map(([mid, rooms]) => {
+      const floor = state.floors.find(f => f.mid === Number(mid));
+      const floorName = floor ? floor.name : `Middle ${mid}`;
+      const total = Object.values(rooms).reduce((a, gs) => a + gs.length, 0);
+      const fid   = `gfloor-${mid}`;
+
+      return `
+      <div style="margin-bottom:8px">
+        <div class="ga-main-row" onclick="toggleBlock('${fid}')">
+          <span class="mid-badge">M${mid}</span>
+          <span class="ga-main-name">${escHtml(floorName)}</span>
+          <span class="badge badge-teal" style="margin-left:auto">${total} GAs</span>
+          <span style="margin-left:8px;opacity:.5;font-size:12px" id="arr-${fid}">▼</span>
+        </div>
+        <div id="${fid}">
+          ${Object.entries(rooms).map(([roomName, roomGas], ri) => {
+            const rid = `groom-${mid}-${ri}`;
+            return `
+            <div style="margin-bottom:4px">
+              <div class="ga-mid-row" onclick="toggleBlock('${rid}')">
+                <span class="ga-mid-name">${escHtml(roomName)}</span>
+                <span class="badge badge-gray" style="margin-left:auto">${roomGas.length}</span>
+                <span style="margin-left:8px;opacity:.4;font-size:11px" id="arr-${rid}">▼</span>
+              </div>
+              <div id="${rid}">
+                ${roomGas.map(g => gaRow(g)).join('')}
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('');
 }
 
 function renderGaTable(filtered) {
@@ -2512,25 +1205,16 @@ function refreshPreview() {
   loadXmlPreview();
 }
 
-async function loadXmlPreview() {
+function loadXmlPreview() {
   const pane = document.getElementById('xml-preview-pane');
   if (!pane || !state.generatedGAs.length) return;
   try {
-    const res = await fetch('/api/export/xml', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        gas: state.generatedGAs,
-        opts: {
-          projectName: state.projectName,
-          floors:      state.floors,
-          includeDpt:  state.exportOpts.dpt,
-          includeDesc: state.exportOpts.desc
-        }
-      })
+    const xml = buildXML(state.generatedGAs, {
+      projectName: state.projectName,
+      floors:      state.floors,
+      includeDpt:  state.exportOpts.dpt,
+      includeDesc: state.exportOpts.desc
     });
-    if (!res.ok) throw new Error((await res.json()).error);
-    const xml = await res.text();
     state._xmlCache = xml;
     pane.innerHTML = syntaxHighlight(xml);
   } catch (e) {
@@ -2555,127 +1239,135 @@ function copyPreview() {
   });
 }
 
-// ── API calls ─────────────────────────────────────────────────────────────────
-async function callGenerate() {
-  showLoading(state.lang === 'vi' ? 'Đang tạo GA…' : 'Generating GAs…');
+// ── Engine calls (direct — no server needed) ──────────────────────────────────
+function callGenerate() {
   try {
-    const res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        structure:  state.structure,
-        floors:     state.floors,
-        systems:    state.systems,
-        quantities: state.quantities,
-        manualGAs:  state.manualGAs,
-        ltSubs:     state.ltSubs,
-        hvacSubs:   state.hvacSubs
-      })
+    const gas = generateGAs({
+      structure:  state.structure,
+      floors:     state.floors,
+      systems:    state.systems,
+      circuits:   state.circuits,
+      manualGAs:  state.manualGAs,
+      ltSubs:     state.ltSubs,
+      hvacSubs:   state.hvacSubs
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Generate failed');
-    state.generatedGAs = data.gas;
+    state.generatedGAs = gas;
     renderPanel();
     renderSidebar();
     saveState();
-    showToast((state.lang === 'vi' ? `${data.count} GA đã tạo` : `${data.count} GAs generated`));
+    showToast(state.lang === 'vi' ? `${gas.length} GA đã tạo` : `${gas.length} GAs generated`);
   } catch (e) {
     showToast(e.message, true);
-  } finally {
-    hideLoading();
   }
 }
 
-async function callExportXML() {
+function callExportXML() {
   if (!state.generatedGAs.length) { showToast(state.lang === 'vi' ? 'Chưa có GA nào' : 'No GAs to export', true); return; }
-  showLoading(state.lang === 'vi' ? 'Đang xuất XML…' : 'Building XML…');
   try {
     const fname = (document.getElementById('filename-input')?.value || 'KNX_GA').trim();
-    const res = await fetch('/api/export/xml', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        gas: state.generatedGAs,
-        opts: {
-          projectName: state.projectName,
-          floors:      state.floors,
-          includeDpt:  state.exportOpts.dpt,
-          includeDesc: state.exportOpts.desc
-        }
-      })
+    const xml = buildXML(state.generatedGAs, {
+      projectName: state.projectName,
+      floors:      state.floors,
+      includeDpt:  state.exportOpts.dpt,
+      includeDesc: state.exportOpts.desc
     });
-    if (!res.ok) throw new Error((await res.json()).error);
-    const xml = await res.text();
     triggerDownload(xml, fname + '.xml', 'application/xml');
     showToast(t('file_ready'));
   } catch (e) {
     showToast(e.message, true);
-  } finally {
-    hideLoading();
   }
 }
 
-async function callExportCSV() {
+function callExportCSV() {
   if (!state.generatedGAs.length) { showToast(state.lang === 'vi' ? 'Chưa có GA nào' : 'No GAs to export', true); return; }
-  showLoading(state.lang === 'vi' ? 'Đang xuất CSV…' : 'Building CSV…');
   try {
     const fname = (document.getElementById('filename-input')?.value || 'KNX_GA').trim();
-    const res = await fetch('/api/export/csv', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        gas:  state.generatedGAs,
-        opts: { floors: state.floors }
-      })
-    });
-    if (!res.ok) throw new Error((await res.json()).error);
-    const csv = await res.text();
+    const csv = buildCSV(state.generatedGAs, { floors: state.floors });
     triggerDownload(csv, fname + '.csv', 'text/plain');
     showToast(t('file_ready'));
   } catch (e) {
     showToast(e.message, true);
-  } finally {
-    hideLoading();
   }
 }
 
-async function callImportXML(rawStr) {
-  showLoading(state.lang === 'vi' ? 'Đang nhập XML…' : 'Importing XML…');
+function callImportXML(rawStr) {
+  const fromStep1 = state.step === 1;
   try {
-    const res = await fetch('/api/import/xml', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ xml: rawStr })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    let merged = 0;
-    data.gas.forEach(ig => {
+    const gas = parseXML(rawStr);
+    gas.forEach(ig => {
       const existing = state.generatedGAs.find(g => g.addr === ig.addr);
       if (existing) { existing.name = ig.name; }
-      else { state.generatedGAs.push(ig); merged++; }
+      else { state.generatedGAs.push(ig); }
     });
     state.generatedGAs.sort((a, b) => {
       const ap = a.addr.split('/').map(Number), bp = b.addr.split('/').map(Number);
       for (let i = 0; i < 3; i++) { if (ap[i] !== bp[i]) return ap[i] - bp[i]; } return 0;
     });
     closeImportModal();
-    showToast((state.lang === 'vi' ? `Import: ${data.count} GA đã gộp` : `Import: ${data.count} GAs merged`));
-    renderPanel();
-    renderSidebar();
+    showToast(state.lang === 'vi' ? `Import: ${gas.length} GA đã gộp` : `Import: ${gas.length} GAs merged`);
     saveState();
+    if (fromStep1) {
+      // Auto-detect systems
+      const mainToSk = {};
+      Object.entries(sysInfo).forEach(([sk, si]) => { mainToSk[si.main] = sk; });
+      Object.keys(state.systems).forEach(k => { state.systems[k] = false; });
+      gas.forEach(g => { const sk = mainToSk[g.main]; if (sk) state.systems[sk] = true; });
+      // Detect floors & rooms
+      state.floors = extractFloorsFromGAs(gas);
+      // Preserve imported GAs through any future regenerate
+      state.manualGAs = [...gas];
+      state.step = 2;
+      renderAll();
+    } else {
+      renderPanel();
+      renderSidebar();
+    }
   } catch (e) {
     showToast(e.message, true);
-  } finally {
-    hideLoading();
   }
+}
+
+// ── Floor/room extraction from imported GAs ───────────────────────────────────
+function extractFloorsFromGAs(gas) {
+  const floorMap = {};
+
+  gas.forEach(g => {
+    const mid = g.mid;
+    if (mid === 0) return;                        // skip central (sec/scn/sys) GAs
+
+    if (!floorMap[mid]) {
+      const df = defaultFloors.find(f => f.mid === mid);
+      floorMap[mid] = {
+        id:    'f' + mid,
+        mid,
+        name:  df ? df.name : (floorPrefix[mid] || ('Floor ' + mid)),
+        rooms: []
+      };
+    }
+
+    // GA name format: "PREFIX - FLOOR_PREFIX - ROOM [CIRCUIT_TYPE] NAME - GA_SHORT"
+    // Room is in parts[2], extractable when circuit type brackets are present.
+    const parts = g.name.split(' - ');
+    if (parts.length >= 3) {
+      const roomPart = parts[2];
+      const bracketIdx = roomPart.indexOf(' [');
+      if (bracketIdx !== -1) {
+        const room = roomPart.substring(0, bracketIdx).trim();
+        if (room && !floorMap[mid].rooms.includes(room)) {
+          floorMap[mid].rooms.push(room);
+        }
+      }
+    }
+  });
+
+  return Object.values(floorMap).sort((a, b) => a.mid - b.mid);
 }
 
 // ── Import modal ──────────────────────────────────────────────────────────────
 function openImportModal() {
   state.importedXml = null;
   const btn = document.getElementById('btn-confirm-import');
-  if (btn) { btn.disabled = true; }
+  if (btn) { btn.disabled = true; btn.textContent = t('merge_import'); }
   document.getElementById('drop-zone-text').textContent = t('drop_here');
   document.getElementById('import-modal').classList.remove('hidden');
   document.getElementById('modal-title-import').textContent = t('import_xml');
@@ -2762,9 +1454,9 @@ function showToast(msg, isError) {
 }
 
 // ── localStorage persistence ──────────────────────────────────────────────────
-const STORAGE_KEY = 'knx_ga_planner_v1';
+const STORAGE_KEY = 'knx_ga_planner_v2';
 const PERSIST_FIELDS = ['projectName','structure','systems','ltSubs','hvacSubs',
-  'floors','quantities','generatedGAs','manualGAs','exportFormat','exportOpts','lang'];
+  'floors','circuits','generatedGAs','manualGAs','exportFormat','exportOpts','lang'];
 
 function saveState() {
   try {
@@ -2795,7 +1487,7 @@ function loadState() {
 
 function newProject() {
   const hasData = state.projectName || state.generatedGAs.length > 0 ||
-    Object.values(state.quantities).length > 0;
+    Object.keys(state.circuits).length > 0;
   if (hasData) {
     if (!confirm(state.lang === 'vi'
       ? 'Bắt đầu dự án mới? Dữ liệu hiện tại sẽ bị xóa.'
@@ -2810,7 +1502,7 @@ function newProject() {
     hvacSubs:{ therm:true, split:true, fcu:false, ufh:false, hp:false },
     floors: [
     ],
-    quantities: {}, generatedGAs: [], manualGAs: [],
+    circuits: {}, generatedGAs: [], manualGAs: [],
     floorView: 'chip', gaView: 'tree', gaFilter: 'all',
     exportFormat: 'xml', exportOpts: { dpt:true, desc:false, unused:false, floorFirst:false },
     importedXml: null, _xmlCache: null
