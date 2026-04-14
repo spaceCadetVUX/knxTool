@@ -88,6 +88,7 @@ const state = {
   manualGAs:     [],
   floorView:     'chip',
   gaView:        'tree',
+  gaTreeGroup:   'mid',
   gaFilter:      'all',
   exportFormat:  'xml',
   exportOpts:    { dpt:true, desc:false, unused:false, floorFirst:false },
@@ -225,13 +226,29 @@ function getCircuits(fi, ri, sk, ck) {
   return ((((state.circuits[fi] || {})[ri] || {})[sk] || {})[ck]) || [];
 }
 
+const circuitSuggestedNames = {
+  lt_onoff: ['Ceiling', 'Wall', 'Cabinet', 'Strip', 'Night', 'Desk'],
+  lt_dim:   ['Ceiling', 'Pendant', 'Accent', 'Strip', 'Desk', 'Wall'],
+  lt_cct:   ['Ceiling', 'Pendant', 'Strip', 'Desk', 'Wall'],
+  lt_rgb:   ['Accent', 'Strip', 'Wall', 'Ceiling'],
+  pres_sensor: ['Sensor'],
+  sht_motor:   ['Left', 'Right', 'Center', 'Top', 'Bottom'],
+  hvac_unit:   ['FCU', 'Unit', 'AC'],
+  av_unit:     ['TV', 'AMP', 'Speaker'],
+  nrg_meter:   ['Meter', 'Circuit'],
+  scn_scene:   ['Scene'],
+  sec_zone:    ['Zone'],
+};
+
 function addCircuit(fi, ri, sk, ck) {
   if (!state.circuits[fi])             state.circuits[fi] = {};
   if (!state.circuits[fi][ri])         state.circuits[fi][ri] = {};
   if (!state.circuits[fi][ri][sk])     state.circuits[fi][ri][sk] = {};
   if (!state.circuits[fi][ri][sk][ck]) state.circuits[fi][ri][sk][ck] = [];
-  const n = state.circuits[fi][ri][sk][ck].length + 1;
-  state.circuits[fi][ri][sk][ck].push(String(n));
+  const idx  = state.circuits[fi][ri][sk][ck].length;
+  const pool = circuitSuggestedNames[`${sk}_${ck}`] || [];
+  const name = pool[idx] !== undefined ? pool[idx] : String(idx + 1);
+  state.circuits[fi][ri][sk][ck].push(name);
   debouncedSave();
   renderPanel();
 }
@@ -898,6 +915,11 @@ function renderStep5() {
       }).join('')}
     </div>
     <div style="display:flex;gap:8px;margin-left:auto;align-items:center">
+      ${isTree ? `
+      <div class="view-toggle">
+        <button class="vt-btn ${state.gaTreeGroup === 'mid'  ? 'active' : ''}" onclick="state.gaTreeGroup='mid';renderPanel()">${state.lang === 'vi' ? 'Theo tầng' : 'By Floor'}</button>
+        <button class="vt-btn ${state.gaTreeGroup === 'main' ? 'active' : ''}" onclick="state.gaTreeGroup='main';renderPanel()">${state.lang === 'vi' ? 'Theo hệ thống' : 'By System'}</button>
+      </div>` : ''}
       <div class="view-toggle">
         <button class="vt-btn ${isTree ? 'active' : ''}" onclick="state.gaView='tree';renderPanel()">Tree</button>
         <button class="vt-btn ${!isTree ? 'active' : ''}" onclick="state.gaView='table';renderPanel()">Table</button>
@@ -909,7 +931,9 @@ function renderStep5() {
 
   ${total === 0
     ? `<div class="card" style="text-align:center;padding:40px;color:var(--gray-400)">${t('no_gas')}</div>`
-    : (isTree ? renderGaTree(filtered) : renderGaTable(filtered))
+    : (isTree
+        ? (state.gaTreeGroup === 'main' ? renderGaTreeByMain(filtered) : renderGaTree(filtered))
+        : renderGaTable(filtered))
   }
 
   <div class="card mt-4">
@@ -999,6 +1023,54 @@ function renderGaTree(filtered) {
               </div>
             </div>`;
           }).join('')}
+        </div>
+      </div>`;
+    }).join('');
+}
+
+function renderGaTreeByMain(filtered) {
+  // Group by main (x) → mid (y) → GAs
+  const mainGroups = {};
+  filtered.forEach(g => {
+    const mk = g.main;
+    if (!mainGroups[mk]) mainGroups[mk] = { name: g.mainName || `Main ${mk}`, mids: {} };
+    const yk = g.mid;
+    if (!mainGroups[mk].mids[yk]) mainGroups[mk].mids[yk] = { name: g.midName || String(yk), gas: [] };
+    mainGroups[mk].mids[yk].gas.push(g);
+  });
+
+  if (!Object.keys(mainGroups).length) return `<div class="card" style="padding:32px;text-align:center;color:var(--gray-400)">${t('no_gas')}</div>`;
+
+  return Object.entries(mainGroups)
+    .sort((a, b) => Number(a[0]) - Number(b[0]))
+    .map(([main, mg]) => {
+      const total = Object.values(mg.mids).reduce((a, m) => a + m.gas.length, 0);
+      const fid   = `gmain-${main}`;
+      return `
+      <div style="margin-bottom:8px">
+        <div class="ga-main-row" onclick="toggleBlock('${fid}')">
+          <span class="mid-badge">${main}</span>
+          <span class="ga-main-name">${escHtml(mg.name)}</span>
+          <span class="badge badge-teal" style="margin-left:auto">${total} GAs</span>
+          <span style="margin-left:8px;opacity:.5;font-size:12px" id="arr-${fid}">▼</span>
+        </div>
+        <div id="${fid}">
+          ${Object.entries(mg.mids)
+            .sort((a, b) => Number(a[0]) - Number(b[0]))
+            .map(([mid, mg2], mi) => {
+              const rid = `gmid-${main}-${mid}`;
+              return `
+              <div style="margin-bottom:4px">
+                <div class="ga-mid-row" onclick="toggleBlock('${rid}')">
+                  <span class="ga-mid-name">${main}/${mid} — ${escHtml(mg2.name)}</span>
+                  <span class="badge badge-gray" style="margin-left:auto">${mg2.gas.length}</span>
+                  <span style="margin-left:8px;opacity:.4;font-size:11px" id="arr-${rid}">▼</span>
+                </div>
+                <div id="${rid}">
+                  ${mg2.gas.map(g => gaRow(g)).join('')}
+                </div>
+              </div>`;
+            }).join('')}
         </div>
       </div>`;
     }).join('');
