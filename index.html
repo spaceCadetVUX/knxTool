@@ -16,8 +16,7 @@
   <!-- Header -->
   <header id="header">
     <div class="header-brand">
-      <span class="logo-knx">KNX</span>
-      GA Planner
+      <img src="./assets/logo.png" alt="KNX GA Planner" class="header-logo" />
     </div>
     <div class="header-sep"></div>
     <div class="header-project" id="header-project" style="display:none">
@@ -801,29 +800,38 @@ function renderStep4() {
       const si    = sysInfo[sk];
       const cdefs = activeDefs(sk);
       const total = cdefs.reduce((a, [ck]) => a + getCircuits(fi, ri, sk, ck).length, 0);
+      const badgeText = total === 0
+        ? (vi ? 'chưa có' : 'none')
+        : total + (vi ? ' mạch' : (total > 1 ? ' circuits' : ' circuit'));
       return `
-      <div class="sys-section-head">
-        <div class="sys-section-icon">
-          <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${sysIconSvg[si.icon]}</svg>
+      <div class="sys-section">
+        <div class="sys-section-head">
+          <div class="sys-section-icon">
+            <svg viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${sysIconSvg[si.icon]}</svg>
+          </div>
+          <span class="sys-section-label">${si['name_' + state.lang] || si.name_en}</span>
+          <span class="qty-sum-badge ${total === 0 ? 'zero' : ''}">${badgeText}</span>
         </div>
-        <span class="sys-section-label">${si['name_' + state.lang] || si.name_en}</span>
-        <span class="qty-sum-badge ${total === 0 ? 'zero' : ''}">${total === 0 ? (vi ? 'chưa có' : 'none') : total + ' circuit' + (total > 1 ? 's' : '')}</span>
-      </div>
-      ${cdefs.map(([ck, clabel]) => {
-        const names = getCircuits(fi, ri, sk, ck);
-        return `
-        <div style="margin-bottom:12px">
-          <div style="font-size:11px;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">${clabel}</div>
-          ${names.map((name, idx) => `
-          <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">
-            <input class="input input-sm" style="flex:1;max-width:260px" value="${escHtml(name)}"
-              oninput="setCircuitName(${fi},${ri},'${sk}','${ck}',${idx},this.value)" />
-            <button class="btn-icon danger btn-xs" onclick="removeCircuit(${fi},${ri},'${sk}','${ck}',${idx})">×</button>
-          </div>`).join('')}
-          <button class="btn btn-ghost btn-sm" style="margin-top:2px"
-            onclick="addCircuit(${fi},${ri},'${sk}','${ck}')">+ ${vi ? 'Thêm' : 'Add'} ${clabel}</button>
-        </div>`;
-      }).join('')}`;
+        ${cdefs.map(([ck, clabel]) => {
+          const names = getCircuits(fi, ri, sk, ck);
+          return `
+          <div class="circuit-type-group">
+            <div class="circuit-type-label">${clabel}</div>
+            ${names.map((name, idx) => `
+            <div class="circuit-row">
+              <span class="circuit-num">${idx + 1}</span>
+              <input class="input input-sm circuit-name-input" value="${escHtml(name)}"
+                oninput="setCircuitName(${fi},${ri},'${sk}','${ck}',${idx},this.value)" />
+              <button class="circuit-del" onclick="removeCircuit(${fi},${ri},'${sk}','${ck}',${idx})"
+                title="${vi ? 'Xóa' : 'Remove'}">✕</button>
+            </div>`).join('')}
+            <button class="circuit-add-btn" onclick="addCircuit(${fi},${ri},'${sk}','${ck}')">
+              <span style="font-size:15px;line-height:1;margin-top:-1px">+</span>
+              ${vi ? 'Thêm' : 'Add'} ${clabel}
+            </button>
+          </div>`;
+        }).join('')}
+      </div>`;
     }).join('');
   }
 
@@ -833,13 +841,14 @@ function renderStep4() {
 
   <div class="assign-layout">
     <div class="assign-left">
+      <div class="assign-left-header">${vi ? 'Tầng' : 'Floors'}</div>
       ${state.floors.map((f, fi) => {
         const ft = floorTotal(fi);
         return `<button class="assign-floor-btn ${fi === assignFloor ? 'active' : ''}"
           onclick="assignFloor=${fi};assignRoom=0;renderPanel()">
           <span class="mid-badge">M${f.mid}</span>
-          <span style="flex:1">${escHtml(f.name)}</span>
-          ${ft > 0 ? `<span style="font-size:10px;color:var(--teal-500);font-weight:700">${ft}</span>` : ''}
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(f.name)}</span>
+          ${ft > 0 ? `<span class="assign-floor-count">${ft}</span>` : ''}
         </button>`;
       }).join('')}
     </div>
@@ -847,20 +856,20 @@ function renderStep4() {
     <div>
       <div class="room-tab-bar">
         ${validRooms.length === 0
-          ? `<span style="font-size:13px;color:var(--gray-400)">${t('no_rooms')}</span>`
+          ? `<span style="font-size:13px;color:var(--gray-400);padding:12px 4px;display:inline-block">${t('no_rooms')}</span>`
           : validRooms.map((room, ri) => {
               const rt = roomTotal(assignFloor, ri);
               return `<button class="room-tab ${ri === assignRoom ? 'active' : ''}"
                 onclick="assignRoom=${ri};renderPanel()">
-                ${escHtml(room)}${rt > 0 ? ` <span style="font-size:10px;color:var(--teal-500)">(${rt})</span>` : ''}
+                ${escHtml(room)}${rt > 0 ? `<span class="room-tab-count">${rt}</span>` : ''}
               </button>`;
             }).join('')}
       </div>
       <div class="room-qty-area">
         ${validRooms.length === 0
-          ? `<div style="padding:24px;text-align:center;color:var(--gray-400);font-size:13px">${t('no_rooms')}</div>`
+          ? `<div style="padding:32px;text-align:center;color:var(--gray-400);font-size:13px">${t('no_rooms')}</div>`
           : (sysList.length === 0
-            ? `<div style="padding:24px;text-align:center;color:var(--gray-400);font-size:13px">${vi ? 'Chưa chọn hệ thống nào.' : 'No systems selected.'}</div>`
+            ? `<div style="padding:32px;text-align:center;color:var(--gray-400);font-size:13px">${vi ? 'Chưa chọn hệ thống nào.' : 'No systems selected.'}</div>`
             : renderRoomCircuits(assignFloor, assignRoom))}
       </div>
     </div>
@@ -1295,30 +1304,42 @@ function callExportCSV() {
 function callImportXML(rawStr) {
   const fromStep1 = state.step === 1;
   try {
-    const gas = parseXML(rawStr);
-    gas.forEach(ig => {
-      const existing = state.generatedGAs.find(g => g.addr === ig.addr);
-      if (existing) { existing.name = ig.name; }
-      else { state.generatedGAs.push(ig); }
-    });
-    state.generatedGAs.sort((a, b) => {
-      const ap = a.addr.split('/').map(Number), bp = b.addr.split('/').map(Number);
-      for (let i = 0; i < 3; i++) { if (ap[i] !== bp[i]) return ap[i] - bp[i]; } return 0;
-    });
-    closeImportModal();
-    showToast(state.lang === 'vi' ? `Import: ${gas.length} GA đã gộp` : `Import: ${gas.length} GAs merged`);
-    saveState();
     if (fromStep1) {
-      // Auto-detect systems
-      const mainToSk = {};
-      Object.entries(sysInfo).forEach(([sk, si]) => { mainToSk[si.main] = sk; });
-      Object.keys(state.systems).forEach(k => { state.systems[k] = false; });
-      gas.forEach(g => { const sk = mainToSk[g.main]; if (sk) state.systems[sk] = true; });
-      // Detect floors & rooms
-      state.floors = extractFloorsFromGAs(gas);
+      // Full reconstruction: populate systems, floors, rooms, circuits, ltSubs, hvacSubs
+      const result = reconstructFromXML(rawStr);
+      state.systems      = result.systems;
+      state.ltSubs       = result.ltSubs;
+      state.hvacSubs     = result.hvacSubs;
+      state.floors       = result.floors;
+      state.circuits     = result.circuits;
+      state.generatedGAs = [];
+      state.manualGAs    = [];
+      closeImportModal();
+      saveState();
+      const totalCircuits = Object.values(result.circuits).reduce((a, byRoom) =>
+        a + Object.values(byRoom).reduce((b, bySk) =>
+          b + Object.values(bySk).reduce((c, byCk) =>
+            c + Object.values(byCk).reduce((d, names) => d + names.length, 0), 0), 0), 0);
+      showToast(state.lang === 'vi'
+        ? `Đã nhập: ${result.floors.length} tầng, ${totalCircuits} mạch`
+        : `Imported: ${result.floors.length} floors, ${totalCircuits} circuits`);
       state.step = 2;
       renderAll();
     } else {
+      // Step 5 merge: add/update imported GAs into the current generated list
+      const gas = parseXML(rawStr);
+      gas.forEach(ig => {
+        const existing = state.generatedGAs.find(g => g.addr === ig.addr);
+        if (existing) { existing.name = ig.name; }
+        else { state.generatedGAs.push(ig); }
+      });
+      state.generatedGAs.sort((a, b) => {
+        const ap = a.addr.split('/').map(Number), bp = b.addr.split('/').map(Number);
+        for (let i = 0; i < 3; i++) { if (ap[i] !== bp[i]) return ap[i] - bp[i]; } return 0;
+      });
+      closeImportModal();
+      saveState();
+      showToast(state.lang === 'vi' ? `Import: ${gas.length} GA đã gộp` : `Import: ${gas.length} GAs merged`);
       renderPanel();
       renderSidebar();
     }

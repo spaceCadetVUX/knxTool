@@ -447,6 +447,152 @@ function buildCSV(gas, { floors = [] } = {}) {
 }
 
 // ─── EXPORTS (Node.js only — not used in browser) ─────────────────────────────
+// ─── RECONSTRUCT FROM XML ─────────────────────────────────────────────────────
+/**
+ * Full state reconstruction from an ETS XML export.
+ * Parses GroupRange elements for floor names, then derives floors, rooms,
+ * circuits, and active systems so every wizard step is pre-populated.
+ *
+ * GA name format produced by this tool:
+ *   With bracket  : "PREFIX - FP - ROOM [TYPE] NAME - GA_SHORT"   (lt when >1 type)
+ *   Without bracket: "PREFIX - FP - ROOM NAME - GA_SHORT"          (all single-type systems)
+ *
+ * @param {string} xmlString
+ * @returns {{ floors, circuits, systems, ltSubs, hvacSubs }}
+ */
+function reconstructFromXML(xmlString) {
+  // 1. Parse floor names from middle-level GroupRange elements
+  //    e.g. <GroupRange Name="1/1 Tầng 1 " ...>  → mid=1, name="Tầng 1"
+  const floorNames = {};
+  const grRegex = /<GroupRange\s[^>]*?Name="([^"]*)"/g;
+  let grM;
+  while ((grM = grRegex.exec(xmlString)) !== null) {
+    const midM = grM[1].match(/^\d+\/(\d+)\s+(.*)/);
+    if (midM) {
+      const mid = parseInt(midM[1]);
+      const fname = midM[2].trim();
+      if (mid > 0 && fname) floorNames[mid] = fname;
+    }
+  }
+
+  // 2. Parse all GAs
+  const gas = parseXML(xmlString);
+  if (!gas.length) return { floors: [], circuits: {}, systems: {}, ltSubs: {}, hvacSubs: {} };
+
+  // 3. Helpers
+  const prefixToSk = {};
+  Object.entries(prefix).forEach(([sk, px]) => { prefixToSk[px] = sk; });
+
+  const labelToCk = {}; // sk → typeLabel → ck
+  Object.entries(circuitDefs).forEach(([sk, defs]) => {
+    labelToCk[sk] = {};
+    defs.forEach(([ck, label]) => { labelToCk[sk][label] = ck; });
+  });
+
+  // 4. Build unique circuit signatures per mid
+  //    Signature = GA name without trailing " - GA_SHORT"
+  //    e.g. "LT - BAS - Sảnh [On/Off] đèn sảnh" (deduplicates SW/FB/etc.)
+  const sigMap = {}; // mid → { sig → { sk, roomTypeName } }
+  const systems = Object.fromEntries(Object.keys(sysInfo).map(k => [k, false]));
+
+  gas.forEach(g => {
+    if (g.mid === 0) return;
+    const parts = g.name.split(' - ');
+    if (parts.length < 4) return;
+    const sk = prefixToSk[parts[0].trim()];
+    if (!sk) return;
+    systems[sk] = true;
+    const sig = parts.slice(0, -1).join(' - ');
+    const roomTypeName = parts[2].trim();
+    if (!sigMap[g.mid]) sigMap[g.mid] = {};
+    if (!sigMap[g.mid][sig]) sigMap[g.mid][sig] = { sk, roomTypeName };
+  });
+
+  // 5. First pass: extract rooms from bracket entries ("ROOM [TYPE] NAME")
+  const midRooms = {}; // mid → string[] unique ordered
+  Object.entries(sigMap).forEach(([midStr, sigs]) => {
+    const mid = parseInt(midStr);
+    midRooms[mid] = [];
+    Object.values(sigs).forEach(({ roomTypeName }) => {
+      const bi = roomTypeName.indexOf(' [');
+      if (bi === -1) return;
+      const room = roomTypeName.substring(0, bi).trim();
+      if (room && !midRooms[mid].includes(room)) midRooms[mid].push(room);
+    });
+  });
+
+  // 6. Build floors array
+  const floorMap = {};
+  Object.entries(midRooms).forEach(([midStr, rooms]) => {
+    const mid = parseInt(midStr);
+    floorMap[mid] = { id: 'f' + mid, mid, name: floorNames[mid] || floorPrefix[mid] || ('Floor ' + mid), rooms: [...rooms] };
+  });
+  gas.forEach(g => { // cover floors without bracket-extractable rooms
+    if (g.mid === 0 || floorMap[g.mid]) return;
+    floorMap[g.mid] = { id: 'f' + g.mid, mid: g.mid, name: floorNames[g.mid] || floorPrefix[g.mid] || ('Floor ' + g.mid), rooms: [] };
+  });
+  const floors = Object.values(floorMap).sort((a, b) => a.mid - b.mid);
+
+  // 7. Index maps
+  const midToFi = {};
+  floors.forEach((f, fi) => { midToFi[f.mid] = fi; });
+  const roomIdx = {};
+  floors.forEach((f, fi) => { roomIdx[fi] = {}; f.rooms.forEach((r, ri) => { roomIdx[fi][r] = ri; }); });
+
+  // 8. Second pass: build circuits + detect lt/hvac subtypes
+  const circuits = {};
+  const ltSubsFound = {};
+  const hvacSubsFound = {};
+
+  Object.entries(sigMap).forEach(([midStr, sigs]) => {
+    const mid = parseInt(midStr);
+    const fi = midToFi[mid];
+    if (fi === undefined) return;
+
+    Object.values(sigs).forEach(({ sk, roomTypeName }) => {
+      let room, ck, circuitName;
+      const bi = roomTypeName.indexOf(' [');
+
+      if (bi !== -1) {
+        // Bracket format: "ROOM [TYPE] NAME"
+        room = roomTypeName.substring(0, bi).trim();
+        const be = roomTypeName.indexOf(']');
+        const typeLabel = roomTypeName.substring(bi + 2, be).trim(); // skip ' ['
+        circuitName = roomTypeName.substring(be + 2).trim();         // skip '] '
+        ck = (labelToCk[sk] || {})[typeLabel] || ((circuitDefs[sk] || [[]])[0] || [])[0];
+        if (sk === 'lt' && ck) ltSubsFound[ck] = true;
+      } else {
+        // No-bracket format: "ROOM NAME" — match room against known rooms for this floor
+        const knownRooms = floors[fi] ? floors[fi].rooms : [];
+        room = knownRooms.find(r => roomTypeName === r || roomTypeName.startsWith(r + ' '));
+        if (!room) return;
+        circuitName = roomTypeName.substring(room.length).trim();
+        ck = ((circuitDefs[sk] || [[]])[0] || [])[0];
+        if (sk === 'hvac' && ck) hvacSubsFound[ck] = true;
+      }
+
+      if (!room || !ck || !circuitName) return;
+      const ri = (roomIdx[fi] || {})[room];
+      if (ri === undefined) return;
+
+      if (!circuits[fi])             circuits[fi] = {};
+      if (!circuits[fi][ri])         circuits[fi][ri] = {};
+      if (!circuits[fi][ri][sk])     circuits[fi][ri][sk] = {};
+      if (!circuits[fi][ri][sk][ck]) circuits[fi][ri][sk][ck] = [];
+      const arr = circuits[fi][ri][sk][ck];
+      if (!arr.includes(circuitName)) arr.push(circuitName);
+    });
+  });
+
+  // 9. Build ltSubs / hvacSubs with correct default keys
+  const ltSubs   = { onoff: false, dim: false, cct: false, rgb: false, facade: false };
+  const hvacSubs = { therm: false, split: false, fcu: false, ufh: false, hp: false };
+  Object.keys(ltSubsFound).forEach(k   => { if (k in ltSubs)   ltSubs[k]   = true; });
+  Object.keys(hvacSubsFound).forEach(k => { if (k in hvacSubs) hvacSubs[k] = true; });
+
+  return { floors, circuits, systems, ltSubs, hvacSubs };
+}
+
 if (typeof module !== 'undefined') module.exports = {
   ALLOWED_ORIGINS,
   sysInfo,
@@ -458,6 +604,7 @@ if (typeof module !== 'undefined') module.exports = {
   defaultFloors,
   generateGAs,
   parseXML,
+  reconstructFromXML,
   buildXML,
   buildCSV
 };
