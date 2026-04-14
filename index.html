@@ -146,7 +146,8 @@ const i18n = {
     no_rooms: 'No rooms in this floor. Go back to Step 3 to add rooms.',
     no_gas: 'No GAs yet. Add circuits in Step 4 then click Regenerate.',
     add_ga_manual: 'Add GA manually', add_ga: 'Add GA',
-    generate_prompt: 'Click "Generate" in Step 4 or go back and enter quantities.'
+    generate_prompt: 'Click "Generate" in Step 4 or go back and enter quantities.',
+    all_filter: 'All'
   },
   vi: {
     steps: ['Cấu trúc','Hệ thống','Tầng & Phòng','Phân gán','Tạo & Kiểm tra','Xuất file'],
@@ -191,7 +192,8 @@ const i18n = {
     no_rooms: 'Tầng này chưa có phòng. Quay lại Step 3 để thêm phòng.',
     no_gas: 'Chưa có GA nào. Nhập số lượng ở Step 4 rồi nhấn Tạo lại.',
     add_ga_manual: 'Thêm GA thủ công', add_ga: 'Thêm GA',
-    generate_prompt: 'Nhấn "Tạo lại" hoặc quay lại Step 4 để nhập số lượng.'
+    generate_prompt: 'Nhấn "Tạo lại" hoặc quay lại Step 4 để nhập số lượng.',
+    all_filter: 'Tất cả'
   }
 };
 
@@ -1314,8 +1316,6 @@ function callImportXML(rawStr) {
       gas.forEach(g => { const sk = mainToSk[g.main]; if (sk) state.systems[sk] = true; });
       // Detect floors & rooms
       state.floors = extractFloorsFromGAs(gas);
-      // Preserve imported GAs through any future regenerate
-      state.manualGAs = [...gas];
       state.step = 2;
       renderAll();
     } else {

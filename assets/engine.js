@@ -258,25 +258,6 @@ function generateGAs({ structure, floors, systems, circuits = {}, manualGAs = []
       return true;
     });
 
-    // Central block (mid=0) for sec, scn, sys
-    if (sk === 'sec' || sk === 'scn' || sk === 'sys') {
-      const ckey = `${sk}_${(cdefs[0] || ['zone'])[0]}`;
-      const cset = circuitGaSet[ckey] || gasets[sk];
-      const sub = nextSub(mainNum, 0);
-      cset.forEach((ga, gi) => {
-        gas.push({
-          addr: `${mainNum}/0/${sub + gi}`,
-          name: `${px} - ${ga.full}`,
-          dpt: ga.dpt,
-          type: ga.t,
-          main: mainNum,
-          mid: 0,
-          mainName: si.name_en
-        });
-      });
-      advanceSub(mainNum, 0, cset.length);
-    }
-
     // Per floor → per room → per circuit type → per unit quantity
     floors.forEach((floor, fi) => {
       if (floor.mid === 0) return;

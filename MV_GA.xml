@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<GroupAddress-Export xmlns="http://knx.org/xml/ga-export/01">
+
+  <!-- Main group 1: Lighting -->
+  <GroupRange Name="1 Lighting" RangeStart="2048" RangeEnd="4095">
+    <GroupRange Name="1/1 Tầng 1 " RangeStart="2304" RangeEnd="2559">
+      <GroupAddress Name="LT - BAS - Sảnh [On/Off] đèn sảnh - SW" Address="1/1/0" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Sảnh [On/Off] đèn sảnh - FB" Address="1/1/1" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Sảnh [Dimming] Hắt trần - SW" Address="1/1/2" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Sảnh [Dimming] Hắt trần - FB" Address="1/1/3" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Sảnh [Dimming] Hắt trần - DIM" Address="1/1/4" DPTs="DPST-3-007" />
+      <GroupAddress Name="LT - BAS - Sảnh [Dimming] Hắt trần - VAL" Address="1/1/5" DPTs="DPST-5-001" />
+      <GroupAddress Name="LT - BAS - Sảnh [Dimming] Hắt trần - VALFB" Address="1/1/6" DPTs="DPST-5-001" />
+      <GroupAddress Name="LT - BAS - Sảnh [CCT] Dowlight - SW" Address="1/1/7" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Sảnh [CCT] Dowlight - FB" Address="1/1/8" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Sảnh [CCT] Dowlight - DIM" Address="1/1/9" DPTs="DPST-3-007" />
+      <GroupAddress Name="LT - BAS - Sảnh [CCT] Dowlight - VAL" Address="1/1/10" DPTs="DPST-5-001" />
+      <GroupAddress Name="LT - BAS - Sảnh [CCT] Dowlight - VALFB" Address="1/1/11" DPTs="DPST-5-001" />
+      <GroupAddress Name="LT - BAS - Sảnh [CCT] Dowlight - CCT" Address="1/1/12" DPTs="DPST-9-001" />
+      <GroupAddress Name="LT - BAS - Sảnh [CCT] Dowlight - CCT_FB" Address="1/1/13" DPTs="DPST-9-001" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [Dimming] Dowlight - SW" Address="1/1/14" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [Dimming] Dowlight - FB" Address="1/1/15" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [Dimming] Dowlight - DIM" Address="1/1/16" DPTs="DPST-3-007" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [Dimming] Dowlight - VAL" Address="1/1/17" DPTs="DPST-5-001" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [Dimming] Dowlight - VALFB" Address="1/1/18" DPTs="DPST-5-001" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [CCT] Spotlight - SW" Address="1/1/19" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [CCT] Spotlight - FB" Address="1/1/20" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [CCT] Spotlight - DIM" Address="1/1/21" DPTs="DPST-3-007" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [CCT] Spotlight - VAL" Address="1/1/22" DPTs="DPST-5-001" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [CCT] Spotlight - VALFB" Address="1/1/23" DPTs="DPST-5-001" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [CCT] Spotlight - CCT" Address="1/1/24" DPTs="DPST-9-001" />
+      <GroupAddress Name="LT - BAS - Phòng Ngủ [CCT] Spotlight - CCT_FB" Address="1/1/25" DPTs="DPST-9-001" />
+      <GroupAddress Name="LT - BAS - Phòng ăn [On/Off] Đèn bàn - SW" Address="1/1/26" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Phòng ăn [On/Off] Đèn bàn - FB" Address="1/1/27" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Phòng ăn [On/Off] Đèn rìa - SW" Address="1/1/28" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Phòng ăn [On/Off] Đèn rìa - FB" Address="1/1/29" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Phòng ăn [Dimming] Hắt trần - SW" Address="1/1/30" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Phòng ăn [Dimming] Hắt trần - FB" Address="1/1/31" DPTs="DPST-1-001" />
+      <GroupAddress Name="LT - BAS - Phòng ăn [Dimming] Hắt trần - DIM" Address="1/1/32" DPTs="DPST-3-007" />
+      <GroupAddress Name="LT - BAS - Phòng ăn [Dimming] Hắt trần - VAL" Address="1/1/33" DPTs="DPST-5-001" />
+      <GroupAddress Name="LT - BAS - Phòng ăn [Dimming] Hắt trần - VALFB" Address="1/1/34" DPTs="DPST-5-001" />
+    </GroupRange>
+  </GroupRange>
+
+  <!-- Main group 3: Shutter -->
+  <GroupRange Name="3 Shutter" RangeStart="6144" RangeEnd="8191">
+    <GroupRange Name="3/1 Tầng 1 " RangeStart="6400" RangeEnd="6655">
+      <GroupAddress Name="SHT - BAS - Sảnh Rèm cửa sổ lớn - MOVE" Address="3/1/0" DPTs="DPST-1-008" />
+      <GroupAddress Name="SHT - BAS - Sảnh Rèm cửa sổ lớn - STEP" Address="3/1/1" DPTs="DPST-1-007" />
+      <GroupAddress Name="SHT - BAS - Sảnh Rèm cửa sổ lớn - POS" Address="3/1/2" DPTs="DPST-5-001" />
+      <GroupAddress Name="SHT - BAS - Sảnh Rèm cửa sổ lớn - POS_FB" Address="3/1/3" DPTs="DPST-5-001" />
+      <GroupAddress Name="SHT - BAS - Sảnh Rèm cửa sổ lớn - TILT" Address="3/1/4" DPTs="DPST-5-001" />
+      <GroupAddress Name="SHT - BAS - Sảnh Rèm cửa sổ lớn - TILT_FB" Address="3/1/5" DPTs="DPST-5-001" />
+      <GroupAddress Name="SHT - BAS - Phòng Ngủ Cạnh giường - MOVE" Address="3/1/6" DPTs="DPST-1-008" />
+      <GroupAddress Name="SHT - BAS - Phòng Ngủ Cạnh giường - STEP" Address="3/1/7" DPTs="DPST-1-007" />
+      <GroupAddress Name="SHT - BAS - Phòng Ngủ Cạnh giường - POS" Address="3/1/8" DPTs="DPST-5-001" />
+      <GroupAddress Name="SHT - BAS - Phòng Ngủ Cạnh giường - POS_FB" Address="3/1/9" DPTs="DPST-5-001" />
+      <GroupAddress Name="SHT - BAS - Phòng Ngủ Cạnh giường - TILT" Address="3/1/10" DPTs="DPST-5-001" />
+      <GroupAddress Name="SHT - BAS - Phòng Ngủ Cạnh giường - TILT_FB" Address="3/1/11" DPTs="DPST-5-001" />
+      <GroupAddress Name="SHT - BAS - Phòng ăn Rèm cuộn  - MOVE" Address="3/1/12" DPTs="DPST-1-008" />
+      <GroupAddress Name="SHT - BAS - Phòng ăn Rèm cuộn  - STEP" Address="3/1/13" DPTs="DPST-1-007" />
+      <GroupAddress Name="SHT - BAS - Phòng ăn Rèm cuộn  - POS" Address="3/1/14" DPTs="DPST-5-001" />
+      <GroupAddress Name="SHT - BAS - Phòng ăn Rèm cuộn  - POS_FB" Address="3/1/15" DPTs="DPST-5-001" />
+      <GroupAddress Name="SHT - BAS - Phòng ăn Rèm cuộn  - TILT" Address="3/1/16" DPTs="DPST-5-001" />
+      <GroupAddress Name="SHT - BAS - Phòng ăn Rèm cuộn  - TILT_FB" Address="3/1/17" DPTs="DPST-5-001" />
+    </GroupRange>
+  </GroupRange>
+
+  <!-- Main group 4: HVAC -->
+  <GroupRange Name="4 HVAC" RangeStart="8192" RangeEnd="10239">
+    <GroupRange Name="4/1 Tầng 1 " RangeStart="8448" RangeEnd="8703">
+      <GroupAddress Name="HVAC - BAS - Sảnh Máy lạnh sảnh - TEMP" Address="4/1/0" DPTs="DPST-9-001" />
+      <GroupAddress Name="HVAC - BAS - Sảnh Máy lạnh sảnh - SETP" Address="4/1/1" DPTs="DPST-9-001" />
+      <GroupAddress Name="HVAC - BAS - Sảnh Máy lạnh sảnh - MODE" Address="4/1/2" DPTs="DPST-20-102" />
+      <GroupAddress Name="HVAC - BAS - Sảnh Máy lạnh sảnh - FAN" Address="4/1/3" DPTs="DPST-5-001" />
+      <GroupAddress Name="HVAC - BAS - Sảnh Máy lạnh sảnh - ENABLE" Address="4/1/4" DPTs="DPST-1-001" />
+      <GroupAddress Name="HVAC - BAS - Sảnh Máy lạnh sảnh - OUTPUT_FB" Address="4/1/5" DPTs="DPST-5-001" />
+      <GroupAddress Name="HVAC - BAS - Phòng Ngủ HVAC P ngủ - TEMP" Address="4/1/6" DPTs="DPST-9-001" />
+      <GroupAddress Name="HVAC - BAS - Phòng Ngủ HVAC P ngủ - SETP" Address="4/1/7" DPTs="DPST-9-001" />
+      <GroupAddress Name="HVAC - BAS - Phòng Ngủ HVAC P ngủ - MODE" Address="4/1/8" DPTs="DPST-20-102" />
+      <GroupAddress Name="HVAC - BAS - Phòng Ngủ HVAC P ngủ - FAN" Address="4/1/9" DPTs="DPST-5-001" />
+      <GroupAddress Name="HVAC - BAS - Phòng Ngủ HVAC P ngủ - ENABLE" Address="4/1/10" DPTs="DPST-1-001" />
+      <GroupAddress Name="HVAC - BAS - Phòng Ngủ HVAC P ngủ - OUTPUT_FB" Address="4/1/11" DPTs="DPST-5-001" />
+    </GroupRange>
+  </GroupRange>
+
+  <!-- Main group 5: Security -->
+  <GroupRange Name="5 Security" RangeStart="10240" RangeEnd="12287">
+    <GroupRange Name="5/1 Tầng 1 " RangeStart="10496" RangeEnd="10751">
+      <GroupAddress Name="SEC - BAS - Phòng ăn an ninh - ARM_AWAY" Address="5/1/0" DPTs="DPST-1-001" />
+      <GroupAddress Name="SEC - BAS - Phòng ăn an ninh - ARM_HOME" Address="5/1/1" DPTs="DPST-1-001" />
+      <GroupAddress Name="SEC - BAS - Phòng ăn an ninh - DISARM" Address="5/1/2" DPTs="DPST-1-001" />
+      <GroupAddress Name="SEC - BAS - Phòng ăn an ninh - ALARM_FB" Address="5/1/3" DPTs="DPST-1-005" />
+      <GroupAddress Name="SEC - BAS - Phòng ăn an ninh - FIRE" Address="5/1/4" DPTs="DPST-1-005" />
+      <GroupAddress Name="SEC - BAS - Phòng ăn an ninh - SIREN" Address="5/1/5" DPTs="DPST-1-001" />
+    </GroupRange>
+  </GroupRange>
+
+  <!-- Main group 6: Scenes -->
+  <GroupRange Name="6 Scenes" RangeStart="12288" RangeEnd="14335">
+    <GroupRange Name="6/1 Tầng 1 " RangeStart="12544" RangeEnd="12799">
+      <GroupAddress Name="SCN - BAS - Sảnh ALL on - ACTIVATE" Address="6/1/0" DPTs="DPST-18-001" />
+      <GroupAddress Name="SCN - BAS - Sảnh ALL on - FB" Address="6/1/1" DPTs="DPST-18-001" />
+      <GroupAddress Name="SCN - BAS - Sảnh All OFF - ACTIVATE" Address="6/1/2" DPTs="DPST-18-001" />
+      <GroupAddress Name="SCN - BAS - Sảnh All OFF - FB" Address="6/1/3" DPTs="DPST-18-001" />
+    </GroupRange>
+  </GroupRange>
+</GroupAddress-Export>
