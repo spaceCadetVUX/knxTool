@@ -1,70 +1,89 @@
-# CLAUDE.md — KNX GA Planner Rebuild
+# CLAUDE.md — KNX GA Planner
 
 ## Project context
 
-Đây là project rebuild KNX GA Planner từ single-file HTML thành 3-file architecture:
-- `engine.js` — toàn bộ GA logic + data (không bao giờ serve ra browser)
-- `server.js` — HTTP server, zero npm dependency
-- `index.html` — UI shell, không chứa business logic
+Pure client-side tool — chạy thẳng trên browser, không cần server.
 
-Đọc `ROADMAP.md` trước khi làm bất kỳ sprint nào.
+### File structure
+
+```
+index.html          — HTML shell + load scripts theo thứ tự
+assets/engine.js    — GA data + pure functions (không đọc DOM, không đọc state)
+assets/state.js     — app state object + localStorage persistence
+assets/i18n.js      — i18n strings + t() + setLang()
+assets/render.js    — toàn bộ render/UI functions (renderStep1–6, circuit helpers…)
+assets/app.js       — engine calls, import modal, utilities, init
+assets/styles.css   — stylesheet
+```
+
+### Load order trong index.html (bắt buộc theo thứ tự)
+
+```html
+<script src="assets/engine.js"></script>
+<script src="assets/state.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/render.js"></script>
+<script src="assets/app.js"></script>
+```
 
 ---
 
 ## Nguyên tắc làm việc
 
 ### Scope
-- Chỉ viết đúng những gì sprint yêu cầu, không thêm feature ngoài spec
-- Không tạo file mới ngoài 3 file đã định (`engine.js`, `server.js`, `index.html`)
-- Không refactor sprint khác khi đang làm một sprint
+- Không tạo file JS ngoài 5 file đã định ở trên
+- Không tạo file CSS mới — dùng `assets/styles.css`
+- Không dùng framework, bundler, hay npm package nào
 
 ### Code style
-- Vanilla JS, không dùng bất kỳ framework hay thư viện nào
-- `server.js` chỉ dùng Node built-in: `http`, `fs`, `path` — tuyệt đối không `require` package ngoài
-- `engine.js` phải là pure functions — không đọc/ghi global state, không có side effect
-- `index.html` không được chứa bất kỳ GA data hay logic nào (`gasets`, `circuitDefs`, `generateGAs`...)
+- Vanilla JS thuần — không ES modules (`import`/`export`)
+- Tất cả symbols đều ở global scope — file sau dùng được symbol của file trước
+- Không inline CSS trong JS template literals — dùng class đã định nghĩa sẵn trong `styles.css`
 
 ### Đặt tên
-- Giữ nguyên tên biến từ source gốc khi có thể (tránh breaking change)
+- Giữ nguyên tên biến từ source gốc (tránh breaking change)
 - State field tên là `generatedGAs` — không phải `gas`
-- API functions trong UI đặt tên `callGenerate`, `callExportXML`, `callExportCSV`, `callImportXML`
+- Engine call functions: `callGenerate`, `callExportXML`, `callExportCSV`, `callImportXML`
 
 ---
 
-## Quy tắc engine.js
+## Quy tắc từng file
 
-- Sprint 1: chỉ data, không có function
-- Sprint 2: chỉ pure functions, không đọc `state` global
-- `generateGAs(payload)` nhận object payload, không đọc biến ngoài scope
-- `parseXML()` dùng regex — không dùng DOMParser (không có trong Node.js)
-- `buildCSV()` xuất hierarchical format (4 cột: Main group / Middle group / Group address / Address)
-- Export cuối file: `module.exports = { ... }` gộp cả data lẫn functions
+### engine.js
+- Pure functions + data — không đọc `state`, không đọc DOM
+- `generateGAs(payload)` nhận object, không đọc biến ngoài scope
+- `parseXML()` dùng regex — không dùng DOMParser
+- Cuối file: `if (typeof module !== 'undefined') module.exports = { ... }`
 
----
+### state.js
+- Định nghĩa `const state = { ... }` và các hằng persistence (`STORAGE_KEY`, `PERSIST_FIELDS`)
+- Các hàm: `saveState`, `debouncedSave`, `loadState`, `newProject`
+- Không gọi DOM render từ đây — chỉ đọc/ghi state và localStorage
 
-## Quy tắc server.js
+### i18n.js
+- Định nghĩa `const i18n = { en: {...}, vi: {...} }`
+- Hàm `t(key)` đọc `state.lang`
+- Hàm `setLang(lang)` — cập nhật state rồi gọi `renderAll()`
+- Không chứa tên hệ thống KNX hay GA label — chỉ UI strings
 
-- Domain check: bỏ qua khi `origin` header rỗng (localhost direct access)
-- Mọi route API phải wrap trong try/catch, lỗi trả `{ error: message }` với status 500
-- Không log sensitive data ra console
-- Port mặc định: `3000`, đọc từ `process.env.PORT || 3000`
+### render.js
+- Toàn bộ render functions: `renderAll`, `renderStepBar`, `renderSidebar`, `renderPanel`, `goStep`
+- Toàn bộ `renderStep1` – `renderStep6` và các helper đi kèm
+- Circuit helpers: `activeDefs`, `getCircuits`, `addCircuit`, `removeCircuit`, `setCircuitName`
+- Constants dùng trong render: `sysIconSvg`, `circuitSuggestedNames`
+- Được gọi `escHtml`, `showToast`, `callGenerate` (defined in app.js) — chấp nhận được vì script load xong hết trước khi event nào kích hoạt
 
----
-
-## Quy tắc index.html
-
-- Không có `gasets`, `circuitDefs`, `circuitGaSet`, `generateGAs`, `buildXML`, `buildCSV`
-- State khởi tạo với `floors: []` — nhận default floors từ API hoặc hardcode UI-side
-- Loading overlay phải hiện trước khi gọi fetch, ẩn sau khi nhận response (kể cả lỗi)
-- Khi server không phản hồi: hiện error toast, không crash, không console.error ẩn
-- CSS không được inline trong JS template literals (dùng class đã định nghĩa sẵn)
-- i18n `t(key)` chỉ chứa UI strings — không chứa tên hệ thống KNX hay GA label
+### app.js
+- Utilities: `escHtml`, `showToast`, `showLoading`, `hideLoading`, `triggerDownload`, `updateHeaderProject`
+- Engine calls: `callGenerate`, `callExportXML`, `callExportCSV`, `callImportXML`
+- Import modal: `openImportModal`, `closeImportModal`, `handleXmlFile`, `readXmlFile`
+- Floor extraction: `extractFloorsFromGAs`
+- Init block ở cuối file: `loadState(); renderAll();`
 
 ---
 
 ## Thứ tự ưu tiên khi có conflict
 
 1. **Correctness** — logic sinh GA phải đúng (địa chỉ không trùng, đúng DPT)
-2. **Security** — engine.js không bao giờ expose ra client
-3. **Simplicity** — code đơn giản hơn code "thông minh"
-4. **UX** — UI phản hồi rõ ràng mọi trạng thái (loading / error / success)
+2. **Simplicity** — code đơn giản hơn code "thông minh"
+3. **UX** — UI phản hồi rõ ràng mọi trạng thái (loading / error / success)
