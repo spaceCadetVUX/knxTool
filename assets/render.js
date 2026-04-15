@@ -141,13 +141,13 @@ function renderSidebar() {
   if (state.generatedGAs.length) {
     html += '<div class="sb-section">';
     html += `<div class="sb-label">${t('total_gas')}</div>`;
-    html += `<div style="font-size:24px;font-weight:700;color:var(--teal-600)">${state.generatedGAs.length}</div>`;
+    html += `<div class="sb-ga-total">${state.generatedGAs.length}</div>`;
     html += '</div>';
   }
 
   // New project button
-  html += `<div class="sb-section" style="margin-top:auto">
-    <button class="btn btn-ghost btn-sm" style="width:100%;color:var(--gray-500)"
+  html += `<div class="sb-section mt-auto">
+    <button class="btn btn-ghost btn-sm w-full text-muted"
       onclick="newProject()">
       ${state.lang === 'vi' ? '🗑 Dự án mới' : '🗑 New project'}
     </button>
@@ -220,13 +220,13 @@ function renderStep1() {
     </div>
   </div>
 
-  <div class="sb-label" style="margin-bottom:10px">${t('structure_type')}</div>
+  <div class="sb-label mb-2">${t('structure_type')}</div>
   <div class="structure-grid">
     <div class="structure-card ${state.structure === 'function' ? 'selected' : ''}" onclick="selectStructure('function')">
       <div class="sc-icon">⚙️</div>
       <div class="sc-title">${t('function_based')}</div>
       <div class="sc-desc">${t('fn_desc')}</div>
-      <div class="mt-3" style="font-family:var(--font-mono);font-size:11px;color:var(--teal-700);background:var(--teal-50);padding:8px;border-radius:4px;line-height:1.8">
+      <div class="addr-hint mt-3">
         1/2/0 → LT - GF - Living room - SW<br>
         3/2/0 → SHT - GF - Living room - MOVE<br>
         4/3/0 → HVAC - FL1 - Master bed - TEMP
@@ -236,7 +236,7 @@ function renderStep1() {
       <div class="sc-icon">🏢</div>
       <div class="sc-title">${t('building_based')}</div>
       <div class="sc-desc">${t('bd_desc')}</div>
-      <div class="mt-3" style="font-family:var(--font-mono);font-size:11px;color:var(--teal-700);background:var(--teal-50);padding:8px;border-radius:4px;line-height:1.8">
+      <div class="addr-hint mt-3">
         2/1/0 → GF - Lighting - Living room - SW<br>
         2/3/0 → GF - Shutter - Living room - MOVE<br>
         3/2/0 → FL1 - HVAC - Master bed - TEMP
@@ -284,14 +284,14 @@ function renderStep2() {
       <div class="section-desc">${t('step2_desc')} <span class="sel-count">${selCount} selected</span></div>
 
       <div class="sb-label">${t('core_systems')}</div>
-      <div class="systems-grid" style="margin-bottom:16px">${coreSys.map(sysCard).join('')}</div>
+      <div class="systems-grid mb-4">${coreSys.map(sysCard).join('')}</div>
 
       <div class="sb-label">${t('extended_systems')}</div>
-      <div class="systems-grid" style="margin-bottom:16px">${extSys.map(sysCard).join('')}</div>
+      <div class="systems-grid mb-4">${extSys.map(sysCard).join('')}</div>
 
       ${state.systems.lt ? `
       <div class="sb-label">${t('lt_subopts')}</div>
-      <div class="sub-chips" style="margin-bottom:16px">
+      <div class="sub-chips mb-4">
         ${ltSubChips.map(([k,l]) => `<div class="chip ${state.ltSubs[k] ? 'active' : ''}" onclick="state.ltSubs['${k}']=!state.ltSubs['${k}'];this.classList.toggle('active')">${l}</div>`).join('')}
       </div>` : ''}
 
@@ -299,7 +299,7 @@ function renderStep2() {
     <div>
       <div class="ga-set-preview" id="ga-detail-pane">
         <div class="ga-set-empty">
-          <div style="font-size:28px;margin-bottom:8px">📋</div>
+          <div class="ga-set-icon">📋</div>
           ${t('click_card')}
         </div>
       </div>
@@ -320,12 +320,12 @@ function showGaDetail(sk) {
   const si = sysInfo[sk];
   const lang = state.lang;
   pane.innerHTML = `
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+    <div class="flex items-center gap-2 mb-2">
       <svg viewBox="0 0 15 15" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px">${sysIconSvg[si.icon]}</svg>
       <strong style="font-size:14px">${si['name_' + lang] || si.name_en}</strong>
       <span class="badge badge-teal">Main ${si.main}</span>
     </div>
-    <div style="font-size:12px;color:var(--gray-500);margin-bottom:12px">${si['desc_' + lang] || si.desc_en}</div>
+    <div class="text-sm mb-3">${si['desc_' + lang] || si.desc_en}</div>
     <div class="sb-label">${t('ga_set_per')}</div>
     ${si.gaNames.map((n, i) => `<div class="ga-set-row">
       <span class="ga-offset">+${i}</span>
@@ -341,7 +341,7 @@ function renderStep3() {
 
   const emptyState = `
   <div class="floors-empty">
-    <div class="floors-empty-icon" style="font-size:28px;color:var(--gray-300)">▤</div>
+    <div class="floors-empty-icon">▤</div>
     <p>${vi ? 'Chưa có tầng nào. Bấm "+ Thêm tầng" để bắt đầu.' : 'No floors yet. Click "+ Add floor" to get started.'}</p>
   </div>`;
 
@@ -349,7 +349,7 @@ function renderStep3() {
   <div class="section-title">${t('step3_title')}</div>
   <div class="section-desc">${t('step3_desc')}</div>
 
-  <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+  <div class="flex justify-end mb-3">
     <div class="view-toggle">
       <button class="vt-btn ${isChip ? 'active' : ''}" onclick="state.floorView='chip';renderPanel()">${t('chip_view')}</button>
       <button class="vt-btn ${!isChip ? 'active' : ''}" onclick="state.floorView='tree';renderPanel()">${t('tree_view')}</button>
@@ -362,7 +362,7 @@ function renderStep3() {
   )}
 
   <button class="add-floor-btn" onclick="addFloor()" style="margin-top:${isEmpty?'0':'4px'}">
-    <span style="font-size:18px;line-height:1">+</span>
+    <span>+</span>
     ${t('add_floor')}
   </button>`;
 }
@@ -421,7 +421,7 @@ function renderFloorTree() {
         <input class="floor-name-field" value="${escHtml(floor.name)}"
           oninput="state.floors[${fi}].name=this.value;debouncedSave();renderSidebar()"
           onclick="event.stopPropagation()" />
-        <span class="floor-room-count ${rc===0?'zero':''}" id="frc-${fi}" style="flex-shrink:0">${rc} ${vi?'phòng':rc===1?'room':'rooms'}</span>
+        <span class="floor-room-count ${rc===0?'zero':''}" id="frc-${fi}">${rc} ${vi?'phòng':rc===1?'room':'rooms'}</span>
         <button class="floor-del" onclick="event.stopPropagation();removeFloor(${fi})"
           title="${vi?'Xóa tầng':'Remove floor'}">✕</button>
       </div>
@@ -578,7 +578,7 @@ function renderStep4() {
   if (state.floors.length === 0) return `
     <div class="section-title">${t('step4_title')}</div>
     <div class="section-desc">${t('step4_desc')}</div>
-    <div style="padding:40px;text-align:center;color:var(--gray-400);font-size:13px;border:1px dashed var(--gray-200);border-radius:var(--radius)">
+    <div class="empty-state bordered">
       ${vi ? 'Chưa có tầng nào. Quay lại bước Tầng & Phòng để thêm.' : 'No floors defined. Go back to Floors & Rooms to add some.'}
     </div>`;
 
@@ -629,7 +629,7 @@ function renderStep4() {
                 title="${vi ? 'Xóa' : 'Remove'}">✕</button>
             </div>`).join('')}
             <button class="circuit-add-btn" onclick="addCircuit(${fi},${ri},'${sk}','${ck}')">
-              <span style="font-size:15px;line-height:1;margin-top:-1px">+</span>
+              <span>+</span>
               ${vi ? 'Thêm' : 'Add'} ${clabel}
             </button>
           </div>`;
@@ -657,7 +657,7 @@ function renderStep4() {
         return `<button class="assign-floor-btn ${fi === assignFloor ? 'active' : ''}"
           onclick="assignFloor=${fi};assignRoom=0;renderPanel()">
           <span class="mid-badge">M${f.mid}</span>
-          <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(f.name)}</span>
+          <span class="truncate-flex">${escHtml(f.name)}</span>
           ${ft > 0 ? `<span class="assign-floor-count">${ft}</span>` : ''}
         </button>`;
       }).join('')}
@@ -666,7 +666,7 @@ function renderStep4() {
     <div>
       <div class="room-tab-bar">
         ${validRooms.length === 0
-          ? `<span style="font-size:13px;color:var(--gray-400);padding:12px 4px;display:inline-block">${t('no_rooms')}</span>`
+          ? `<span class="no-rooms-msg">${t('no_rooms')}</span>`
           : validRooms.map((room, ri) => {
               const rt = roomTotal(assignFloor, ri);
               return `<button class="room-tab ${ri === assignRoom ? 'active' : ''}"
@@ -677,9 +677,9 @@ function renderStep4() {
       </div>
       <div class="room-qty-area">
         ${validRooms.length === 0
-          ? `<div style="padding:32px;text-align:center;color:var(--gray-400);font-size:13px">${t('no_rooms')}</div>`
+          ? `<div class="empty-state">${t('no_rooms')}</div>`
           : (sysList.length === 0
-            ? `<div style="padding:32px;text-align:center;color:var(--gray-400);font-size:13px">${vi ? 'Chưa chọn hệ thống nào.' : 'No systems selected.'}</div>`
+            ? `<div class="empty-state">${vi ? 'Chưa chọn hệ thống nào.' : 'No systems selected.'}</div>`
             : renderRoomCircuits(assignFloor, assignRoom))}
       </div>
     </div>
@@ -710,13 +710,13 @@ function renderStep5() {
   <div class="section-title">${t('step5_title')}</div>
   <div class="section-desc">${t('step5_desc')}</div>
 
-  <div class="stat-bar" style="margin-bottom:16px">
+  <div class="stat-bar mb-4">
     <div class="stat-card"><div class="val">${total}</div><div class="lbl">${t('total_gas')}</div></div>
     <div class="stat-card"><div class="val">${mainCnt}</div><div class="lbl">${t('main_groups')}</div></div>
     <div class="stat-card"><div class="val">${state.floors.length}</div><div class="lbl">${t('floors')}</div></div>
   </div>
 
-  <div class="ga-toolbar" style="margin-bottom:12px">
+  <div class="ga-toolbar mb-3">
     <div class="filter-chips">
       <div class="chip ${state.gaFilter === 'all' ? 'active' : ''}" onclick="state.gaFilter='all';renderPanel()">${t('all_filter')} (${total})</div>
       ${sysList.map(sk => {
@@ -725,7 +725,7 @@ function renderStep5() {
         return `<div class="chip ${state.gaFilter === sk ? 'active' : ''}" onclick="state.gaFilter='${sk}';renderPanel()">${si['name_' + state.lang] || si.name_en} (${cnt})</div>`;
       }).join('')}
     </div>
-    <div style="display:flex;gap:8px;margin-left:auto;align-items:center">
+    <div class="toolbar-actions">
       <div class="view-toggle">
         <button class="vt-btn ${state.gaTreeGroup === 'mid'  ? 'active' : ''}" onclick="state.gaTreeGroup='mid';renderPanel()">${state.lang === 'vi' ? 'Theo tầng' : 'By Floor'}</button>
         <button class="vt-btn ${state.gaTreeGroup === 'main' ? 'active' : ''}" onclick="state.gaTreeGroup='main';renderPanel()">${state.lang === 'vi' ? 'Theo hệ thống' : 'By System'}</button>
@@ -738,7 +738,7 @@ function renderStep5() {
   </div>
 
   ${total === 0
-    ? `<div class="card" style="text-align:center;padding:40px;color:var(--gray-400)">${t('no_gas')}</div>`
+    ? `<div class="card empty-state">${t('no_gas')}</div>`
     : (state.gaTreeGroup === 'main' ? renderGaTreeByMain(filtered) : renderGaTree(filtered))
   }
 
@@ -747,23 +747,23 @@ function renderStep5() {
       <div class="card-title">${t('add_ga_manual')}</div>
     </div>
     <div class="manual-ga-form">
-      <div class="field" style="margin:0">
+      <div class="field">
         <label class="field-label">Main</label>
         <select class="input input-sm input-w-lg" id="add-main">${mainOpts}</select>
       </div>
-      <div class="field" style="margin:0">
+      <div class="field">
         <label class="field-label">Middle</label>
         <select class="input input-sm input-w-lg" id="add-mid">${midOpts}</select>
       </div>
-      <div class="field" style="margin:0">
+      <div class="field">
         <label class="field-label">Sub (0–255)</label>
         <input class="input input-sm input-w-sm" id="add-sub" type="number" min="0" max="255" placeholder="0" />
       </div>
-      <div class="field field-name" style="margin:0;flex:1;min-width:180px">
+      <div class="field field-name">
         <label class="field-label">${state.lang === 'vi' ? 'Tên GA' : 'GA name'}</label>
         <input class="input input-sm" id="add-name" type="text" placeholder="e.g. LT - GF - Custom - SW" />
       </div>
-      <div class="field" style="margin:0">
+      <div class="field">
         <label class="field-label">DPT</label>
         <select class="input input-sm input-w-md" id="add-dpt">
           <option value="DPST-1-001">DPST-1-001 (1-bit)</option>
@@ -774,7 +774,7 @@ function renderStep5() {
           <option value="DPST-232-600">DPST-232-600 (RGB)</option>
         </select>
       </div>
-      <div class="field" style="margin:0">
+      <div class="field">
         <label class="field-label">${state.lang === 'vi' ? 'Loại' : 'Type'}</label>
         <select class="input input-sm input-w-xs" id="add-type">
           <option value="ctrl">control</option>
@@ -795,7 +795,7 @@ function renderGaTree(filtered) {
     floorGroups[g.mid][roomKey].push(g);
   });
 
-  if (!Object.keys(floorGroups).length) return `<div class="card" style="padding:32px;text-align:center;color:var(--gray-400)">${t('no_gas')}</div>`;
+  if (!Object.keys(floorGroups).length) return `<div class="card empty-state">${t('no_gas')}</div>`;
 
   return Object.entries(floorGroups)
     .sort((a, b) => Number(a[0]) - Number(b[0]))
@@ -806,22 +806,22 @@ function renderGaTree(filtered) {
       const fid   = `gfloor-${mid}`;
 
       return `
-      <div style="margin-bottom:8px">
+      <div class="mb-2">
         <div class="ga-main-row" onclick="toggleBlock('${fid}')">
           <span class="mid-badge">M${mid}</span>
           <span class="ga-main-name">${escHtml(floorName)}</span>
-          <span class="badge badge-teal" style="margin-left:auto">${total} GAs</span>
-          <span style="margin-left:8px;opacity:.5;font-size:12px" id="arr-${fid}">▼</span>
+          <span class="badge badge-teal ml-auto">${total} GAs</span>
+          <span class="tree-arrow" id="arr-${fid}">▼</span>
         </div>
         <div id="${fid}">
           ${Object.entries(rooms).map(([roomName, roomGas], ri) => {
             const rid = `groom-${mid}-${ri}`;
             return `
-            <div style="margin-bottom:4px">
+            <div class="mb-1">
               <div class="ga-mid-row" onclick="toggleBlock('${rid}')">
                 <span class="ga-mid-name">${escHtml(roomName)}</span>
-                <span class="badge badge-gray" style="margin-left:auto">${roomGas.length}</span>
-                <span style="margin-left:8px;opacity:.4;font-size:11px" id="arr-${rid}">▼</span>
+                <span class="badge badge-gray ml-auto">${roomGas.length}</span>
+                <span class="tree-arrow" id="arr-${rid}">▼</span>
               </div>
               <div id="${rid}">
                 ${roomGas.map(g => gaRow(g)).join('')}
@@ -843,7 +843,7 @@ function renderGaTreeByMain(filtered) {
     mainGroups[mk].mids[yk].gas.push(g);
   });
 
-  if (!Object.keys(mainGroups).length) return `<div class="card" style="padding:32px;text-align:center;color:var(--gray-400)">${t('no_gas')}</div>`;
+  if (!Object.keys(mainGroups).length) return `<div class="card empty-state">${t('no_gas')}</div>`;
 
   return Object.entries(mainGroups)
     .sort((a, b) => Number(a[0]) - Number(b[0]))
@@ -851,12 +851,12 @@ function renderGaTreeByMain(filtered) {
       const total = Object.values(mg.mids).reduce((a, m) => a + m.gas.length, 0);
       const fid   = `gmain-${main}`;
       return `
-      <div style="margin-bottom:8px">
+      <div class="mb-2">
         <div class="ga-main-row" onclick="toggleBlock('${fid}')">
           <span class="mid-badge">${main}</span>
           <span class="ga-main-name">${escHtml(mg.name)}</span>
-          <span class="badge badge-teal" style="margin-left:auto">${total} GAs</span>
-          <span style="margin-left:8px;opacity:.5;font-size:12px" id="arr-${fid}">▼</span>
+          <span class="badge badge-teal ml-auto">${total} GAs</span>
+          <span class="tree-arrow" id="arr-${fid}">▼</span>
         </div>
         <div id="${fid}">
           ${Object.entries(mg.mids)
@@ -864,11 +864,11 @@ function renderGaTreeByMain(filtered) {
             .map(([mid, mg2]) => {
               const rid = `gmid-${main}-${mid}`;
               return `
-              <div style="margin-bottom:4px">
+              <div class="mb-1">
                 <div class="ga-mid-row" onclick="toggleBlock('${rid}')">
                   <span class="ga-mid-name">${main}/${mid} — ${escHtml(mg2.name)}</span>
-                  <span class="badge badge-gray" style="margin-left:auto">${mg2.gas.length}</span>
-                  <span style="margin-left:8px;opacity:.4;font-size:11px" id="arr-${rid}">▼</span>
+                  <span class="badge badge-gray ml-auto">${mg2.gas.length}</span>
+                  <span class="tree-arrow" id="arr-${rid}">▼</span>
                 </div>
                 <div id="${rid}">
                   ${mg2.gas.map(g => gaRow(g)).join('')}
@@ -902,7 +902,7 @@ function renderGaTable(filtered) {
           <input class="input-inline ga-name-input" data-addr="${g.addr}"
             onblur="stopGaEdit(this)" onkeydown="keyGaEdit(event,this)" />
         </td>
-        <td class="col-sys"><span class="badge badge-gray" style="font-size:11px">${escHtml(g.mainName || '')}</span></td>
+        <td class="col-sys"><span class="badge badge-gray text-xs">${escHtml(g.mainName || '')}</span></td>
         <td class="col-dpt">${g.dpt}</td>
         <td class="col-type"><span class="badge ${g.type === 'ctrl' ? 'badge-teal' : 'badge-gray'}">${g.type === 'ctrl' ? t('ctrl_short') : t('fb_short')}</span></td>
         <td class="col-del"><button class="btn-icon danger" onclick="deleteGA('${g.addr}')">✕</button></td>
@@ -1038,28 +1038,28 @@ function renderStep6() {
 
   <div class="export-layout">
     <div>
-      <div class="card" style="margin-bottom:14px">
-        <div class="card-title" style="margin-bottom:10px">${t('project_summary')}</div>
+      <div class="card mb-3">
+        <div class="card-title mb-2">${t('project_summary')}</div>
         <div class="sb-info-row"><span>${state.lang === 'vi' ? 'Dự án' : 'Project'}</span><strong>${escHtml(state.projectName || '—')}</strong></div>
         <div class="sb-info-row"><span>${state.lang === 'vi' ? 'Cấu trúc' : 'Structure'}</span><strong>${state.structure === 'function' ? t('function_based') : t('building_based')}</strong></div>
-        <div class="sb-info-row"><span>${t('total_gas')}</span><strong style="color:var(--teal-600)">${gas.length}</strong></div>
+        <div class="sb-info-row"><span>${t('total_gas')}</span><strong class="fw-bold text-teal">${gas.length}</strong></div>
         <div class="sb-info-row"><span>${t('main_groups')}</span><strong>${sysList.length}</strong></div>
         <div class="sb-info-row"><span>${t('floors')}</span><strong>${state.floors.length}</strong></div>
       </div>
 
-      <div class="card" style="margin-bottom:14px">
-        <div class="card-title" style="margin-bottom:10px">${t('export_format')}</div>
+      <div class="card mb-3">
+        <div class="card-title mb-2">${t('export_format')}</div>
         <div class="format-selector">
           <div class="format-btn ${state.exportFormat === 'xml' ? 'active' : ''}" onclick="state.exportFormat='xml';renderPanel();refreshPreview()">XML</div>
           <div class="format-btn ${state.exportFormat === 'csv' ? 'active' : ''}" onclick="state.exportFormat='csv';renderPanel();refreshPreview()">CSV</div>
         </div>
-        <div style="font-size:12px;color:var(--gray-500)">
+        <div class="text-sm text-muted">
           ${state.exportFormat === 'xml' ? t('xml_desc') : t('csv_desc')}
         </div>
       </div>
 
-      <div class="card" style="margin-bottom:14px">
-        <div class="card-title" style="margin-bottom:10px">${t('options')}</div>
+      <div class="card mb-3">
+        <div class="card-title mb-2">${t('options')}</div>
         ${[['dpt', t('include_dpt')], ['desc', t('include_desc')]].map(([k, l]) => `
         <div class="toggle-row">
           <span class="toggle-label">${l}</span>
@@ -1072,10 +1072,10 @@ function renderStep6() {
       </div>
 
       <div class="card">
-        <div class="card-title" style="margin-bottom:8px">${t('filename')}</div>
+        <div class="card-title mb-2">${t('filename')}</div>
         <input class="input input-sm" id="filename-input" value="${escHtml(defName)}" />
-        <div style="font-size:11px;color:var(--gray-400);margin-top:4px">.${state.exportFormat} ${state.lang === 'vi' ? 'sẽ được thêm vào' : 'will be appended'}</div>
-        <div style="margin-top:14px">
+        <div class="text-xs text-muted mt-1">.${state.exportFormat} ${state.lang === 'vi' ? 'sẽ được thêm vào' : 'will be appended'}</div>
+        <div class="mt-3">
           ${state.exportFormat === 'csv'
             ? `<button class="btn btn-primary" onclick="callExportCSV()">${t('export_csv')}</button>`
             : `<button class="btn btn-primary" onclick="callExportXML()">${t('download_xml')}</button>`}

@@ -834,16 +834,68 @@ label.field-label {
 
 /* ── Misc utils ─────────────────────────────────────────────────────────── */
 .hidden { display: none !important; }
-.text-sm { font-size: 12px; }
+.text-xs   { font-size: 11px; }
+.text-sm   { font-size: 12px; }
 .text-muted { color: var(--gray-400); }
+.fw-bold   { font-weight: 700; }
+.text-teal  { color: var(--teal-600); }
+.mt-1 { margin-top: 4px; }
 .mt-2 { margin-top: 8px; }
 .mt-3 { margin-top: 12px; }
 .mt-4 { margin-top: 16px; }
+.mt-auto { margin-top: auto; }
+.mb-1 { margin-bottom: 4px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+.ml-auto { margin-left: auto; }
+.w-full  { width: 100%; }
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
 .items-center { align-items: center; }
 .gap-2 { gap: 8px; }
 .gap-3 { gap: 12px; }
+.justify-end { justify-content: flex-end; }
+.truncate-flex { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Reusable component classes ─────────────────────────────────────────── */
+.empty-state {
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--gray-400);
+  font-size: 13px;
+}
+.empty-state.bordered {
+  border: 1px dashed var(--gray-200);
+  border-radius: var(--radius);
+}
+
+/* Sidebar GA total count */
+.sb-ga-total { font-size: 24px; font-weight: 700; color: var(--teal-600); }
+
+/* Step 5 toolbar right-side action group */
+.toolbar-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
+
+/* GA set preview icon */
+.ga-set-icon { font-size: 28px; margin-bottom: 8px; }
+
+/* GA tree toggle arrow */
+.tree-arrow { margin-left: 8px; opacity: 0.5; font-size: 12px; user-select: none; }
+
+/* Step 1 address-format preview box */
+.addr-hint {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--teal-700);
+  background: var(--teal-50);
+  padding: 8px;
+  border-radius: 4px;
+  line-height: 1.8;
+}
+
+/* Manual-GA form: remove default field margin */
+.manual-ga-form .field { margin: 0; }
+
 .section-title {
     font-size: 16px;
     font-weight: 700;
@@ -1062,6 +1114,7 @@ label.field-label {
     display: flex; align-items: center; justify-content: center; gap: 6px;
 }
 .add-floor-btn:hover { border-color: var(--teal-400); color: var(--teal-600); background: var(--teal-50); }
+.add-floor-btn span { font-size: 18px; line-height: 1; }
 
 /* ── Step 3 — Room inline rename ────────────────────────────────────────── */
 .room-tag-rename {
@@ -1160,7 +1213,8 @@ label.field-label {
     border: 2px dashed var(--gray-200); border-radius: var(--radius);
     color: var(--gray-400);
 }
-.floors-empty-icon { font-size: 32px; margin-bottom: 12px; }
+.floors-empty-icon { font-size: 28px; color: var(--gray-300); margin-bottom: 12px; }
+.no-rooms-msg { font-size: 13px; color: var(--gray-400); padding: 12px 4px; display: inline-block; }
 .floors-empty p { font-size: 13px; margin: 0 0 16px; }
 
 /* ── Step 4 — Assign layout ─────────────────────────────────────────────── */
@@ -1384,6 +1438,7 @@ label.field-label {
     transition: all .15s;
     margin-top: 2px;
 }
+.circuit-add-btn span { font-size: 15px; line-height: 1; margin-top: -1px; }
 .circuit-add-btn:hover {
     border-color: var(--accent);
     color: var(--accent);
