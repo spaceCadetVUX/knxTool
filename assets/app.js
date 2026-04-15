@@ -245,6 +245,47 @@ function showUndoToast(msg, undoFn) {
   el._t = setTimeout(() => { el.className = ''; window._toastUndoFn = null; }, 4000);
 }
 
+// ── Manual GA — room select ───────────────────────────────────────────────────
+function updateManualRoomSelect() {
+  const floorId = document.getElementById('add-floor')?.value;
+  const roomSel = document.getElementById('add-room');
+  if (!roomSel) return;
+  const floor = floorId ? state.floors.find(f => f.id === floorId) : null;
+  const rooms = floor ? floor.rooms : [];
+  const none  = state.lang === 'vi' ? 'Không chọn' : 'None';
+  roomSel.innerHTML = `<option value="">— ${none} —</option>` +
+    rooms.map(r => `<option value="${escHtml(r)}">${escHtml(r)}</option>`).join('');
+}
+
+// ── DPT custom dropdown ───────────────────────────────────────────────────────
+function filterDptList() {
+  const input    = document.getElementById('add-dpt');
+  const dropdown = document.getElementById('dpt-dropdown');
+  if (!input || !dropdown) return;
+  const q = input.value.toLowerCase().trim();
+  const matches = q
+    ? dptOptions.filter(d => d.id.toLowerCase().includes(q) || d.name.toLowerCase().includes(q))
+    : dptOptions;
+  const shown = matches.slice(0, 120);
+  dropdown.innerHTML = shown.map(d =>
+    `<div class="dpt-option" onmousedown="selectDpt('${escHtml(d.id)}')">${escHtml(d.id)} — ${escHtml(d.name)}</div>`
+  ).join('') + (matches.length > 120
+    ? `<div class="dpt-option-more">+${matches.length - 120} ${state.lang === 'vi' ? 'kết quả nữa, hãy gõ thêm để lọc' : 'more — keep typing to narrow down'}</div>`
+    : '');
+  dropdown.classList.toggle('open', shown.length > 0);
+}
+
+function selectDpt(id) {
+  const input = document.getElementById('add-dpt');
+  if (input) input.value = id;
+  hideDptList();
+}
+
+function hideDptList() {
+  const dropdown = document.getElementById('dpt-dropdown');
+  if (dropdown) dropdown.classList.remove('open');
+}
+
 // ── Feedback ──────────────────────────────────────────────────────────────────
 function sendFeedback() {
   const el  = document.getElementById('sb-feedback-text');

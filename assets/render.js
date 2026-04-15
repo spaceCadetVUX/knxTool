@@ -715,8 +715,6 @@ function renderStep5() {
     ? gas
     : gas.filter(g => { const si = sysInfo[state.gaFilter]; return si && g.main === si.main; });
 
-  const dptDatalist = dptOptions.map(d =>
-    `<option value="${d.id}">${d.id} — ${d.name}</option>`).join('');
 
   return `
   <div class="section-title">${t('step5_title')}</div>
@@ -776,10 +774,31 @@ function renderStep5() {
         <label class="field-label">${state.lang === 'vi' ? 'Tên GA' : 'GA name'}</label>
         <input class="input input-sm" id="add-name" type="text" placeholder="e.g. LT - GF - Living Room - SW" />
       </div>
+      <div class="field field-dpt">
+        <label class="field-label">DPT <span class="field-hint">${state.lang === 'vi' ? '— gõ để tìm' : '— type to search'}</span></label>
+        <div class="dpt-search-wrap">
+          <span class="dpt-search-icon">&#9906;</span>
+          <input class="input input-sm dpt-search-input" id="add-dpt"
+            placeholder="${state.lang === 'vi' ? 'VD: DPST-1-001 hoặc Switch' : 'e.g. DPST-1-001 or Switch'}"
+            autocomplete="off"
+            oninput="filterDptList()"
+            onfocus="filterDptList()"
+            onblur="setTimeout(hideDptList,150)" />
+          <div class="dpt-dropdown" id="dpt-dropdown"></div>
+        </div>
+      </div>
       <div class="field">
-        <label class="field-label">DPT</label>
-        <input class="input input-sm input-w-dpt" list="dpt-datalist" id="add-dpt" placeholder="Search DPT…" />
-        <datalist id="dpt-datalist">${dptDatalist}</datalist>
+        <label class="field-label">${state.lang === 'vi' ? 'Tầng' : 'Floor'} <span class="field-hint">${state.lang === 'vi' ? '— tuỳ chọn' : '— optional'}</span></label>
+        <select class="input input-sm input-w-lg" id="add-floor" onchange="updateManualRoomSelect()">
+          <option value="">— ${state.lang === 'vi' ? 'Không chọn' : 'None'} —</option>
+          ${state.floors.map(f => `<option value="${escHtml(f.id)}">${escHtml(f.name)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">${state.lang === 'vi' ? 'Phòng' : 'Room'} <span class="field-hint">${state.lang === 'vi' ? '— tuỳ chọn' : '— optional'}</span></label>
+        <select class="input input-sm input-w-lg" id="add-room">
+          <option value="">— ${state.lang === 'vi' ? 'Không chọn' : 'None'} —</option>
+        </select>
       </div>
       <div class="field">
         <label class="field-label">${state.lang === 'vi' ? 'Loại' : 'Type'}</label>
@@ -795,47 +814,59 @@ function renderStep5() {
 
 function renderGaTree(filtered) {
   const floorGroups = {};
+  const UNCAT = '__uncat__';
   filtered.forEach(g => {
-    // gatype systems (LT, SHT, HVAC...): g.mid encodes GA type, not floor.
-    // Find the real floor by looking up which floor contains g.room.
-    // Fall back to mid-based lookup for floor-based systems (SEC, SCN).
-    const floor = (g.room && state.floors.find(f => f.rooms.includes(g.room)))
-               || state.floors.find(f => f.mid === g.mid);
-    const floorMid  = floor ? floor.mid  : g.mid;
-    const floorName = floor ? floor.name : `Floor ${g.mid}`;
-    if (!floorGroups[floorMid]) floorGroups[floorMid] = { name: floorName, gas: [] };
-    floorGroups[floorMid].gas.push(g);
+    // manual GA with explicit floorId → look up by id
+    const floorById = g.floorId && state.floors.find(f => f.id === g.floorId);
+    // gatype systems: find floor via room membership; fallback to mid
+    const floor = floorById
+               || (g.room && state.floors.find(f => f.rooms.includes(g.room)))
+               || (!g.manual && state.floors.find(f => f.mid === g.mid));
+    if (floor) {
+      if (!floorGroups[floor.mid]) floorGroups[floor.mid] = { name: floor.name, gas: [] };
+      floorGroups[floor.mid].gas.push(g);
+    } else {
+      if (!floorGroups[UNCAT]) floorGroups[UNCAT] = { name: state.lang === 'vi' ? 'Chưa phân tầng' : 'Uncategorized', gas: [] };
+      floorGroups[UNCAT].gas.push(g);
+    }
   });
 
   if (!Object.keys(floorGroups).length) return `<div class="card empty-state">${t('no_gas')}</div>`;
 
-  return Object.entries(floorGroups)
-    .sort((a, b) => Number(a[0]) - Number(b[0]))
-    .map(([mid, fg]) => {
-      const fid = `gfloor-${mid}`;
-      return `
-      <div class="mb-2">
-        <div class="ga-main-row" onclick="toggleBlock('${fid}')">
-          <span class="mid-badge">M${mid}</span>
-          <span class="ga-main-name">${escHtml(fg.name)}</span>
-          <span class="badge badge-teal ml-auto">${fg.gas.length} GAs</span>
-          <span class="tree-arrow" id="arr-${fid}">▼</span>
-        </div>
-        <div id="${fid}">
-          ${fg.gas.map(g => gaRow(g)).join('')}
-        </div>
-      </div>`;
-    }).join('');
+  const sorted = Object.entries(floorGroups).sort((a, b) => {
+    if (a[0] === UNCAT) return 1;
+    if (b[0] === UNCAT) return -1;
+    return Number(a[0]) - Number(b[0]);
+  });
+
+  return sorted.map(([key, fg]) => {
+    const fid = `gfloor-${key}`;
+    const badge = key === UNCAT ? '' : `<span class="mid-badge">M${key}</span>`;
+    return `
+    <div class="mb-2">
+      <div class="ga-main-row" onclick="toggleBlock('${fid}')">
+        ${badge}
+        <span class="ga-main-name">${escHtml(fg.name)}</span>
+        <span class="badge badge-teal ml-auto">${fg.gas.length} GAs</span>
+        <span class="tree-arrow" id="arr-${fid}">▼</span>
+      </div>
+      <div id="${fid}">
+        ${fg.gas.map(g => gaRow(g)).join('')}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function renderGaTreeByRoom(filtered) {
-  // Group by room; track which floor each room belongs to for display
   const roomGroups = {};
+  const UNCAT = '__uncat__';
   filtered.forEach(g => {
-    const key = g.room || '—';
+    const key = g.room || UNCAT;
     if (!roomGroups[key]) {
-      const floor = g.room && state.floors.find(f => f.rooms.includes(g.room));
-      roomGroups[key] = { floorName: floor ? floor.name : '', gas: [] };
+      const floor = g.room
+        ? (state.floors.find(f => f.rooms.includes(g.room)) || (g.floorId && state.floors.find(f => f.id === g.floorId)))
+        : null;
+      roomGroups[key] = { displayName: g.room || (state.lang === 'vi' ? 'Chưa phân phòng' : 'Uncategorized'), floorName: floor ? floor.name : '', gas: [] };
     }
     roomGroups[key].gas.push(g);
   });
@@ -843,15 +874,19 @@ function renderGaTreeByRoom(filtered) {
   if (!Object.keys(roomGroups).length) return `<div class="card empty-state">${t('no_gas')}</div>`;
 
   return Object.entries(roomGroups)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([roomName, rg]) => {
-      const rid = `groom-${roomName.replace(/[^a-zA-Z0-9]/g, '-')}`;
+    .sort((a, b) => {
+      if (a[0] === UNCAT) return 1;
+      if (b[0] === UNCAT) return -1;
+      return a[0].localeCompare(b[0]);
+    })
+    .map(([key, rg]) => {
+      const rid = `groom-${key.replace(/[^a-zA-Z0-9]/g, '-')}`;
       const floorBadge = rg.floorName
         ? `<span class="badge badge-gray">${escHtml(rg.floorName)}</span>` : '';
       return `
       <div class="mb-2">
         <div class="ga-main-row" onclick="toggleBlock('${rid}')">
-          <span class="ga-main-name">${escHtml(roomName)}</span>
+          <span class="ga-main-name">${escHtml(rg.displayName)}</span>
           ${floorBadge}
           <span class="badge badge-teal ml-auto">${rg.gas.length} GAs</span>
           <span class="tree-arrow" id="arr-${rid}">▼</span>
@@ -1028,9 +1063,11 @@ function addManualGA() {
   const mid  = parseInt(document.getElementById('add-mid').value);
   const sub  = parseInt(document.getElementById('add-sub').value);
   const name = (document.getElementById('add-name').value || '').trim();
-  const dpt  = document.getElementById('add-dpt').value.trim();
-  const type = document.getElementById('add-type').value;
-  const vi   = state.lang === 'vi';
+  const dpt     = document.getElementById('add-dpt').value.trim();
+  const type    = document.getElementById('add-type').value;
+  const floorId = document.getElementById('add-floor')?.value || '';
+  const room    = document.getElementById('add-room')?.value  || '';
+  const vi      = state.lang === 'vi';
 
   if (isNaN(main) || main < 0 || main > 15) {
     showToast(vi ? 'Main group phải từ 0–15' : 'Main group must be 0–15', true); return;
@@ -1054,7 +1091,12 @@ function addManualGA() {
     state.manualGAs    = state.manualGAs.filter(g => g.addr !== addr);
   }
   const skEntry = Object.keys(sysInfo).find(k => sysInfo[k].main === main);
-  const newGA = { addr, name, dpt, type, main, mid, mainName: skEntry ? sysInfo[skEntry].name_en : 'Custom', manual: true };
+  const newGA = { addr, name, dpt, type, main, mid,
+    mainName: skEntry ? sysInfo[skEntry].name_en : 'Custom',
+    manual: true,
+    ...(floorId && { floorId }),
+    ...(room    && { room    })
+  };
   state.generatedGAs.push(newGA);
   state.manualGAs.push({ ...newGA });
   state.generatedGAs.sort((a, b) => {

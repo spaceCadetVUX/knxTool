@@ -1631,6 +1631,40 @@ label.field-label {
 .input-w-xs  { width: 100px; }
 .input-w-dpt { width: 220px; }
 
+/* DPT search field */
+.field-hint { font-size: 11px; font-weight: 400; color: var(--gray-400); }
+.dpt-search-wrap { position: relative; display: inline-flex; align-items: center; }
+.dpt-search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--gray-400); pointer-events: none; }
+.dpt-search-input { width: 260px; padding-left: 26px !important; }
+.field-dpt { flex: 1 1 260px; }
+
+/* Custom DPT dropdown list */
+.dpt-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  min-width: 320px;
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  z-index: 200;
+}
+.dpt-dropdown.open { display: block; }
+.dpt-option {
+  padding: 7px 12px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  border-bottom: 1px solid var(--gray-50);
+  white-space: nowrap;
+}
+.dpt-option:hover, .dpt-option.focused { background: var(--teal-50); color: var(--teal-700); }
+.dpt-option-more { padding: 6px 12px; font-size: 11px; color: var(--gray-400); text-align: center; }
+
 /* Address x/y/z inline group */
 .addr-inputs { display: flex; align-items: center; gap: 4px; }
 .addr-inputs .addr-part { width: 80px; text-align: center; }
