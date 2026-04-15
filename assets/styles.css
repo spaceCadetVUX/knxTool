@@ -873,6 +873,57 @@ label.field-label {
 /* Sidebar GA total count */
 .sb-ga-total { font-size: 24px; font-weight: 700; color: var(--teal-600); }
 
+/* ── Sidebar feedback widget ────────────────────────────────────────────── */
+.sb-feedback {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.sb-feedback-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+.sb-feedback-icon {
+  width: 14px; height: 14px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.sb-feedback-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+.sb-feedback-desc {
+  font-size: 11px;
+  color: var(--gray-400);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+.sb-feedback-input {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 7px 9px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: white;
+  color: var(--gray-700);
+  min-height: 68px;
+  margin-bottom: 8px;
+  transition: border-color .15s;
+}
+.sb-feedback-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* Step 5 toolbar right-side action group */
 .toolbar-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
 

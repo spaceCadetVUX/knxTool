@@ -241,6 +241,22 @@ function showUndoToast(msg, undoFn) {
   el._t = setTimeout(() => { el.className = ''; window._toastUndoFn = null; }, 4000);
 }
 
+// ── Feedback ──────────────────────────────────────────────────────────────────
+function sendFeedback() {
+  const el  = document.getElementById('sb-feedback-text');
+  const text = el ? el.value.trim() : '';
+  const vi   = state.lang === 'vi';
+  if (!text) {
+    showToast(vi ? 'Vui lòng nhập nội dung góp ý' : 'Please enter your feedback', true);
+    return;
+  }
+  const subject = encodeURIComponent('KNX GA Planner — Feedback');
+  const body    = encodeURIComponent(text);
+  window.open(`mailto:sales@knxstore.vn?subject=${subject}&body=${body}`);
+  if (el) el.value = '';
+  showToast(vi ? 'Cảm ơn! Đang mở ứng dụng email...' : 'Thanks! Opening your email app…');
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadState();

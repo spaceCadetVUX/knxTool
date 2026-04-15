@@ -145,11 +145,27 @@ function renderSidebar() {
     html += '</div>';
   }
 
-  // New project button
+  // Feedback widget + New project button
+  const vi = state.lang === 'vi';
   html += `<div class="sb-section mt-auto">
+    <div class="sb-feedback">
+      <div class="sb-feedback-header">
+        <svg class="sb-feedback-icon" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="1" y="3" width="13" height="9" rx="1.5"/>
+          <polyline points="1,4 7.5,9 14,4"/>
+        </svg>
+        <span class="sb-feedback-title">${vi ? 'Góp ý cải tiến' : 'Send feedback'}</span>
+      </div>
+      <p class="sb-feedback-desc">${vi ? 'Bạn muốn cải tiến điều gì? Cho chúng tôi biết nhé.' : 'What could be improved? We\'d love to hear from you.'}</p>
+      <textarea class="sb-feedback-input" id="sb-feedback-text" rows="3"
+        placeholder="${vi ? 'Nhập góp ý của bạn...' : 'Type your feedback here...'}"></textarea>
+      <button class="btn btn-primary btn-sm w-full" onclick="sendFeedback()">
+        ${vi ? 'Gửi góp ý' : 'Send feedback'}
+      </button>
+    </div>
     <button class="btn btn-ghost btn-sm w-full text-muted"
       onclick="newProject()">
-      ${state.lang === 'vi' ? '🗑 Dự án mới' : '🗑 New project'}
+      ${vi ? '🗑 Dự án mới' : '🗑 New project'}
     </button>
   </div>`;
 
