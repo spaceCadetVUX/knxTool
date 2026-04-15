@@ -38,15 +38,15 @@ const gasets = {
     { o: '+2', n: 'DIM',    full: 'Dimming step',        dpt: 'DPST-3-007',   t: 'ctrl' },
     { o: '+3', n: 'VAL',    full: 'Brightness value',    dpt: 'DPST-5-001',   t: 'ctrl' },
     { o: '+4', n: 'VALFB',  full: 'Brightness feedback', dpt: 'DPST-5-001',   t: 'fb'   },
-    { o: '+5', n: 'CCT',    full: 'Colour temperature',  dpt: 'DPST-9-001',   t: 'ctrl' },
-    { o: '+6', n: 'CCT_FB', full: 'Colour temp FB',      dpt: 'DPST-9-001',   t: 'fb'   },
+    { o: '+5', n: 'CCT',    full: 'Colour temperature',  dpt: 'DPST-5-001',   t: 'ctrl' },
+    { o: '+6', n: 'CCT_FB', full: 'Colour temp FB',      dpt: 'DPST-5-001',   t: 'fb'   },
     { o: '+7', n: 'RGB',    full: 'RGBW colour',         dpt: 'DPST-232-600', t: 'ctrl' },
     { o: '+8', n: 'RGB_FB', full: 'RGBW feedback',       dpt: 'DPST-232-600', t: 'fb'   }
   ],
   pres: [
-    { o: '+0', n: 'STATUS', full: 'Occupancy status', dpt: 'DPST-1-001', t: 'fb'   },
+    { o: '+0', n: 'STATUS', full: 'Occupancy status', dpt: 'DPST-1-018', t: 'fb'   },
     { o: '+1', n: 'LUX',    full: 'Brightness lux',   dpt: 'DPST-9-004', t: 'fb'   },
-    { o: '+2', n: 'LOCK',   full: 'Sensor lock',      dpt: 'DPST-1-001', t: 'ctrl' }
+    { o: '+2', n: 'LOCK',   full: 'Sensor lock',      dpt: 'DPST-1-003', t: 'ctrl' }
   ],
   sht: [
     { o: '+0', n: 'MOVE',    full: 'Up / Down',          dpt: 'DPST-1-008', t: 'ctrl' },
@@ -65,8 +65,8 @@ const gasets = {
     { o:  '+3', n: 'FAN',         full: 'Fan speed',             dpt: 'DPST-5-001',  t: 'ctrl' },
     { o:  '+4', n: 'SETP_OFFSET', full: 'Setpoint offset',       dpt: 'DPST-9-002',  t: 'ctrl' },
     { o:  '+5', n: 'VALVE_CMD',   full: 'Valve command',         dpt: 'DPST-5-001',  t: 'ctrl' },
-    { o:  '+6', n: 'SWING',       full: 'Swing / louver',        dpt: 'DPST-5-010',  t: 'ctrl' },
-    { o:  '+7', n: 'LOCK',        full: 'Remote lock',           dpt: 'DPST-1-001',  t: 'ctrl' },
+    { o:  '+6', n: 'SWING',       full: 'Swing / louver',        dpt: 'DPST-5-001',  t: 'ctrl' },
+    { o:  '+7', n: 'LOCK',        full: 'Remote lock',           dpt: 'DPST-1-003',  t: 'ctrl' },
     { o:  '+8', n: 'TEMP_ACT',    full: 'Actual temperature',    dpt: 'DPST-9-001',  t: 'fb'   },
     { o:  '+9', n: 'SETP_FB',     full: 'Setpoint feedback',     dpt: 'DPST-9-001',  t: 'fb'   },
     { o: '+10', n: 'MODE_FB',     full: 'Mode feedback',         dpt: 'DPST-20-102', t: 'fb'   },
@@ -90,14 +90,14 @@ const gasets = {
   ],
   av: [
     { o: '+0', n: 'POWER',  full: 'Power on/off',    dpt: 'DPST-1-001', t: 'ctrl' },
-    { o: '+1', n: 'SOURCE', full: 'Source select',   dpt: 'DPST-5-001', t: 'ctrl' },
+    { o: '+1', n: 'SOURCE', full: 'Source select',   dpt: 'DPST-5-010', t: 'ctrl' },
     { o: '+2', n: 'VOL',    full: 'Volume 0–255',    dpt: 'DPST-5-001', t: 'ctrl' },
     { o: '+3', n: 'VOL_FB', full: 'Volume feedback', dpt: 'DPST-5-001', t: 'fb'   },
     { o: '+4', n: 'MUTE',   full: 'Mute toggle',     dpt: 'DPST-1-001', t: 'ctrl' }
   ],
   nrg: [
     { o: '+0', n: 'POWER',   full: 'Active power W',   dpt: 'DPST-14-056', t: 'fb' },
-    { o: '+1', n: 'ENERGY',  full: 'Energy kWh',       dpt: 'DPST-13-010', t: 'fb' },
+    { o: '+1', n: 'ENERGY',  full: 'Energy kWh',       dpt: 'DPST-13-013', t: 'fb' },
     { o: '+2', n: 'VOLTAGE', full: 'Voltage V',        dpt: 'DPST-14-027', t: 'fb' },
     { o: '+3', n: 'CURRENT', full: 'Current A',        dpt: 'DPST-14-019', t: 'fb' }
   ],
