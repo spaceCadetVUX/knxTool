@@ -66,6 +66,9 @@ function callImportXML(rawStr) {
       state.circuits     = result.circuits;
       state.generatedGAs = [];
       state.manualGAs    = [];
+      if (!state.projectName.trim()) {
+        state.projectName = state.importedFilename || (state.lang === 'vi' ? 'Dự án nhập' : 'Imported Project');
+      }
       closeImportModal();
       saveState();
       const totalCircuits = Object.values(result.circuits).reduce((a, byRoom) =>
@@ -171,6 +174,7 @@ function readXmlFile(f) {
   const reader = new FileReader();
   reader.onload = e => {
     state.importedXml = e.target.result;
+    state.importedFilename = f.name.replace(/\.xml$/i, '');
     const dzt = document.getElementById('drop-zone-text');
     const btn = document.getElementById('btn-confirm-import');
     if (dzt) dzt.textContent = '✓ ' + f.name;
