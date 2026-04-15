@@ -167,6 +167,13 @@ function renderSidebar() {
       onclick="newProject()">
       ${vi ? '🗑 Dự án mới' : '🗑 New project'}
     </button>
+  </div>
+
+  <div class="sb-brand">
+    <a class="sb-brand-logo" href="https://knxstore.vn/" target="_blank" rel="noopener">KNXStore.vn</a>
+    <div class="sb-brand-tagline">${vi
+      ? 'Công cụ miễn phí — dành cho cộng đồng'
+      : 'Free tool — built for the community'}</div>
   </div>`;
 
   document.getElementById('sidebar').innerHTML = html;
@@ -222,9 +229,14 @@ function renderStep1() {
   <div class="start-options">
     <div class="start-card active">
       <div class="start-card-icon">📋</div>
-      <div>
+      <div style="flex:1">
         <div class="start-card-title">${t('start_new')}</div>
         <div class="start-card-desc">${t('start_new_desc')}</div>
+        <input class="input input-sm mt-2" id="proj-name-input"
+          placeholder="${t('project_name_ph')}"
+          value="${escHtml(state.projectName)}"
+          onclick="event.stopPropagation()"
+          oninput="state.projectName=this.value;updateHeaderProject()" />
       </div>
     </div>
     <div class="start-card" onclick="openImportModal()">
@@ -260,13 +272,7 @@ function renderStep1() {
     </div>
   </div>
 
-  <div class="field mt-4" style="max-width:400px">
-    <label class="field-label">${t('project_name')}</label>
-    <input class="input" id="proj-name-input"
-      placeholder="${t('project_name_ph')}"
-      value="${escHtml(state.projectName)}"
-      oninput="state.projectName=this.value;updateHeaderProject()" />
-  </div>`;
+  `;
 }
 
 function selectStructure(s) {
@@ -741,9 +747,8 @@ function renderStep5() {
         <button class="vt-btn ${state.gaTreeGroup === 'room' ? 'active' : ''}" onclick="state.gaTreeGroup='room';renderPanel()">${state.lang === 'vi' ? 'Theo phòng' : 'By Room'}</button>
         <button class="vt-btn ${state.gaTreeGroup === 'main' ? 'active' : ''}" onclick="state.gaTreeGroup='main';renderPanel()">${state.lang === 'vi' ? 'Theo hệ thống' : 'By System'}</button>
       </div>
-      <button class="btn btn-secondary btn-sm" onclick="collapseAll()" title="${state.lang==='vi'?'Thu gọn tất cả':'Collapse all'}">−</button>
-      <button class="btn btn-secondary btn-sm" onclick="expandAll()"   title="${state.lang==='vi'?'Mở rộng tất cả':'Expand all'}">+</button>
-      <button class="btn btn-secondary btn-sm" onclick="openImportModal()">${t('import_xml')}</button>
+      <button class="btn btn-secondary btn-sm" onclick="collapseAll()">${state.lang === 'vi' ? 'Thu gọn' : 'Collapse'}</button>
+      <button class="btn btn-secondary btn-sm" onclick="expandAll()">${state.lang === 'vi' ? 'Mở rộng' : 'Expand'}</button>
       <button class="btn btn-secondary btn-sm" onclick="callGenerate()">${t('regenerate')}</button>
     </div>
   </div>

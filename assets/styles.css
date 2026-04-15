@@ -924,6 +924,31 @@ label.field-label {
   border-color: var(--accent);
 }
 
+/* ── Sidebar brand footer ────────────────────────────────────────────────── */
+.sb-brand {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--gray-100);
+  text-align: center;
+}
+.sb-brand-logo {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #15527f;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+.sb-brand-logo:hover {
+  text-decoration: underline;
+}
+.sb-brand-tagline {
+  font-size: 10px;
+  color: var(--gray-400);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
 /* Step 5 toolbar right-side action group */
 .toolbar-actions { display: flex; gap: 8px; margin-left: auto; align-items: center; flex-wrap: wrap; }
 
