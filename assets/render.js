@@ -715,12 +715,8 @@ function renderStep5() {
     ? gas
     : gas.filter(g => { const si = sysInfo[state.gaFilter]; return si && g.main === si.main; });
 
-  const mainOpts = sysList.map(sk => {
-    const si = sysInfo[sk];
-    return `<option value="${si.main}">${si.main} — ${si['name_' + state.lang] || si.name_en}</option>`;
-  }).join('');
-  const midOpts = state.floors.map(f =>
-    `<option value="${f.mid}">${f.mid} — ${escHtml(f.name)}</option>`).join('');
+  const dptDatalist = dptOptions.map(d =>
+    `<option value="${d.id}">${d.id} — ${d.name}</option>`).join('');
 
   return `
   <div class="section-title">${t('step5_title')}</div>
@@ -767,31 +763,23 @@ function renderStep5() {
     </div>
     <div class="manual-ga-form">
       <div class="field">
-        <label class="field-label">Main</label>
-        <select class="input input-sm input-w-lg" id="add-main">${mainOpts}</select>
-      </div>
-      <div class="field">
-        <label class="field-label">Middle</label>
-        <select class="input input-sm input-w-lg" id="add-mid">${midOpts}</select>
-      </div>
-      <div class="field">
-        <label class="field-label">Sub (0–255)</label>
-        <input class="input input-sm input-w-sm" id="add-sub" type="number" min="0" max="255" placeholder="0" />
+        <label class="field-label">${state.lang === 'vi' ? 'Địa chỉ (x/y/z)' : 'Address (x/y/z)'}</label>
+        <div class="addr-inputs">
+          <input class="input input-sm addr-part" id="add-main" type="number" min="0" max="15"  placeholder="0–15"  />
+          <span class="addr-sep">/</span>
+          <input class="input input-sm addr-part" id="add-mid"  type="number" min="0" max="7"   placeholder="0–7"   />
+          <span class="addr-sep">/</span>
+          <input class="input input-sm addr-part" id="add-sub"  type="number" min="0" max="255" placeholder="0–255" />
+        </div>
       </div>
       <div class="field field-name">
         <label class="field-label">${state.lang === 'vi' ? 'Tên GA' : 'GA name'}</label>
-        <input class="input input-sm" id="add-name" type="text" placeholder="e.g. LT - GF - Custom - SW" />
+        <input class="input input-sm" id="add-name" type="text" placeholder="e.g. LT - GF - Living Room - SW" />
       </div>
       <div class="field">
         <label class="field-label">DPT</label>
-        <select class="input input-sm input-w-md" id="add-dpt">
-          <option value="DPST-1-001">DPST-1-001 (1-bit)</option>
-          <option value="DPST-3-007">DPST-3-007 (4-bit)</option>
-          <option value="DPST-5-001">DPST-5-001 (1-byte)</option>
-          <option value="DPST-9-001">DPST-9-001 (2-byte float)</option>
-          <option value="DPST-18-001">DPST-18-001 (scene)</option>
-          <option value="DPST-232-600">DPST-232-600 (RGB)</option>
-        </select>
+        <input class="input input-sm input-w-dpt" list="dpt-datalist" id="add-dpt" placeholder="Search DPT…" />
+        <datalist id="dpt-datalist">${dptDatalist}</datalist>
       </div>
       <div class="field">
         <label class="field-label">${state.lang === 'vi' ? 'Loại' : 'Type'}</label>
@@ -1036,18 +1024,28 @@ function undoDeleteGA() {
 }
 
 function addManualGA() {
-  const main = parseInt(document.getElementById('add-main').value) || 1;
-  const mid  = parseInt(document.getElementById('add-mid').value)  || 0;
+  const main = parseInt(document.getElementById('add-main').value);
+  const mid  = parseInt(document.getElementById('add-mid').value);
   const sub  = parseInt(document.getElementById('add-sub').value);
   const name = (document.getElementById('add-name').value || '').trim();
-  const dpt  = document.getElementById('add-dpt').value;
+  const dpt  = document.getElementById('add-dpt').value.trim();
   const type = document.getElementById('add-type').value;
+  const vi   = state.lang === 'vi';
 
+  if (isNaN(main) || main < 0 || main > 15) {
+    showToast(vi ? 'Main group phải từ 0–15' : 'Main group must be 0–15', true); return;
+  }
+  if (isNaN(mid) || mid < 0 || mid > 7) {
+    showToast(vi ? 'Middle group phải từ 0–7' : 'Middle group must be 0–7', true); return;
+  }
   if (isNaN(sub) || sub < 0 || sub > 255) {
-    showToast(state.lang === 'vi' ? 'Sub group phải từ 0–255' : 'Sub group must be 0–255', true); return;
+    showToast(vi ? 'Sub group phải từ 0–255' : 'Sub group must be 0–255', true); return;
   }
   if (!name) {
-    showToast(state.lang === 'vi' ? 'Vui lòng nhập tên GA' : 'Please enter a GA name', true); return;
+    showToast(vi ? 'Vui lòng nhập tên GA' : 'Please enter a GA name', true); return;
+  }
+  if (!dpt) {
+    showToast(vi ? 'Vui lòng chọn DPT' : 'Please select a DPT', true); return;
   }
   const addr = `${main}/${mid}/${sub}`;
   if (state.generatedGAs.find(g => g.addr === addr)) {

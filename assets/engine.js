@@ -111,6 +111,63 @@ const gasets = {
   ]
 };
 
+// ─── DPT OPTIONS (curated list for manual GA form) ────────────────────────────
+const dptOptions = [
+  // 1-bit
+  { id: 'DPST-1-001', name: 'DPT_Switch' },
+  { id: 'DPST-1-002', name: 'DPT_Bool' },
+  { id: 'DPST-1-003', name: 'DPT_Enable' },
+  { id: 'DPST-1-005', name: 'DPT_Alarm' },
+  { id: 'DPST-1-007', name: 'DPT_Step' },
+  { id: 'DPST-1-008', name: 'DPT_UpDown' },
+  { id: 'DPST-1-009', name: 'DPT_OpenClose' },
+  { id: 'DPST-1-011', name: 'DPT_State' },
+  { id: 'DPST-1-018', name: 'DPT_Occupancy' },
+  // 4-bit
+  { id: 'DPST-3-007', name: 'DPT_Control_Dimming' },
+  { id: 'DPST-3-008', name: 'DPT_Control_Blinds' },
+  // 1-byte unsigned
+  { id: 'DPST-5-001', name: 'DPT_Scaling (0–100%)' },
+  { id: 'DPST-5-003', name: 'DPT_Angle' },
+  { id: 'DPST-5-004', name: 'DPT_Percent_U8' },
+  { id: 'DPST-5-010', name: 'DPT_Value_1_Ucount' },
+  // 1-byte signed
+  { id: 'DPST-6-001', name: 'DPT_Percent_V8' },
+  { id: 'DPST-6-010', name: 'DPT_Value_1_Count' },
+  // 2-byte unsigned
+  { id: 'DPST-7-001', name: 'DPT_Value_2_Ucount' },
+  { id: 'DPST-7-005', name: 'DPT_TimePeriodSec' },
+  { id: 'DPST-7-006', name: 'DPT_TimePeriodMin' },
+  { id: 'DPST-7-013', name: 'DPT_Brightness (lux)' },
+  // 2-byte float
+  { id: 'DPST-9-001', name: 'DPT_Value_Temp (°C)' },
+  { id: 'DPST-9-002', name: 'DPT_Value_Tempd (K diff)' },
+  { id: 'DPST-9-004', name: 'DPT_Value_Lux' },
+  { id: 'DPST-9-007', name: 'DPT_Value_Humidity (%)' },
+  { id: 'DPST-9-008', name: 'DPT_Value_AirQuality (ppm)' },
+  { id: 'DPST-9-020', name: 'DPT_Value_Volt (V)' },
+  { id: 'DPST-9-021', name: 'DPT_Value_Curr (A)' },
+  { id: 'DPST-9-024', name: 'DPT_Power (W)' },
+  // time / date
+  { id: 'DPST-10-001', name: 'DPT_TimeOfDay' },
+  { id: 'DPST-11-001', name: 'DPT_Date' },
+  { id: 'DPST-19-001', name: 'DPT_DateTime' },
+  // 4-byte signed
+  { id: 'DPST-13-001', name: 'DPT_Value_4_Count' },
+  { id: 'DPST-13-010', name: 'DPT_ActiveEnergy (Wh)' },
+  { id: 'DPST-13-013', name: 'DPT_ActiveEnergy_kWh' },
+  // 4-byte float
+  { id: 'DPST-14-019', name: 'DPT_Electric_Current (A)' },
+  { id: 'DPST-14-027', name: 'DPT_Electric_Potential (V)' },
+  { id: 'DPST-14-056', name: 'DPT_Value_Power (W)' },
+  // scene / HVAC
+  { id: 'DPST-17-001', name: 'DPT_SceneNumber' },
+  { id: 'DPST-18-001', name: 'DPT_SceneControl' },
+  { id: 'DPST-20-102', name: 'DPT_HVACContrMode' },
+  // colour
+  { id: 'DPST-232-600', name: 'DPT_Colour_RGB' },
+];
+
 // ─── CIRCUIT DEFINITIONS ──────────────────────────────────────────────────────
 // circuits[fi][ri][sk][circuitKey] = string[] (user-given names)
 const circuitDefs = {

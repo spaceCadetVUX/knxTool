@@ -1625,10 +1625,16 @@ label.field-label {
 }
 
 /* Input width helpers — used in manual GA form */
-.input-w-lg { width: 140px; }
-.input-w-md { width: 130px; }
-.input-w-sm { width: 80px; }
-.input-w-xs { width: 100px; }
+.input-w-lg  { width: 140px; }
+.input-w-md  { width: 130px; }
+.input-w-sm  { width: 80px; }
+.input-w-xs  { width: 100px; }
+.input-w-dpt { width: 220px; }
+
+/* Address x/y/z inline group */
+.addr-inputs { display: flex; align-items: center; gap: 4px; }
+.addr-inputs .addr-part { width: 80px; text-align: center; }
+.addr-sep { font-size: 14px; font-weight: 600; color: var(--gray-400); line-height: 1; }
 
 /* ── Hamburger button (hidden on desktop) ────────────────────────────────── */
 .btn-hamburger {
