@@ -1448,6 +1448,61 @@ label.field-label {
 }
 #save-indicator.saved { opacity: 1; color: var(--teal-400); }
 
+/* ── Drag handle & drag-to-reorder ──────────────────────────────────────── */
+.drag-handle {
+  cursor: grab;
+  color: var(--gray-300);
+  font-size: 14px;
+  padding: 0 4px;
+  user-select: none;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.drag-handle:hover { color: var(--gray-500); }
+.drag-handle:active { cursor: grabbing; }
+
+.floor-card.drag-over,
+.tree-floor-node.drag-over {
+  box-shadow: 0 0 0 2px var(--teal-400);
+  opacity: 0.75;
+}
+.floor-card.dragging,
+.tree-floor-node.dragging { opacity: 0.4; }
+
+/* ── Preview line numbers ────────────────────────────────────────────────── */
+.xml-preview .ln {
+  display: block;
+  counter-increment: ln;
+}
+.xml-preview .ln::before {
+  content: counter(ln);
+  display: inline-block;
+  width: 3ch;
+  margin-right: 12px;
+  color: #475569;
+  text-align: right;
+  user-select: none;
+  font-size: 10px;
+}
+.xml-preview { counter-reset: ln; }
+.xml-preview .csv-header { color: #86efac; font-weight: 600; }
+
+/* ── Toast undo button ───────────────────────────────────────────────────── */
+.toast-undo {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 8px;
+  vertical-align: middle;
+  transition: background .15s;
+}
+.toast-undo:hover { background: rgba(255,255,255,0.25); }
+
 /* ── GA name editing ─────────────────────────────────────────────────────── */
 .ga-name-text { cursor: text; flex: 1; }
 .ga-name-input { display: none; flex: 1; }

@@ -176,6 +176,20 @@ function renderPanel() {
 function goStep(n) {
   if (n < 1 || n > 6) return;
   const prev = state.step;
+  const vi = state.lang === 'vi';
+
+  // Validate only when going forward
+  if (n > prev) {
+    if (!state.projectName.trim()) {
+      showToast(vi ? 'Vui lòng nhập tên dự án trước' : 'Please enter a project name first', true);
+      return;
+    }
+    if (n >= 4 && !state.floors.some(f => f.rooms.length > 0)) {
+      showToast(vi ? 'Cần ít nhất 1 tầng có phòng' : 'Need at least 1 floor with a room', true);
+      return;
+    }
+  }
+
   state.step = n;
   renderAll();
   if (n === 5 && prev < 5) callGenerate();
@@ -363,8 +377,13 @@ function renderFloorCard(floor, fi) {
     </div>`).join('');
 
   return `
-  <div class="floor-card">
+  <div class="floor-card" draggable="true" id="fcard-${fi}"
+    ondragstart="floorDragStart(event,${fi})"
+    ondragover="floorDragOver(event,${fi})"
+    ondrop="floorDrop(event,${fi})"
+    ondragend="floorDragEnd()">
     <div class="floor-card-header">
+      <span class="drag-handle" title="${vi?'Kéo để sắp xếp':'Drag to reorder'}">⠿</span>
       <span class="mid-badge">M${floor.mid}</span>
       <input class="floor-name-field" value="${escHtml(floor.name)}"
         oninput="state.floors[${fi}].name=this.value;debouncedSave();renderSidebar()"
@@ -390,8 +409,13 @@ function renderFloorTree() {
     const rc = floor.rooms.length;
     const isOpen = floor._open !== false;
     return `
-    <div class="tree-floor-node">
+    <div class="tree-floor-node" draggable="true" id="fcard-${fi}"
+      ondragstart="floorDragStart(event,${fi})"
+      ondragover="floorDragOver(event,${fi})"
+      ondrop="floorDrop(event,${fi})"
+      ondragend="floorDragEnd()">
       <div class="tree-floor-hd ${isOpen?'open':''}" onclick="toggleTreeFloor(${fi})">
+        <span class="drag-handle" onclick="event.stopPropagation()" title="${state.lang==='vi'?'Kéo để sắp xếp':'Drag to reorder'}">⠿</span>
         <span class="tree-caret ${isOpen?'open':''}">▶</span>
         <span class="mid-badge">M${floor.mid}</span>
         <input class="floor-name-field" value="${escHtml(floor.name)}"
@@ -540,6 +564,12 @@ function removeFloor(fi) {
 // ── Step 4 — Assign circuits ──────────────────────────────────────────────────
 let assignFloor = 0;
 let assignRoom  = 0;
+
+// ── Drag-to-reorder state ────────────────────────────────────────────────────
+let _dragFloorIdx = null;
+
+// ── Undo delete state ────────────────────────────────────────────────────────
+let _undoBuffer = null;
 
 function renderStep4() {
   const sysList = Object.keys(state.systems).filter(k => state.systems[k]);
@@ -700,6 +730,8 @@ function renderStep5() {
         <button class="vt-btn ${state.gaTreeGroup === 'mid'  ? 'active' : ''}" onclick="state.gaTreeGroup='mid';renderPanel()">${state.lang === 'vi' ? 'Theo tầng' : 'By Floor'}</button>
         <button class="vt-btn ${state.gaTreeGroup === 'main' ? 'active' : ''}" onclick="state.gaTreeGroup='main';renderPanel()">${state.lang === 'vi' ? 'Theo hệ thống' : 'By System'}</button>
       </div>
+      <button class="btn btn-secondary btn-sm" onclick="collapseAll()" title="${state.lang==='vi'?'Thu gọn tất cả':'Collapse all'}">−</button>
+      <button class="btn btn-secondary btn-sm" onclick="expandAll()"   title="${state.lang==='vi'?'Mở rộng tất cả':'Expand all'}">+</button>
       <button class="btn btn-secondary btn-sm" onclick="openImportModal()">${t('import_xml')}</button>
       <button class="btn btn-secondary btn-sm" onclick="callGenerate()">${t('regenerate')}</button>
     </div>
@@ -929,12 +961,36 @@ function keyGaEdit(e, inp) {
 }
 
 function deleteGA(addr) {
-  if (!confirm((state.lang === 'vi' ? 'Xóa GA ' : 'Delete GA ') + addr + '?')) return;
-  state.generatedGAs = state.generatedGAs.filter(g => g.addr !== addr);
-  state.manualGAs    = state.manualGAs.filter(g => g.addr !== addr);
+  const idx = state.generatedGAs.findIndex(g => g.addr === addr);
+  if (idx === -1) return;
+  const mIdx = state.manualGAs.findIndex(g => g.addr === addr);
+  _undoBuffer = {
+    ga:      { ...state.generatedGAs[idx] },
+    gaIdx:   idx,
+    manual:  mIdx !== -1 ? { ...state.manualGAs[mIdx] } : null,
+    manIdx:  mIdx
+  };
+  state.generatedGAs.splice(idx, 1);
+  if (mIdx !== -1) state.manualGAs.splice(mIdx, 1);
   renderPanel();
   renderSidebar();
   saveState();
+  showUndoToast(
+    (state.lang === 'vi' ? `Đã xóa GA ${addr}` : `Deleted GA ${addr}`),
+    undoDeleteGA
+  );
+}
+
+function undoDeleteGA() {
+  if (!_undoBuffer) return;
+  const { ga, gaIdx, manual, manIdx } = _undoBuffer;
+  _undoBuffer = null;
+  state.generatedGAs.splice(gaIdx, 0, ga);
+  if (manual) state.manualGAs.splice(manIdx, 0, manual);
+  renderPanel();
+  renderSidebar();
+  saveState();
+  showToast(state.lang === 'vi' ? 'Đã hoàn tác' : 'Undone');
 }
 
 function addManualGA() {
@@ -1029,7 +1085,9 @@ function renderStep6() {
 
     <div>
       <div class="preview-toolbar">
-        <span class="preview-title">${t('xml_preview')}</span>
+        <span class="preview-title">${state.exportFormat === 'csv'
+          ? (state.lang === 'vi' ? 'Xem trước CSV' : 'CSV preview')
+          : t('xml_preview')}</span>
         <button class="btn btn-secondary btn-sm" id="btn-copy-preview" onclick="copyPreview()">${t('copy_clipboard')}</button>
       </div>
       <div class="xml-preview" id="xml-preview-pane">
@@ -1051,25 +1109,42 @@ function loadXmlPreview() {
   const pane = document.getElementById('xml-preview-pane');
   if (!pane || !state.generatedGAs.length) return;
   try {
-    const xml = buildXML(state.generatedGAs, {
-      projectName: state.projectName,
-      floors:      state.floors,
-      includeDpt:  state.exportOpts.dpt,
-      includeDesc: state.exportOpts.desc
-    });
-    state._xmlCache = xml;
-    pane.innerHTML = syntaxHighlight(xml);
+    if (state.exportFormat === 'csv') {
+      const csv = buildCSV(state.generatedGAs, { floors: state.floors });
+      state._xmlCache = csv;
+      pane.innerHTML = highlightCsv(csv);
+    } else {
+      const xml = buildXML(state.generatedGAs, {
+        projectName: state.projectName,
+        floors:      state.floors,
+        includeDpt:  state.exportOpts.dpt,
+        includeDesc: state.exportOpts.desc
+      });
+      state._xmlCache = xml;
+      pane.innerHTML = syntaxHighlight(xml);
+    }
   } catch (e) {
     if (pane) pane.innerHTML = `<span style="color:#f87171">${escHtml(e.message)}</span>`;
   }
 }
 
 function syntaxHighlight(xml) {
-  return escHtml(xml)
+  const highlighted = escHtml(xml)
     .replace(/(&lt;\/?[\w:-]+)/g,  '<span class="tag">$1</span>')
     .replace(/([\w-]+=)/g,         '<span class="attr">$1</span>')
     .replace(/="([^"]*)"/g,        '="<span class="val">$1</span>"')
     .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="cmt">$1</span>');
+  return highlighted.split('\n').map(l => `<span class="ln">${l}</span>`).join('\n');
+}
+
+function highlightCsv(csv) {
+  return csv.split('\n').map((line, i) => {
+    const escaped = escHtml(line);
+    const content = i === 0
+      ? `<span class="csv-header">${escaped}</span>`
+      : escaped.replace(/^([^,]+)/,  '<span class="tag">$1</span>');
+    return `<span class="ln">${content}</span>`;
+  }).join('\n');
 }
 
 function copyPreview() {
@@ -1078,5 +1153,59 @@ function copyPreview() {
   navigator.clipboard && navigator.clipboard.writeText(content).then(() => {
     const btn = document.getElementById('btn-copy-preview');
     if (btn) { const orig = btn.textContent; btn.textContent = t('copied'); setTimeout(() => btn.textContent = orig, 1800); }
+  });
+}
+
+// ── Collapse / Expand all (Step 5) ────────────────────────────────────────────
+function collapseAll() {
+  document.querySelectorAll('[id^="gfloor-"],[id^="groom-"],[id^="gmain-"],[id^="gmid-"]').forEach(el => {
+    el.style.display = 'none';
+    const arr = document.getElementById('arr-' + el.id);
+    if (arr) arr.textContent = '▶';
+  });
+}
+
+function expandAll() {
+  document.querySelectorAll('[id^="gfloor-"],[id^="groom-"],[id^="gmain-"],[id^="gmid-"]').forEach(el => {
+    el.style.display = '';
+    const arr = document.getElementById('arr-' + el.id);
+    if (arr) arr.textContent = '▼';
+  });
+}
+
+// ── Drag-to-reorder floors (Step 3) ──────────────────────────────────────────
+function floorDragStart(e, fi) {
+  _dragFloorIdx = fi;
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => {
+    const el = document.getElementById('fcard-' + fi);
+    if (el) el.classList.add('dragging');
+  }, 0);
+}
+
+function floorDragOver(e, fi) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  if (_dragFloorIdx === null || _dragFloorIdx === fi) return;
+  document.querySelectorAll('.floor-card, .tree-floor-node').forEach((el, i) => {
+    el.classList.toggle('drag-over', i === fi);
+  });
+}
+
+function floorDrop(e, fi) {
+  e.preventDefault();
+  if (_dragFloorIdx === null || _dragFloorIdx === fi) { _dragFloorIdx = null; return; }
+  const moved = state.floors.splice(_dragFloorIdx, 1)[0];
+  state.floors.splice(fi, 0, moved);
+  _dragFloorIdx = null;
+  renderPanel();
+  renderSidebar();
+  saveState();
+}
+
+function floorDragEnd() {
+  _dragFloorIdx = null;
+  document.querySelectorAll('.floor-card, .tree-floor-node').forEach(el => {
+    el.classList.remove('drag-over', 'dragging');
   });
 }

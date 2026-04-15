@@ -231,6 +231,16 @@ function showToast(msg, isError) {
   el._t = setTimeout(() => { el.className = ''; }, 3000);
 }
 
+function showUndoToast(msg, undoFn) {
+  const el = document.getElementById('toast');
+  const label = state.lang === 'vi' ? 'Hoàn tác' : 'Undo';
+  el.innerHTML = escHtml(msg) + ` <button class="toast-undo" onclick="(window._toastUndoFn||function(){})()">${label}</button>`;
+  window._toastUndoFn = undoFn;
+  el.className = 'show';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ''; window._toastUndoFn = null; }, 4000);
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadState();
