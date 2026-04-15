@@ -58,6 +58,7 @@
 
   <!-- Header -->
   <header id="header">
+    <button class="btn-hamburger" id="btn-hamburger" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</button>
     <div class="header-brand">
       <img src="./assets/logo.png" alt="KNX GA Planner" class="header-logo" />
     </div>
@@ -80,6 +81,9 @@
 
 
 </div>
+
+<!-- Sidebar backdrop (mobile) -->
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
 
 <!-- Import XML modal -->
 <div class="modal-overlay hidden" id="import-modal">

@@ -1452,3 +1452,126 @@ label.field-label {
 .ga-name-text { cursor: text; flex: 1; }
 .ga-name-input { display: none; flex: 1; }
 .ga-name-input.visible { display: block; }
+
+/* ── Sprint 2 base styles ────────────────────────────────────────────────── */
+.floor-select-mobile { display: none; }
+
+.manual-ga-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+/* Input width helpers — used in manual GA form */
+.input-w-lg { width: 140px; }
+.input-w-md { width: 130px; }
+.input-w-sm { width: 80px; }
+.input-w-xs { width: 100px; }
+
+/* ── Hamburger button (hidden on desktop) ────────────────────────────────── */
+.btn-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--gray-600);
+  color: var(--gray-300);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.btn-hamburger:hover { border-color: var(--teal-400); color: var(--teal-300); }
+
+/* ── Sidebar backdrop (mobile only) ─────────────────────────────────────── */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 199;
+}
+.sidebar-backdrop.open { display: block; }
+
+/* ══ Responsive breakpoints ══════════════════════════════════════════════ */
+
+/* ── Tablet ≤ 768px ──────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  :root { --sidebar-w: 220px; }
+
+  #panel { padding: 16px; gap: 16px; }
+
+  /* Step 2: stacked */
+  .two-col { grid-template-columns: 1fr; }
+  .ga-set-preview { position: static; }
+
+  /* Step 6: stacked */
+  .export-layout { grid-template-columns: 1fr; }
+
+  /* Step 4: show dropdown, hide sidebar floor list */
+  .floor-select-mobile { display: block; margin-bottom: 12px; }
+  .assign-layout { grid-template-columns: 1fr; }
+  .assign-left   { display: none; }
+
+  /* Step 5 toolbar: wrap buttons below filter chips */
+  .ga-toolbar { flex-direction: column; align-items: stretch; }
+  .ga-toolbar .filter-chips { flex-wrap: wrap; }
+  .ga-toolbar > div:last-child { margin-left: 0; flex-wrap: wrap; }
+}
+
+/* ── Mobile ≤ 480px ──────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  :root { --sidebar-w: 280px; }
+
+  /* Show hamburger */
+  .btn-hamburger { display: inline-flex; }
+
+  /* Sidebar: fixed drawer sliding in from left */
+  #sidebar {
+    position: fixed;
+    top: calc(var(--header-h) + var(--step-h));
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-w);
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    z-index: 200;
+    box-shadow: var(--shadow-lg);
+    border-right: 1px solid var(--gray-200);
+  }
+  #sidebar.open { transform: translateX(0); }
+
+  /* Panel takes full width */
+  #panel { padding: 12px; gap: 12px; }
+
+  /* Step bar: hide labels, keep numbers only */
+  .step-label { display: none; }
+  .step-arrow { display: none; }
+  .step-item  { padding: 6px 8px; }
+
+  /* Step 1 */
+  .start-options  { grid-template-columns: 1fr; }
+  .structure-grid { grid-template-columns: 1fr; }
+
+  /* Step 5: smaller stat values */
+  .stat-card .val { font-size: 22px; }
+
+  /* Step 5 GA tree: reduce deep indent, hide secondary columns */
+  .ga-row     { padding-left: 16px; }
+  .ga-mid-row { padding-left: 12px; }
+  .ga-row .dpt  { display: none; }
+  .ga-row .type { display: none; }
+
+  /* Step 5 manual GA form: 2-column grid */
+  .manual-ga-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; align-items: end; }
+  .manual-ga-form .field-name { grid-column: 1 / -1; }
+  .manual-ga-form > .btn      { grid-column: 1 / -1; width: 100%; justify-content: center; }
+  .input-w-lg, .input-w-md, .input-w-sm, .input-w-xs { width: 100%; }
+
+  /* Header: shorten project name */
+  .header-project { max-width: 110px; }
+}

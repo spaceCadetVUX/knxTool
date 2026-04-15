@@ -95,7 +95,7 @@ function renderStepBar() {
     const num = i < state.step ? '✓' : i;
     html += `<button class="step-item ${cls}" onclick="goStep(${i})">
       <div class="step-num">${num}</div>
-      ${Array.isArray(labels) ? labels[i-1] : ''}
+      <span class="step-label">${Array.isArray(labels) ? labels[i-1] : ''}</span>
     </button>`;
     if (i < 6) html += '<div class="step-arrow">›</div>';
   }
@@ -180,6 +180,7 @@ function goStep(n) {
   renderAll();
   if (n === 5 && prev < 5) callGenerate();
   if (n === 6 && state.generatedGAs.length > 0) loadXmlPreview();
+  closeSidebar();
 }
 
 // ── Step 1 — Structure ────────────────────────────────────────────────────────
@@ -611,6 +612,13 @@ function renderStep4() {
   <div class="section-title">${t('step4_title')}</div>
   <div class="section-desc">${t('step4_desc')}</div>
 
+  <div class="floor-select-mobile">
+    <label class="field-label">${vi ? 'Tầng' : 'Floor'}</label>
+    <select class="input" onchange="assignFloor=parseInt(this.value);assignRoom=0;renderPanel()">
+      ${state.floors.map((f, fi) => `<option value="${fi}" ${fi === assignFloor ? 'selected' : ''}>${escHtml(f.name)}</option>`).join('')}
+    </select>
+  </div>
+
   <div class="assign-layout">
     <div class="assign-left">
       <div class="assign-left-header">${vi ? 'Tầng' : 'Floors'}</div>
@@ -706,26 +714,26 @@ function renderStep5() {
     <div class="card-header">
       <div class="card-title">${t('add_ga_manual')}</div>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+    <div class="manual-ga-form">
       <div class="field" style="margin:0">
         <label class="field-label">Main</label>
-        <select class="input input-sm" id="add-main" style="width:140px">${mainOpts}</select>
+        <select class="input input-sm input-w-lg" id="add-main">${mainOpts}</select>
       </div>
       <div class="field" style="margin:0">
         <label class="field-label">Middle</label>
-        <select class="input input-sm" id="add-mid" style="width:140px">${midOpts}</select>
+        <select class="input input-sm input-w-lg" id="add-mid">${midOpts}</select>
       </div>
       <div class="field" style="margin:0">
         <label class="field-label">Sub (0–255)</label>
-        <input class="input input-sm" id="add-sub" type="number" min="0" max="255" placeholder="0" style="width:80px" />
+        <input class="input input-sm input-w-sm" id="add-sub" type="number" min="0" max="255" placeholder="0" />
       </div>
-      <div class="field" style="margin:0;flex:1;min-width:180px">
+      <div class="field field-name" style="margin:0;flex:1;min-width:180px">
         <label class="field-label">${state.lang === 'vi' ? 'Tên GA' : 'GA name'}</label>
         <input class="input input-sm" id="add-name" type="text" placeholder="e.g. LT - GF - Custom - SW" />
       </div>
       <div class="field" style="margin:0">
         <label class="field-label">DPT</label>
-        <select class="input input-sm" id="add-dpt" style="width:130px">
+        <select class="input input-sm input-w-md" id="add-dpt">
           <option value="DPST-1-001">DPST-1-001 (1-bit)</option>
           <option value="DPST-3-007">DPST-3-007 (4-bit)</option>
           <option value="DPST-5-001">DPST-5-001 (1-byte)</option>
@@ -736,7 +744,7 @@ function renderStep5() {
       </div>
       <div class="field" style="margin:0">
         <label class="field-label">${state.lang === 'vi' ? 'Loại' : 'Type'}</label>
-        <select class="input input-sm" id="add-type" style="width:100px">
+        <select class="input input-sm input-w-xs" id="add-type">
           <option value="ctrl">control</option>
           <option value="fb">feedback</option>
         </select>

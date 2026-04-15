@@ -179,6 +179,17 @@ function readXmlFile(f) {
   reader.readAsText(f);
 }
 
+// ── Sidebar (mobile drawer) ───────────────────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-backdrop').classList.toggle('open');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-backdrop').classList.remove('open');
+}
+
 // ── Loading overlay ───────────────────────────────────────────────────────────
 function showLoading(msg) {
   const el = document.getElementById('loading-overlay');
