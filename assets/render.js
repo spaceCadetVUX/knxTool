@@ -744,6 +744,7 @@ function renderStep5() {
     <div class="toolbar-actions">
       <div class="view-toggle">
         <button class="vt-btn ${state.gaTreeGroup === 'mid'  ? 'active' : ''}" onclick="state.gaTreeGroup='mid';renderPanel()">${state.lang === 'vi' ? 'Theo tầng' : 'By Floor'}</button>
+        <button class="vt-btn ${state.gaTreeGroup === 'room' ? 'active' : ''}" onclick="state.gaTreeGroup='room';renderPanel()">${state.lang === 'vi' ? 'Theo phòng' : 'By Room'}</button>
         <button class="vt-btn ${state.gaTreeGroup === 'main' ? 'active' : ''}" onclick="state.gaTreeGroup='main';renderPanel()">${state.lang === 'vi' ? 'Theo hệ thống' : 'By System'}</button>
       </div>
       <button class="btn btn-secondary btn-sm" onclick="collapseAll()" title="${state.lang==='vi'?'Thu gọn tất cả':'Collapse all'}">−</button>
@@ -755,7 +756,9 @@ function renderStep5() {
 
   ${total === 0
     ? `<div class="card empty-state">${t('no_gas')}</div>`
-    : (state.gaTreeGroup === 'main' ? renderGaTreeByMain(filtered) : renderGaTree(filtered))
+    : (state.gaTreeGroup === 'main' ? renderGaTreeByMain(filtered)
+      : state.gaTreeGroup === 'room' ? renderGaTreeByRoom(filtered)
+      : renderGaTree(filtered))
   }
 
   <div class="card mt-4">
@@ -805,45 +808,68 @@ function renderStep5() {
 function renderGaTree(filtered) {
   const floorGroups = {};
   filtered.forEach(g => {
-    if (!floorGroups[g.mid]) floorGroups[g.mid] = {};
-    const roomKey = g.room || '—';
-    if (!floorGroups[g.mid][roomKey]) floorGroups[g.mid][roomKey] = [];
-    floorGroups[g.mid][roomKey].push(g);
+    // gatype systems (LT, SHT, HVAC...): g.mid encodes GA type, not floor.
+    // Find the real floor by looking up which floor contains g.room.
+    // Fall back to mid-based lookup for floor-based systems (SEC, SCN).
+    const floor = (g.room && state.floors.find(f => f.rooms.includes(g.room)))
+               || state.floors.find(f => f.mid === g.mid);
+    const floorMid  = floor ? floor.mid  : g.mid;
+    const floorName = floor ? floor.name : `Floor ${g.mid}`;
+    if (!floorGroups[floorMid]) floorGroups[floorMid] = { name: floorName, gas: [] };
+    floorGroups[floorMid].gas.push(g);
   });
 
   if (!Object.keys(floorGroups).length) return `<div class="card empty-state">${t('no_gas')}</div>`;
 
   return Object.entries(floorGroups)
     .sort((a, b) => Number(a[0]) - Number(b[0]))
-    .map(([mid, rooms]) => {
-      const floor = state.floors.find(f => f.mid === Number(mid));
-      const floorName = floor ? floor.name : `Middle ${mid}`;
-      const total = Object.values(rooms).reduce((a, gs) => a + gs.length, 0);
-      const fid   = `gfloor-${mid}`;
-
+    .map(([mid, fg]) => {
+      const fid = `gfloor-${mid}`;
       return `
       <div class="mb-2">
         <div class="ga-main-row" onclick="toggleBlock('${fid}')">
           <span class="mid-badge">M${mid}</span>
-          <span class="ga-main-name">${escHtml(floorName)}</span>
-          <span class="badge badge-teal ml-auto">${total} GAs</span>
+          <span class="ga-main-name">${escHtml(fg.name)}</span>
+          <span class="badge badge-teal ml-auto">${fg.gas.length} GAs</span>
           <span class="tree-arrow" id="arr-${fid}">▼</span>
         </div>
         <div id="${fid}">
-          ${Object.entries(rooms).map(([roomName, roomGas], ri) => {
-            const rid = `groom-${mid}-${ri}`;
-            return `
-            <div class="mb-1">
-              <div class="ga-mid-row" onclick="toggleBlock('${rid}')">
-                <span class="ga-mid-name">${escHtml(roomName)}</span>
-                <span class="badge badge-gray ml-auto">${roomGas.length}</span>
-                <span class="tree-arrow" id="arr-${rid}">▼</span>
-              </div>
-              <div id="${rid}">
-                ${roomGas.map(g => gaRow(g)).join('')}
-              </div>
-            </div>`;
-          }).join('')}
+          ${fg.gas.map(g => gaRow(g)).join('')}
+        </div>
+      </div>`;
+    }).join('');
+}
+
+function renderGaTreeByRoom(filtered) {
+  // Group by room; track which floor each room belongs to for display
+  const roomGroups = {};
+  filtered.forEach(g => {
+    const key = g.room || '—';
+    if (!roomGroups[key]) {
+      const floor = g.room && state.floors.find(f => f.rooms.includes(g.room));
+      roomGroups[key] = { floorName: floor ? floor.name : '', gas: [] };
+    }
+    roomGroups[key].gas.push(g);
+  });
+
+  if (!Object.keys(roomGroups).length) return `<div class="card empty-state">${t('no_gas')}</div>`;
+
+  return Object.entries(roomGroups)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([roomName, rg]) => {
+      const rid = `groom-${roomName.replace(/[^a-zA-Z0-9]/g, '-')}`;
+      const floorBadge = rg.floorName
+        ? `<span class="badge badge-gray">${escHtml(rg.floorName)}</span>` : '';
+      return `
+      <div class="mb-2">
+        <div class="ga-main-row" onclick="toggleBlock('${rid}')">
+          <span class="ga-main-name">${escHtml(roomName)}</span>
+          ${floorBadge}
+          <span class="badge badge-teal ml-auto">${rg.gas.length} GAs</span>
+          <span class="tree-arrow" id="arr-${rid}">▼</span>
+        </div>
+        <div id="${rid}">
+          ${rg.gas.map(g => gaRow(g)).join('')}
         </div>
       </div>`;
     }).join('');
