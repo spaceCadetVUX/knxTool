@@ -406,7 +406,6 @@ function renderFloorCard(floor, fi) {
     ondragend="floorDragEnd()">
     <div class="floor-card-header">
       <span class="drag-handle" title="${vi?'Kéo để sắp xếp':'Drag to reorder'}">⠿</span>
-      <span class="mid-badge">M${floor.mid}</span>
       <input class="floor-name-field" value="${escHtml(floor.name)}"
         oninput="state.floors[${fi}].name=this.value;debouncedSave();renderSidebar()"
         title="${vi?'Click để đổi tên':'Click to rename'}" />
@@ -439,7 +438,6 @@ function renderFloorTree() {
       <div class="tree-floor-hd ${isOpen?'open':''}" onclick="toggleTreeFloor(${fi})">
         <span class="drag-handle" onclick="event.stopPropagation()" title="${state.lang==='vi'?'Kéo để sắp xếp':'Drag to reorder'}">⠿</span>
         <span class="tree-caret ${isOpen?'open':''}">▶</span>
-        <span class="mid-badge">M${floor.mid}</span>
         <input class="floor-name-field" value="${escHtml(floor.name)}"
           oninput="state.floors[${fi}].name=this.value;debouncedSave();renderSidebar()"
           onclick="event.stopPropagation()" />
@@ -678,7 +676,6 @@ function renderStep4() {
         const ft = floorTotal(fi);
         return `<button class="assign-floor-btn ${fi === assignFloor ? 'active' : ''}"
           onclick="assignFloor=${fi};assignRoom=0;renderPanel()">
-          <span class="mid-badge">M${f.mid}</span>
           <span class="truncate-flex">${escHtml(f.name)}</span>
           ${ft > 0 ? `<span class="assign-floor-count">${ft}</span>` : ''}
         </button>`;
