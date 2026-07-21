@@ -245,6 +245,80 @@ Input Device + Channel CRUD — mảnh còn thiếu cuối cùng để build đ�
 
 **QA (headless Chrome + CDP, `2026-07-21`):** đo `bodyScrollWidth` so với `innerWidth` ở 6 mức (1200/900/768/600/480/375px) — **khớp chính xác ở mọi mức, không còn overflow ngang**. Trước fix: 516px content trong viewport 480px (lệch 36px) và 516px trong 375px (lệch 141px). Ảnh chụp xác nhận nút "VI" hiện đầy đủ, không bị cắt; graph workspace xếp dọc gọn gàng ở màn hẹp. Không console error.
 
+---
+
+## UX pass 2 (sau Sprint 4) — Click vùng trống để bỏ chọn node
+
+**Yêu cầu user:** click vào chỗ trống trên graph phải bỏ chọn (deactive) widget/node đang chọn.
+
+**Fix v1 (`graph.js`):** `.graph-canvas` nhận `onclick="handleGraphCanvasClick(event)"` — kiểm tra `event.target.closest('.node-graph')`, nếu click không rơi vào bất kỳ node nào thì gọi `deselectGraphNode()` (bỏ class `selected`/`dim` khỏi mọi node, `hi`/`dim` khỏi mọi edge, reset inspector về empty-state).
+
+**Vấn đề còn sót (user báo tiếp):** fix v1 chỉ bắt click trong `.graph-canvas` — click vùng trống ở legend, subnav, hay bên trong panel inspector (ngoài canvas) không trigger deselect vì handler chưa bao phủ tới đó.
+
+**Fix v2:** bọc toàn bộ nội dung Graph view (subnav + legend + demo-banner + workspace) trong 1 `<div class="graph-view-root" onclick="handleGraphCanvasClick(event)">` duy nhất thay vì chỉ gắn trên `.graph-canvas` — giờ bất kỳ click nào trong toàn bộ vùng Graph mà không rơi vào `.node-graph` đều bỏ chọn, kể cả legend/inspector/khoảng trống dưới cột ngắn.
+
+**QA (headless Chrome + CDP, `2026-07-21`):** chọn node → click vùng trống ở legend, ở panel inspector, và ở khoảng trống dưới cột "Thiết bị nhấn" (cột ngắn hơn cột khác) — cả 3 đều bỏ chọn đúng (`selectedCount: 0`). Kiểm tra không regression: tab lọc hệ thống và nút "+ Cảnh mới" vẫn hoạt động bình thường sau khi bọc thêm div. Không console error.
+
+**Vấn đề còn sót (user báo tiếp):** deselect chỉ chắc chắn work khi click trong panel inspector, chỗ khác thì không đều.
+
+**Nguyên nhân (đo bằng `elementFromPoint` ở nhiều toạ độ cụ thể):** `.graph-view-root` là div block thường, chỉ cao đúng bằng nội dung bên trong nó (~789px), trong khi `#panel` (flex column) cao hơn (~940px) — khoảng chênh lệch ở dưới cùng thuộc về `#panel`/`<main>` chứ không phải `.graph-view-root`, nên click vào đó không trúng handler nào. Click vào gap giữa 2 cột hay bên trong inspector thì work vì 2 chỗ đó nằm trong `.graph-view-root`.
+
+**Fix (`styles.css`):** `.graph-view-root{flex:1;min-height:0}` + `.graph-workspace{flex:1;min-height:0}` — root giờ giãn lấp đầy đúng content-box của `#panel`, không còn khoảng hở.
+
+**QA (headless Chrome + CDP, `2026-07-21`):** đo lại đúng toạ độ trước đó từng fail — giờ trúng đúng `.graph-workspace`/`.graph-columns` (nằm trong root) thay vì `<main>`, deselect đúng ở mọi điểm test. Phần chênh lệch còn lại (24px) khớp chính xác với `padding:24px` mặc định của `#panel` — vùng đệm bình thường, không phải bug (giống mọi nơi khác trong app). Không console error.
+
+---
+
+## UX pass 3 (sau Sprint 4) — Highlight nối liên tiếp cả chuỗi, không chỉ node kề
+
+**Yêu cầu user:** click 1 node chỉ sáng đúng node kề gần nhất (1 bước), muốn sáng liên tiếp hết cả chuỗi.
+
+**Fix (`graph.js`):** `graphNeighbors(id)` đổi từ duyệt 1 bước (chỉ edge trực tiếp chạm node) sang **BFS 2 chiều** theo toàn bộ `_graphEdges` — mở rộng tập node liên tục tới khi không còn node mới, tức lấy nguyên cả connected component chứa node đó. Edge-highlight (`selectGraphNode`) cũng đổi theo: 1 edge được `.hi` khi **cả 2 đầu** đều nằm trong tập đã duyệt (thay vì chỉ cần 1 đầu trùng node đang chọn).
+
+**Hệ quả cần biết:** click vào 1 channel của thiết bị A sẽ sáng **luôn cả 2 channel khác của cùng thiết bị A** (vì cùng chung node Device là điểm nối) — đây là hành vi đúng theo yêu cầu "nối liên tiếp cả chuỗi", không phải chỉ soi đúng 1 nhánh vừa click.
+
+**QA (headless Chrome + CDP, `2026-07-21`):** click channel giữa chuỗi (double-press) → sáng đúng 9 node (device + cả 3 channel của nó + scene + 2 GA effect... tính cả nhánh short/long riêng của device đó), 8 node còn lại (thiết bị khác + chuỗi của nó) dim đúng. Click ngược từ 1 GA ở cuối chuỗi → light lại đúng y hệt tập node đó (đối xứng 2 chiều). Không console error.
+
+---
+
+## UX pass 4 (sau Sprint 4) — Đường active rõ hơn, đường chưa active mỏng lại
+
+**Yêu cầu user:** đường highlight (`.hi`) đang mờ, cần rõ hơn; đường chưa active cần mỏng lại.
+
+**Fix (`styles.css`):**
+- Stroke mặc định (chưa chọn gì): `2px → 1.25px` (structural/effect dashed: `1.5px/1px → 1px`) — nền đỡ rối hơn khi chưa click gì.
+- `.hi` (đang active): `3px → 4px` cho edge màu (short/long/double), thêm `filter: drop-shadow(...)` tạo độ nổi; structural/effect khi `.hi` tăng lên `2.25px` (trước đó chung rule với default nên gần như không đổi khi active).
+- `.dim`: `opacity .12 → .1` (mờ hơn 1 chút, tăng tương phản với `.hi`).
+
+**QA (headless Chrome + CDP, `2026-07-21`):** đo `getComputedStyle` xác nhận: idle state stroke-width đúng 1px; sau khi click, edge active có width 4px (màu) / 2.25px (structural/effect) + có filter drop-shadow; dim opacity đúng 0.1. Ảnh chụp xác nhận tương phản active/inactive rõ rệt hơn hẳn. Không console error.
+
+---
+
+## Fix (sau UX pass 3) — Active sai node không liên quan
+
+**Triệu chứng user báo:** highlight bị "active sai" — sáng cả những node không thật sự liên quan tới node vừa click.
+
+**Nguyên nhân:** BFS ở "UX pass 3" duyệt 2 chiều **vô hướng** trên toàn bộ edge — click 1 channel sẽ đi ngược lên Device rồi từ Device lại **tạt ngang** sang các channel KHÁC của cùng thiết bị (dù các channel đó không nằm trên đường đi thật của channel vừa click, chỉ tình cờ chung node cha).
+
+**Fix (`graph.js`):** `graphNeighbors(id)` đổi từ BFS vô hướng sang **2 lượt duyệt có hướng riêng biệt**: 1 lượt đi ngược (chỉ theo `edge.to === node hiện tại`, tìm `edge.from`) để lấy đúng chuỗi nguồn, 1 lượt đi xuôi (chỉ theo `edge.from === node hiện tại`, tìm `edge.to`) để lấy đúng chuỗi đích — không bao giờ tạt ngang qua nhánh anh em không liên quan.
+
+**QA (headless Chrome + CDP, `2026-07-21`):**
+- Click channel "double" → sáng đúng 5 node (device, chính nó, scene, 2 GA effect) — **không còn** kéo theo channel short/long.
+- Click channel "short" (action GA trực tiếp) → sáng đúng 3 node (device, chính nó, 1 GA đích) — gọn đúng như kỳ vọng.
+- Click ngược từ 1 GA cuối chuỗi → về đúng channel đã kích hoạt nó + device, không lẫn channel khác.
+- Click vào **Device** (không phải channel) → vẫn sáng đủ cả 3 channel + toàn bộ downstream của chúng — đúng vì Device thật sự là điểm toả ra nhiều nhánh, khác với việc click 1 channel cụ thể.
+Không console error.
+
+---
+
+## UX pass 5 (sau Sprint 4) — Line inactive đồng bộ đứt nét, active chuyển nét liền
+
+**Yêu cầu user:** đồng bộ toàn bộ line chưa active thành đứt nét hết; line active thì nét liền + đậm/nổi bật hơn.
+
+**Fix (`styles.css`):** trước đây chỉ `structural`/`effect` có `stroke-dasharray` (2 kiểu pitch khác nhau: `3 3` và `4 4`), còn `short`/`long`/`double` luôn nét liền bất kể active hay không. Giờ chuyển `stroke-dasharray: 4 3` lên rule gốc `.edges-layer path` — **mọi loại edge đều đứt nét đồng nhất 1 kiểu khi chưa active**. `.hi` override `stroke-dasharray: none` (chuyển hẳn nét liền) + tăng `stroke-width` (4px→4.5px màu, 2.25px→2.5px structural/effect).
+
+**QA (headless Chrome + CDP, `2026-07-21`):** đo `strokeDasharray` thực tế — idle: toàn bộ 15 edge (mọi loại: structural/short/long/double/effect) đều `"4px, 3px"` giống nhau. Sau khi chọn: edge `.hi` chuyển đúng `"none"` (nét liền) + width tăng đúng; edge `.dim` (không liên quan) vẫn giữ đứt nét. Ảnh chụp xác nhận tương phản liền/đứt rất rõ. Không console error.
+
 ### Quyết định kiến trúc cho Sprint 4
 
 - **Không thêm modal thứ 3 cho action-per-channel** — thay vào đó, sửa action ngay trong `.graph-inspector` (đổi sang chế độ edit khi bấm "Sửa hành động", Lưu/Huỷ để quay lại view thường). Lý do: channel đã có sẵn slot hiển thị chi tiết trong inspector từ Sprint 2, mở thêm modal riêng cho 1 channel là dư thừa — tái dùng đúng vị trí đã có.

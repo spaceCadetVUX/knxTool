@@ -1838,12 +1838,19 @@ label.field-label {
     height: 100%;
     pointer-events: none;
 }
-.edges-layer path { fill: none; stroke-width: 2; }
-.edges-layer path.structural { stroke: var(--gray-300); stroke-width: 1.5; stroke-dasharray: 3 3; }
+/* Mặc định (chưa active): TẤT CẢ line đều đứt nét, đồng bộ 1 kiểu gạch nối.
+   Khi .hi (đang active): chuyển hẳn sang nét liền + dày hơn + nổi bật hơn — xem dưới. */
+.edges-layer path {
+    fill: none;
+    stroke-width: 1.25;
+    stroke-dasharray: 4 3;
+    transition: stroke-width .12s, opacity .12s, stroke .12s, stroke-dasharray .12s;
+}
+.edges-layer path.structural { stroke: var(--gray-300); stroke-width: 1; }
 .edges-layer path.short  { stroke: var(--teal-600); }
 .edges-layer path.long   { stroke: var(--amber-500); }
 .edges-layer path.double { stroke: #7c3aed; }
-.edges-layer path.effect { stroke: var(--gray-400); stroke-dasharray: 4 4; }
+.edges-layer path.effect { stroke: var(--gray-400); stroke-width: 1; }
 
 .graph-columns { position: relative; display: flex; gap: 32px; z-index: 1; }
 .graph-col { flex: 1; min-width: 240px; display: flex; flex-direction: column; }
@@ -1870,8 +1877,14 @@ label.field-label {
 .node-graph .n-title { font-size: 12.5px; font-weight: 700; color: var(--gray-800); }
 .node-graph .n-sub   { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
 .node-graph.n-ga .n-title { font-family: var(--font-mono); color: var(--teal-700); }
-.edges-layer path.dim { opacity: .12; }
-.edges-layer path.hi  { stroke-width: 3; }
+.edges-layer path.dim { opacity: .1; }
+.edges-layer path.hi  {
+    stroke-width: 4.5;
+    stroke-dasharray: none; /* active = nét liền, khác hẳn nét đứt lúc chưa active */
+    filter: drop-shadow(0 0 3px rgba(0,0,0,.3));
+}
+.edges-layer path.structural.hi,
+.edges-layer path.effect.hi { stroke: var(--gray-600); stroke-width: 2.5; }
 
 /* ── Graph sub-nav (system tabs) ──────────────────────────────────────────── */
 .graph-subnav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -1884,7 +1897,11 @@ label.field-label {
 .graph-tab:not(.active):hover { border-color: var(--gray-300); color: var(--gray-800); }
 
 /* ── Graph workspace (canvas + inspector) ─────────────────────────────────── */
-.graph-workspace { display: flex; gap: 16px; align-items: flex-start; }
+.graph-view-root {
+    display: flex; flex-direction: column;
+    flex: 1; min-height: 0; /* lấp đầy #panel — tránh khoảng trống dưới cùng không bắt được click bỏ chọn */
+}
+.graph-workspace { display: flex; gap: 16px; align-items: flex-start; flex: 1; min-height: 0; }
 .graph-workspace .graph-canvas { flex: 1; min-width: 0; height: auto; }
 
 .graph-inspector {

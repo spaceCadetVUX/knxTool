@@ -79,17 +79,19 @@ function renderGraphView() {
     : '';
 
   panel.innerHTML = `
-    ${renderGraphSubnav()}
-    ${renderGraphLegend()}
-    ${demoBannerHtml}
-    <div class="graph-workspace">
-      <div class="graph-canvas">
-        <div class="graph-inner" id="graphInner">
-          <svg class="edges-layer" id="edgesLayer"></svg>
-          <div class="graph-columns">${columnsHtml}</div>
+    <div class="graph-view-root" onclick="handleGraphCanvasClick(event)">
+      ${renderGraphSubnav()}
+      ${renderGraphLegend()}
+      ${demoBannerHtml}
+      <div class="graph-workspace">
+        <div class="graph-canvas">
+          <div class="graph-inner" id="graphInner">
+            <svg class="edges-layer" id="edgesLayer"></svg>
+            <div class="graph-columns">${columnsHtml}</div>
+          </div>
         </div>
+        <aside class="graph-inspector" id="graphInspector">${renderInspectorEmpty()}</aside>
       </div>
-      <aside class="graph-inspector" id="graphInspector">${renderInspectorEmpty()}</aside>
     </div>`;
 
   const inner = document.getElementById('graphInner');
@@ -249,30 +251,62 @@ function renderGaNode(node) {
 }
 
 // ── Selection + inspector ────────────────────────────────────────────────────────
+// Duyệt CÓ HƯỚNG, không phải BFS 2 chiều vô hướng: đi ngược lên đúng nguồn (ai trỏ
+// tới node này) và đi xuôi xuống đúng đích (node này trỏ tới ai), lặp lại theo từng
+// hướng riêng. Nhờ vậy click 1 channel không kéo theo các channel KHÁC cùng thiết bị
+// (chúng chỉ chung node cha Device, không nằm trên đường đi xuôi/ngược của channel
+// đang click) — trước đây BFS vô hướng đi ngược lên Device rồi tạt ngang sang node
+// khác, gây sáng nhầm những node không thật sự liên quan tới lựa chọn.
 function graphNeighbors(id) {
   const set = new Set([id]);
-  _graphEdges.forEach(e => {
-    if (e.from === id) set.add(e.to);
-    if (e.to === id) set.add(e.from);
-  });
+
+  let queue = [id];
+  while (queue.length) {
+    const cur = queue.shift();
+    _graphEdges.forEach(e => {
+      if (e.to === cur && !set.has(e.from)) { set.add(e.from); queue.push(e.from); }
+    });
+  }
+
+  queue = [id];
+  while (queue.length) {
+    const cur = queue.shift();
+    _graphEdges.forEach(e => {
+      if (e.from === cur && !set.has(e.to)) { set.add(e.to); queue.push(e.to); }
+    });
+  }
+
   return set;
 }
 
 function selectGraphNode(id) {
   _selectedNodeId = id;
-  const neighbors = graphNeighbors(id);
+  const chain = graphNeighbors(id);
 
   document.querySelectorAll('.node-graph').forEach(el => {
     el.classList.toggle('selected', el.id === id);
-    el.classList.toggle('dim', !neighbors.has(el.id));
+    el.classList.toggle('dim', !chain.has(el.id));
   });
   document.querySelectorAll('.edges-layer path').forEach(p => {
-    const touches = p.getAttribute('data-from') === id || p.getAttribute('data-to') === id;
+    const touches = chain.has(p.getAttribute('data-from')) && chain.has(p.getAttribute('data-to'));
     p.classList.toggle('hi', touches);
     p.classList.toggle('dim', !touches);
   });
 
   renderInspectorContent(_graphNodeById[id]);
+}
+
+// Click vào vùng trống của canvas (không phải node) → bỏ chọn, về trạng thái mặc định.
+function handleGraphCanvasClick(e) {
+  if (e.target.closest('.node-graph')) return;
+  deselectGraphNode();
+}
+
+function deselectGraphNode() {
+  _selectedNodeId = null;
+  document.querySelectorAll('.node-graph').forEach(el => el.classList.remove('selected', 'dim'));
+  document.querySelectorAll('.edges-layer path').forEach(p => p.classList.remove('hi', 'dim'));
+  renderInspectorContent(null);
 }
 
 function renderInspectorEmpty() {
