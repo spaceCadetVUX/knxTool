@@ -73,9 +73,18 @@ function setCircuitName(fi, ri, sk, ck, idx, val) {
 
 // ── Core render ───────────────────────────────────────────────────────────────
 function renderAll() {
-  renderStepBar();
-  renderSidebar();
-  renderPanel();
+  const stepbar = document.getElementById('stepbar');
+
+  if (state.view === 'graph') {
+    if (stepbar) stepbar.style.display = 'none';
+    renderSidebar();
+    renderGraphView();
+  } else {
+    if (stepbar) stepbar.style.display = '';
+    renderStepBar();
+    renderSidebar();
+    renderPanel();
+  }
 
   const hp = document.getElementById('header-project');
   const hn = document.getElementById('header-project-name');
@@ -85,6 +94,16 @@ function renderAll() {
   } else {
     hp.style.display = 'none';
   }
+}
+
+// ── View switch (Wizard ↔ Graph) — see controlGraphSpec.md ─────────────────────
+function setAppView(view) {
+  state.view = view;
+  const wb = document.getElementById('btn-mode-wizard');
+  const gb = document.getElementById('btn-mode-graph');
+  if (wb) wb.classList.toggle('active', view === 'wizard');
+  if (gb) gb.classList.toggle('active', view === 'graph');
+  renderAll();
 }
 
 function renderStepBar() {

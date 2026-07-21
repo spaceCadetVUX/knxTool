@@ -4,6 +4,7 @@
 const state = {
   lang: 'en',
   step: 1,
+  view: 'wizard',
   projectName: '',
   structure: 'function',
   systems: { lt:true, pres:true, sht:true, hvac:true, sec:true, scn:true, av:false, nrg:false, sys:false },
@@ -19,13 +20,19 @@ const state = {
   exportFormat:  'xml',
   exportOpts:    { dpt:true, desc:false, unused:false, floorFirst:false },
   importedXml:   null,
-  _xmlCache:     null
+  _xmlCache:     null,
+
+  // Control graph — see controlGraphSpec.md
+  inputDevices:  [],
+  scenes:        [],
+  graphView:     'all'
 };
 
 // ── localStorage persistence ───────────────────────────────────────────────────
 const STORAGE_KEY = 'knx_ga_planner_v2';
 const PERSIST_FIELDS = ['projectName','structure','systems','ltSubs',
-  'floors','circuits','generatedGAs','manualGAs','exportFormat','exportOpts','lang'];
+  'floors','circuits','generatedGAs','manualGAs','exportFormat','exportOpts','lang',
+  'inputDevices','scenes','graphView'];
 
 function saveState() {
   try {
@@ -71,7 +78,8 @@ function newProject() {
     circuits: {}, generatedGAs: [], manualGAs: [],
     floorView: 'chip', gaView: 'tree', gaTreeGroup: 'mid', gaFilter: 'all',
     exportFormat: 'xml', exportOpts: { dpt:true, desc:false, unused:false, floorFirst:false },
-    importedXml: null, _xmlCache: null
+    importedXml: null, _xmlCache: null,
+    inputDevices: [], scenes: [], graphView: 'all'
   });
   renderAll();
 }

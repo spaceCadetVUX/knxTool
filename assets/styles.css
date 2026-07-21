@@ -12,6 +12,10 @@
     --teal-800: #115e59;
     --teal-900: #134e4a;
 
+    --amber-50:  #fffbeb;
+    --amber-500: #f59e0b;
+    --amber-700: #92400e;
+
     --gray-50:  #f9fafb;
     --gray-100: #f3f4f6;
     --gray-200: #e5e7eb;
@@ -88,6 +92,7 @@ a { color: inherit; text-decoration: none; }
     display: block;
 }
 .header-sep { flex: 1; }
+.header-brand, .view-toggle, .btn-lang, #save-indicator { flex-shrink: 0; }
 .header-project {
     font-size: 13px;
     color: var(--gray-300);
@@ -1747,6 +1752,11 @@ label.field-label {
   .ga-toolbar { flex-direction: column; align-items: stretch; }
   .ga-toolbar .filter-chips { flex-wrap: wrap; }
   .ga-toolbar > div:last-child { margin-left: 0; flex-wrap: wrap; }
+
+  /* Graph view: inspector xuống dưới thay vì bóp canvas còn vài chục px */
+  .graph-workspace { flex-direction: column; }
+  .graph-inspector { width: 100%; position: static; }
+  .graph-subnav .btn-sm { margin-left: 0 !important; }
 }
 
 /* ── Mobile ≤ 480px ──────────────────────────────────────────────────────── */
@@ -1800,4 +1810,168 @@ label.field-label {
 
   /* Header: shorten project name */
   .header-project { max-width: 110px; }
+
+  /* Header: giải phóng chỗ cho view-toggle (Wizard/Graph) — ẩn save-indicator
+     (chỉ là feedback thoáng qua, không thiết yếu), thu nhỏ nút toggle/logo/gap. */
+  #header { padding: 0 12px; gap: 8px; }
+  #save-indicator { display: none; }
+  .header-logo { height: 22px; }
+  .view-toggle .vt-btn { padding: 2px 7px; font-size: 10.5px; }
 }
+
+/* ── Control graph (Graph view) — see controlGraphSpec.md ────────────────── */
+.graph-canvas {
+    overflow: auto;
+    background: var(--gray-50);
+    position: relative;
+    height: 100%;
+}
+.graph-inner {
+    position: relative;
+    min-width: 1080px;
+    padding: 20px 24px 40px;
+}
+.edges-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+.edges-layer path { fill: none; stroke-width: 2; }
+.edges-layer path.structural { stroke: var(--gray-300); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.edges-layer path.short  { stroke: var(--teal-600); }
+.edges-layer path.long   { stroke: var(--amber-500); }
+.edges-layer path.double { stroke: #7c3aed; }
+.edges-layer path.effect { stroke: var(--gray-400); stroke-dasharray: 4 4; }
+
+.graph-columns { position: relative; display: flex; gap: 32px; z-index: 1; }
+.graph-col { flex: 1; min-width: 240px; display: flex; flex-direction: column; }
+.graph-col-head {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--gray-400); margin-bottom: 12px; padding-left: 2px;
+}
+.graph-col-body { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+
+.node-graph {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 10px 12px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: box-shadow .15s, border-color .15s, opacity .15s;
+}
+.node-graph:hover { border-color: var(--gray-300); box-shadow: var(--shadow); }
+.node-graph:focus-visible { outline: 2px solid var(--teal-600); outline-offset: 2px; }
+.node-graph.selected { border-color: var(--teal-500); box-shadow: 0 0 0 3px var(--teal-100); }
+.node-graph.dim { opacity: .35; }
+.node-graph .n-title { font-size: 12.5px; font-weight: 700; color: var(--gray-800); }
+.node-graph .n-sub   { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+.node-graph.n-ga .n-title { font-family: var(--font-mono); color: var(--teal-700); }
+.edges-layer path.dim { opacity: .12; }
+.edges-layer path.hi  { stroke-width: 3; }
+
+/* ── Graph sub-nav (system tabs) ──────────────────────────────────────────── */
+.graph-subnav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.graph-tab {
+    border: 1px solid var(--gray-200); background: #fff; color: var(--gray-600);
+    font-size: 12.5px; font-weight: 600; padding: 6px 12px; border-radius: 20px;
+    transition: background .12s, border-color .12s, color .12s;
+}
+.graph-tab.active { background: var(--teal-50); border-color: var(--teal-500); color: var(--teal-700); }
+.graph-tab:not(.active):hover { border-color: var(--gray-300); color: var(--gray-800); }
+
+/* ── Graph workspace (canvas + inspector) ─────────────────────────────────── */
+.graph-workspace { display: flex; gap: 16px; align-items: flex-start; }
+.graph-workspace .graph-canvas { flex: 1; min-width: 0; height: auto; }
+
+.graph-inspector {
+    width: 300px; flex-shrink: 0; background: #fff; border: 1px solid var(--gray-200);
+    border-radius: var(--radius); padding: 16px; position: sticky; top: 0;
+}
+.graph-inspector-empty { text-align: center; color: var(--gray-400); padding: 40px 8px; font-size: 12.5px; line-height: 1.6; }
+.graph-inspector-empty .gi-empty-title { font-weight: 700; color: var(--gray-600); margin-bottom: 6px; }
+
+.gi-kicker  { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--gray-400); }
+.gi-title   { font-size: 15px; font-weight: 700; margin-top: 3px; color: var(--gray-800); }
+.gi-field   { margin-top: 14px; }
+.gi-label   { font-size: 10.5px; color: var(--gray-400); text-transform: uppercase; letter-spacing: .05em; font-weight: 700; margin-bottom: 4px; }
+.gi-value   { font-size: 13px; color: var(--gray-800); }
+.gi-ok      { font-size: 11px; color: var(--teal-700); margin-top: 10px; }
+.gi-effects { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.gi-effect  { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; background: var(--gray-50); border-radius: 8px; }
+.gi-effect-addr { font-family: var(--font-mono); font-size: 11.5px; color: var(--teal-700); font-weight: 600; }
+.gi-effect-name { font-size: 10.5px; color: var(--gray-500); }
+.gi-effect-val  { font-family: var(--font-mono); font-size: 11px; background: #fff; border: 1px solid var(--gray-200); padding: 2px 7px; border-radius: 5px; flex-shrink: 0; }
+.gi-scene-actions { display: flex; gap: 8px; margin-top: 16px; }
+.gi-scene-actions .btn { flex: 1; justify-content: center; }
+
+/* ── Scene composer modal — see controlGraphSpec.md / sprintPlan.md Sprint 3 ── */
+.modal.modal-lg { width: 560px; }
+.composer-effects { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.composer-effect-row { display: flex; align-items: center; gap: 6px; }
+.composer-effect-row select.input { flex: 1; min-width: 0; }
+.composer-effect-row input.input { width: 80px; flex-shrink: 0; }
+
+/* ── Device composer + channel action editor — sprintPlan.md Sprint 4 ──────── */
+.channel-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.channel-row input.input { flex: 1; }
+
+.action-mode-row { border: 1px solid var(--gray-200); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+.action-mode-row .amr-head { margin-bottom: 8px; }
+.action-mode-row .amr-body { display: flex; gap: 6px; flex-wrap: wrap; }
+.action-mode-row .amr-body select.input,
+.action-mode-row .amr-body input.input { width: auto; flex: 1; min-width: 90px; }
+
+.graph-empty-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 4px; }
+
+/* ── Node edit affordance (hover-reveal pencil) — UX pass sau Sprint 4 ──────── */
+.node-edit-btn {
+    position: absolute; top: 6px; right: 6px;
+    width: 20px; height: 20px; border-radius: 5px; border: none;
+    background: var(--gray-100); color: var(--gray-500); font-size: 11px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity .12s, background .12s, color .12s;
+}
+.node-graph:hover .node-edit-btn,
+.node-graph:focus-within .node-edit-btn { opacity: 1; }
+.node-edit-btn:hover { background: var(--teal-100); color: var(--teal-700); }
+
+/* ── Channel chưa cấu hình — mời bấm thay vì chỉ ghi chú tĩnh ──────────────── */
+.node-channel-empty {
+    border-style: dashed; border-color: var(--gray-300);
+    display: flex; align-items: center; gap: 8px; color: var(--gray-400);
+    transition: border-color .12s, color .12s, background .12s;
+}
+.node-channel-empty:hover { border-color: var(--teal-400); color: var(--teal-600); background: var(--teal-50); }
+.node-channel-empty .nce-plus { font-size: 17px; font-weight: 700; line-height: 1; flex-shrink: 0; }
+.node-channel-empty .n-title { color: inherit; }
+
+/* ── Graph legend (màu press-mode + kiểu đường nối) ────────────────────────── */
+.graph-legend { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; font-size: 11.5px; color: var(--gray-500); margin-bottom: 14px; }
+.graph-legend-item { display: flex; align-items: center; gap: 6px; }
+.graph-legend-swatch { width: 14px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+.graph-demo-banner {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--amber-50); border: 1px solid var(--amber-500); color: var(--amber-700);
+    border-radius: var(--radius-sm); padding: 8px 14px; font-size: 12.5px; margin-bottom: 14px;
+}
+.graph-demo-banner button { border: none; background: transparent; color: var(--amber-700); font-weight: 700; text-decoration: underline; }
+
+.badge-warn {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; color: var(--amber-700);
+    background: var(--amber-50); border: 1px solid var(--amber-500);
+    border-radius: 6px; padding: 3px 7px; margin-top: 6px;
+}
+
+.mode-pill {
+    display: inline-flex; align-items: center; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .02em; padding: 1px 7px; border-radius: 20px;
+}
+.mode-pill.short  { background: var(--teal-100); color: var(--teal-700); }
+.mode-pill.long   { background: var(--amber-50); color: var(--amber-700); }
+.mode-pill.double { background: #f5f3ff; color: #6d28d9; }
+.node-graph.n-scene .n-title { color: #6d28d9; }

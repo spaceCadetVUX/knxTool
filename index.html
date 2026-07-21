@@ -65,6 +65,10 @@
       </a>
     </div>
     <div class="header-sep"></div>
+    <div class="view-toggle" id="view-toggle-mode">
+      <button class="vt-btn active" id="btn-mode-wizard" onclick="setAppView('wizard')">Wizard</button>
+      <button class="vt-btn" id="btn-mode-graph" onclick="setAppView('graph')">Graph</button>
+    </div>
     <div class="header-project" id="header-project" style="display:none">
       Project: <span id="header-project-name"></span>
     </div>
@@ -124,6 +128,8 @@
 <script src="assets/i18n.js"></script>
 <script src="assets/render.js"></script>
 <script src="assets/app.js"></script>
+<script src="assets/graph-data.js"></script>
+<script src="assets/graph.js"></script>
 
 </body>
 </html>
